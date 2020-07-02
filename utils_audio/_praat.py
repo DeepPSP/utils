@@ -23,6 +23,16 @@ class PMSound(pm.Sound):
     """
     def __init__(self, values:Optional[np.ndarray]=None, sampling_frequency:Optional[Real]=None, start_time:Optional[Real]=None, file_path:Optional[str]=None):
         """
+        Parameters:
+        -----------
+        values: ndarray, optional,
+            values of the audio recording
+        sampling_frequency: real number, optional,
+            sampling frequency of the audio recording
+        start_time: real number, optional,
+            start time of the audio recording, units in seconds
+        file_path: str, optional,
+            paths of the audio file
         """
         self.pm_true_false = {True: 'yes', False: 'no'}
         assert values is not None or file_path is not None

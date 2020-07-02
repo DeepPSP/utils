@@ -250,6 +250,8 @@ def detect_peaks(x:ArrayLike,
 def _plot(x, mph, mpd, threshold, edge, valley, ax, ind):
     """
     Plot results of the detect_peaks function, see its help.
+
+    Parameters: ref. the function `detect_peaks`
     """
     try:
         import matplotlib.pyplot as plt
@@ -297,10 +299,15 @@ def compute_snr(original:ArrayLike, noised:ArrayLike) -> float:
 
     Parameters:
     -----------
+    original: array_like,
+        the original signal
+    noised: array_like,
+        the noise component of the original signal
 
     Returns:
     --------
-
+    snr, float,
+        the signal-to-noise ration of the signal `original`
     """
     snr = 10*np.log10(np.sum(np.power(np.array(original),2))/np.sum(np.power(np.array(original)-np.array(noised),2)))
     return snr
@@ -313,11 +320,17 @@ def compute_snr_improvement(original:ArrayLike, noised:ArrayLike, denoised:Array
 
     Parameters:
     -----------
-    to write
+    original: array_like,
+        the original signal
+    noised: array_like,
+        the noise component of the original signal
+    denoised: array_like,
+        denoised signal of `original`
 
     Returns:
     --------
-    to write
+    snr, float,
+        the signal-to-noise ration of the signal `original`
     """
     return 10*np.log10(np.sum(np.power(np.array(original)-np.array(noised),2))/np.sum(np.power(np.array(original)-np.array(denoised),2)))
 
@@ -366,14 +379,20 @@ def uni_polyn_der(coeff:ArrayLike, order:int=1, coeff_asc:bool=True) -> np.ndarr
     return der
 
 
-def eval_uni_polyn(x:Union[int,float,list,tuple,np.ndarray], coeff:ArrayLike, coeff_asc:bool=True) -> Union[int,float,np.ndarray]:
+def eval_uni_polyn(x:Union[Real,list,tuple,np.ndarray], coeff:ArrayLike, coeff_asc:bool=True) -> Union[int,float,np.ndarray]:
     """ finished, checked,
 
     evaluate x at the univariate polynomial defined by coeff
 
     Parameters:
     -----------
-    to write
+    x: real number or array_like,
+        the value(s) for the the univariate polynomial to evaluate at
+    coeff: array_like,
+        the coefficents which defines the univariate polynomial
+    coeff_asc: bool, default True,
+        if True, the degrees of the monomials corr. to the coefficients is in ascending order,
+        otherwise, in descending order
 
     Returns:
     --------
@@ -399,17 +418,20 @@ def noise_std_estimator(data:ArrayLike) -> float:
 
     Parameters:
     -----------
-    to write
+    data: array_like,
+        the input signal
 
     Returns:
     --------
-    to write
+    estimation: float,
+        the estimated standard deviation of the noised data
 
     Reference:
     ----------
     [1] Katkovnik V, Stankovic L. Instantaneous frequency estimation using the Wigner distribution with varying and data-driven window length[J]. IEEE Transactions on signal processing, 1998, 46(9): 2315-2325.
     """
-    return np.median(np.abs(np.diff(data))) / 0.6745
+    estimation = np.median(np.abs(np.diff(data))) / 0.6745
+    return estimation
 
 
 def der_operator(responce_len:int, input_len:int, order:int) -> np.ndarray:
