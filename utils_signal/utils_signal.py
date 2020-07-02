@@ -441,7 +441,9 @@ def der_operator(responce_len:int, input_len:int, order:int) -> np.ndarray:
 
     Parameters:
     -----------
-    to write
+    responce_len: int
+    input_len: int
+    order:int
 
     Returns:
     --------
@@ -458,7 +460,8 @@ def lstsq_with_smoothness_prior(data:ArrayLike) -> np.ndarray:
 
     Parameters:
     -----------
-    to write
+    data: array_like
+        the signal to smooth
 
     Returns:
     --------
@@ -476,7 +479,15 @@ def generate_rr_interval(nb_beats:int, bpm_mean:Real, bpm_std:Real, lf_hf:float,
 
     Parameters:
     -----------
-    to write
+    nb_beats: int,
+    bpm_mean: real number,
+    bpm_std: real number,
+    lf_hf: float,
+    lf_freq: float, default 0.1,
+    hf_freq: float, default 0.25,
+    hf_freq: float, default 0.25,
+    lf_std: float, default 0.01,
+    ff_std: float, default 0.01,
 
     Returns:
     --------
@@ -728,6 +739,7 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
     WaveletDenoiseResult, with field_names: 'is_ecg', 'amplified_ratio', 'amplified_signal', 'raw_r_peaks'
     
     TODO:
+    -----
 
     """
     if amplify_mode not in ['ecg', 'qrs', 'all', 'none']:
@@ -1325,9 +1337,13 @@ def hampel(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_outli
     [3] Hampel, F. R. (1974). The influence curve and its role in robust estimation. Journal of the american statistical association, 69(346), 383-393.
     """
     if use_jit:
-        return _hampel_jit(input_series, window_size, n_sigmas, return_outlier)
+        _h = _hampel_jit(input_series, window_size, n_sigmas, return_outlier)
     else:
-        return _hampel(input_series, window_size, n_sigmas, return_outlier)
+        -h = _hampel(input_series, window_size, n_sigmas, return_outlier)
+    if len(_h) > 0:
+        new_series, outlier_indices = _h
+    else:
+        new_series, outlier_indices = _h, []
 
 @jit(nopython=True)
 def _hampel_jit(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_outlier:bool=True) -> Union[np.ndarray, Tuple[np.ndarray, List[int]]]:
