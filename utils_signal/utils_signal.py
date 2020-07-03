@@ -1327,8 +1327,9 @@ def hampel(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_outli
     --------
     new_series: ndarray,
         the filtered signal
-    outlier_indices: list of int, if `return_outlier` is True,
-        indices of the outliers
+    outlier_indices: list of int,
+        indices of the outliers, if `return_outlier` is True,
+        otherwise empty list
 
     References:
     -----------
@@ -1339,11 +1340,12 @@ def hampel(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_outli
     if use_jit:
         _h = _hampel_jit(input_series, window_size, n_sigmas, return_outlier)
     else:
-        -h = _hampel(input_series, window_size, n_sigmas, return_outlier)
+        _h = _hampel(input_series, window_size, n_sigmas, return_outlier)
     if len(_h) > 0:
         new_series, outlier_indices = _h
     else:
         new_series, outlier_indices = _h, []
+    return new_series, outlier_indices
 
 @jit(nopython=True)
 def _hampel_jit(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_outlier:bool=True) -> Union[np.ndarray, Tuple[np.ndarray, List[int]]]:
@@ -1444,12 +1446,24 @@ class MovingAverage(object):
     """
     def __init__(self, data:ArrayLike, **kwargs):
         """
+        Parameters:
+        -----------
+        data: array_like,
+            the series data to compute its moving average
         """
         self.data = np.array(data)
         self.verbose = kwargs.get("verbose", 0)
 
     def cal(self, method:str, **kwargs) -> np.ndarray:
         """
+        Parameters:
+        -----------
+        method: str,
+            method for computing moving average, can be one of
+            - 'sma', 'simple', 'simple moving average'
+            - 'ema', 'ewma', 'exponential', 'exponential weighted', 'exponential moving average', 'exponential weighted moving average'
+            - 'cma', 'cumulative', 'cumulative moving average'
+            - 'wma', 'weighted', 'weighted moving average'
         """
         m = method.lower().replace('_', ' ')
         if m in ['sma', 'simple', 'simple moving average']:
@@ -1467,6 +1481,14 @@ class MovingAverage(object):
     def _sma(self, window:int=5, center:bool=False, **kwargs) -> np.ndarray:
         """
         simple moving average
+
+        Parameters:
+        -----------
+        window: int, default 5,
+            window length of the moving average
+        center: bool, default False,
+            if True, when computing the output value at each point, the window will be centered at that point;
+            otherwise the previous `window` points of the current point will be used
         """
         smoothed = []
         if center:
@@ -1492,6 +1514,11 @@ class MovingAverage(object):
         exponential moving average,
         which is also the function used in Tensorboard Scalar panel,
         whose parameter `smoothing` is the `weight` here
+
+        Parameters:
+        -----------
+        weight: float, default 0.6,
+            weight of the previous data point
         """
         smoothed = []
         prev = self.data[0]
@@ -1518,6 +1545,11 @@ class MovingAverage(object):
     def _wma(self, window:int=5, **kwargs) -> np.ndarray:
         """
         weighted moving average
+
+        Parameters:
+        -----------
+        window: int, default 5,
+            window length of the moving average
         """
         # smoothed = []
         # total = []

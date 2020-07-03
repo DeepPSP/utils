@@ -24,8 +24,8 @@ from numbers import Real
 from typing import Union, Optional, List, NoReturn
 import warnings
 
-from ..common import ArrayLike, modulo
-from ..utils_universal import intervals_intersection
+from utils.common import ArrayLike, modulo
+from utils.utils_universal import intervals_intersection
 
 
 __all__ = [
