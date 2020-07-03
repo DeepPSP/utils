@@ -6,8 +6,10 @@ docstring, to write
 import os, sys
 
 _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-if _BASE_DIR not in sys.path:
-    sys.path.append(_BASE_DIR)
+_PARENT_DIR = os.path.dirname(_BASE_DIR)
+_IN_SYS_PATH = [p for p in [_BASE_DIR, _PARENT_DIR] if p in sys.path]
+if len(_IN_SYS_PATH) == 0:
+    sys.path.append(_PARENT_DIR)
 
 from .common import *
 # from .utils_universal import *
