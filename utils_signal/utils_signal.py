@@ -15,9 +15,9 @@ from typing import Union, List, NamedTuple, Optional, Tuple
 try:
     from numba import jit
 except:
-    from ..utils_misc import trivial_jit as jit
+    from utils.utils_misc import trivial_jit as jit
 
-from ..common import ArrayLike, ArrayLike_Int
+from utils.common import ArrayLike, ArrayLike_Int
 
 
 np.set_printoptions(precision=5,suppress=True)
@@ -549,7 +549,7 @@ def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) 
     
     if verbose >= 2:
         import matplotlib.pyplot as plt
-        from ..common import DEFAULT_FIG_SIZE_PER_SEC
+        from utils.common import DEFAULT_FIG_SIZE_PER_SEC
         # figsize=(int(DEFAULT_FIG_SIZE_PER_SEC*len(s)/freq), 6)
 
         print('(level 3 of) the wavelet in use looks like:')
@@ -775,7 +775,7 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
     
     if verbose >= 2:
         import matplotlib.pyplot as plt
-        from ..common import DEFAULT_FIG_SIZE_PER_SEC
+        from utils.common import DEFAULT_FIG_SIZE_PER_SEC
         # figsize=(int(DEFAULT_FIG_SIZE_PER_SEC*len(s)/freq), 6)
 
         print('(level 3 of) the wavelet used looks like:')

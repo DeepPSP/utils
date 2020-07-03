@@ -8,7 +8,7 @@ from typing import Union, Optional, List, Tuple, NoReturn
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-from ..common import ArrayLike
+from utils.common import ArrayLike
 
 
 __all__ = [

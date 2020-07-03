@@ -22,9 +22,9 @@ from copy import deepcopy
 from numbers import Real
 from typing import Union, Optional, NoReturn
 
-from ...utils import common
-from ..common import ArrayLike, ArrayLike_Int
-from ..utils_universal import ConvexCone2D, filter_by_percentile
+from utils import common
+from utils.common import ArrayLike, ArrayLike_Int
+from utils.utils_universal import ConvexCone2D, filter_by_percentile
 
 __all__ = [
     "generate_pure_color_image",
