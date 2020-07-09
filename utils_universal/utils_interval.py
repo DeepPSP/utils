@@ -18,7 +18,7 @@ import time
 from numbers import Real
 from typing import Union, Optional, Any, List, Tuple
 
-from ..common import ArrayLike
+from utils.common import ArrayLike
 
 
 __all__ = [

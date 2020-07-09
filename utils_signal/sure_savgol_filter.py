@@ -9,7 +9,7 @@ import numpy as np
 from numbers import Number
 from typing import Union, Optional, Any, Dict, List, Tuple
 
-from ..common import ArrayLike
+from utils.common import ArrayLike
 from .utils_signal import noise_std_estimator, uni_polyn_der, eval_uni_polyn
 
 

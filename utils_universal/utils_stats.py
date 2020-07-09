@@ -16,7 +16,7 @@ import warnings
 from numbers import Real
 from typing import Union, Optional, List, Tuple
 
-from ..common import ArrayLike
+from utils.common import ArrayLike
 
 
 __all__ = [

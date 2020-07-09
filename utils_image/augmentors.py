@@ -286,6 +286,15 @@ def _generate_coordinates(x_low:int, x_high:int, y_low:int, y_high:int):
 
 def add_border(img:np.ndarray, color:ArrayLike=[0,0,0], add_size:Union[int,ArrayLike_Int]=100) -> np.ndarray:
     """
+
+    Parameters:
+    -----------
+    img: ndarray,
+        the image
+    color: array_like,
+        the color of the border to be added, in RGB
+    add_size: int, or sequence of int,
+        size of the added border
     """
     if isinstance(add_size, int):
         add_x_l = add_x_r = add_y_u = add_y_d = add_size
@@ -313,11 +322,32 @@ def add_background(raw_img:np.ndarray, bkgd_img:np.ndarray, mask_func:callable, 
     """
 
     raw_img, bkgd_img in BGR format
+
+    Parameters:
+    -----------
+    raw_img: ndarray,
+        the image to add background
+    bkgd_img: ndarray,
+        the background image
+    mask_func: callable,
+        function for computing the foreground mask of `raw_img`
+    kw_mask_func: dict, optional,
+        key word arguments for `mask_func`
+    save_dst: str, optional,
+        path of save the processed image
+    verbose: int, or str, default 0,
+        verbosity
+    kwargs: dict,
+
+    Returns:
+    --------
+    sys_img: ndarray, or no return,
     """
     crop_ratio = kwargs.get("crop_ratio", 0.2)
 
     if verbose >= 2:
-        import matplotlib.pyplot as plt
+        if 'plt' not in dir():
+            import matplotlib.pyplot as plt
         plt.figure()
         plt.imshow(raw_img[...,::-1])
         plt.show()
@@ -325,10 +355,7 @@ def add_background(raw_img:np.ndarray, bkgd_img:np.ndarray, mask_func:callable, 
         plt.imshow(bkgd_img[...,::-1])
         plt.show()
     
-    if kw_mask_func is None:
-        refined_mask = mask_func(raw_img)
-    else:
-        refined_mask = mask_func(raw_img, **kw_mask_func)
+    refined_mask = mask_func(raw_img, **(kw_mask_func or {}))
     
     if verbose >= 2:
         plt.figure()
@@ -351,8 +378,8 @@ def add_background(raw_img:np.ndarray, bkgd_img:np.ndarray, mask_func:callable, 
         plt.figure()
         plt.imshow(cropped_mask, cmap='gray')
         plt.show()
-        print("cropped_mask.shape =", cropped_mask.shape)
-        print("np.unique(cropped_mask) =", np.unique(cropped_mask))
+        print(f"cropped_mask.shape = {cropped_mask.shape}")
+        print(f"np.unique(cropped_mask) = {np.unique(cropped_mask)}")
 
     bkgd_ratio = max(1, cropped_img.shape[0]/bkgd_img.shape[0], cropped_img.shape[1]/bkgd_img.shape[1])
     cropped_bkgd = cv2.resize(bkgd_img, (int(bkgd_ratio*cropped_img.shape[1]), int(bkgd_ratio*cropped_img.shape[0])))
@@ -365,7 +392,7 @@ def add_background(raw_img:np.ndarray, bkgd_img:np.ndarray, mask_func:callable, 
         plt.figure()
         plt.imshow(cropped_bkgd[...,::-1])
         plt.show()
-        print("cropped_mask_3d.shape =", cropped_mask_3d.shape)
+        print(f"cropped_mask_3d.shape = {cropped_mask_3d.shape}")
     
     sys_img = np.where(cropped_mask_3d==1, cropped_img, cropped_bkgd)
     

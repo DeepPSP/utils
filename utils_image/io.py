@@ -11,7 +11,7 @@ from typing import Tuple, Union, Optional, Tuple, NoReturn
 from random import shuffle
 import cv2
 
-from ..common import ArrayLike
+from utils.common import ArrayLike
 
 
 __all__ = [

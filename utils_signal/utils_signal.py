@@ -15,9 +15,9 @@ from typing import Union, List, NamedTuple, Optional, Tuple
 try:
     from numba import jit
 except:
-    from ..utils_misc import trivial_jit as jit
+    from utils.utils_misc import trivial_jit as jit
 
-from ..common import ArrayLike, ArrayLike_Int
+from utils.common import ArrayLike, ArrayLike_Int
 
 
 np.set_printoptions(precision=5,suppress=True)
@@ -250,6 +250,8 @@ def detect_peaks(x:ArrayLike,
 def _plot(x, mph, mpd, threshold, edge, valley, ax, ind):
     """
     Plot results of the detect_peaks function, see its help.
+
+    Parameters: ref. the function `detect_peaks`
     """
     try:
         import matplotlib.pyplot as plt
@@ -297,10 +299,15 @@ def compute_snr(original:ArrayLike, noised:ArrayLike) -> float:
 
     Parameters:
     -----------
+    original: array_like,
+        the original signal
+    noised: array_like,
+        the noise component of the original signal
 
     Returns:
     --------
-
+    snr, float,
+        the signal-to-noise ration of the signal `original`
     """
     snr = 10*np.log10(np.sum(np.power(np.array(original),2))/np.sum(np.power(np.array(original)-np.array(noised),2)))
     return snr
@@ -313,11 +320,17 @@ def compute_snr_improvement(original:ArrayLike, noised:ArrayLike, denoised:Array
 
     Parameters:
     -----------
-    to write
+    original: array_like,
+        the original signal
+    noised: array_like,
+        the noise component of the original signal
+    denoised: array_like,
+        denoised signal of `original`
 
     Returns:
     --------
-    to write
+    snr, float,
+        the signal-to-noise ration of the signal `original`
     """
     return 10*np.log10(np.sum(np.power(np.array(original)-np.array(noised),2))/np.sum(np.power(np.array(original)-np.array(denoised),2)))
 
@@ -366,14 +379,20 @@ def uni_polyn_der(coeff:ArrayLike, order:int=1, coeff_asc:bool=True) -> np.ndarr
     return der
 
 
-def eval_uni_polyn(x:Union[int,float,list,tuple,np.ndarray], coeff:ArrayLike, coeff_asc:bool=True) -> Union[int,float,np.ndarray]:
+def eval_uni_polyn(x:Union[Real,list,tuple,np.ndarray], coeff:ArrayLike, coeff_asc:bool=True) -> Union[int,float,np.ndarray]:
     """ finished, checked,
 
     evaluate x at the univariate polynomial defined by coeff
 
     Parameters:
     -----------
-    to write
+    x: real number or array_like,
+        the value(s) for the the univariate polynomial to evaluate at
+    coeff: array_like,
+        the coefficents which defines the univariate polynomial
+    coeff_asc: bool, default True,
+        if True, the degrees of the monomials corr. to the coefficients is in ascending order,
+        otherwise, in descending order
 
     Returns:
     --------
@@ -399,17 +418,20 @@ def noise_std_estimator(data:ArrayLike) -> float:
 
     Parameters:
     -----------
-    to write
+    data: array_like,
+        the input signal
 
     Returns:
     --------
-    to write
+    estimation: float,
+        the estimated standard deviation of the noised data
 
     Reference:
     ----------
     [1] Katkovnik V, Stankovic L. Instantaneous frequency estimation using the Wigner distribution with varying and data-driven window length[J]. IEEE Transactions on signal processing, 1998, 46(9): 2315-2325.
     """
-    return np.median(np.abs(np.diff(data))) / 0.6745
+    estimation = np.median(np.abs(np.diff(data))) / 0.6745
+    return estimation
 
 
 def der_operator(responce_len:int, input_len:int, order:int) -> np.ndarray:
@@ -419,7 +441,9 @@ def der_operator(responce_len:int, input_len:int, order:int) -> np.ndarray:
 
     Parameters:
     -----------
-    to write
+    responce_len: int
+    input_len: int
+    order:int
 
     Returns:
     --------
@@ -436,7 +460,8 @@ def lstsq_with_smoothness_prior(data:ArrayLike) -> np.ndarray:
 
     Parameters:
     -----------
-    to write
+    data: array_like
+        the signal to smooth
 
     Returns:
     --------
@@ -454,7 +479,15 @@ def generate_rr_interval(nb_beats:int, bpm_mean:Real, bpm_std:Real, lf_hf:float,
 
     Parameters:
     -----------
-    to write
+    nb_beats: int,
+    bpm_mean: real number,
+    bpm_std: real number,
+    lf_hf: float,
+    lf_freq: float, default 0.1,
+    hf_freq: float, default 0.25,
+    hf_freq: float, default 0.25,
+    lf_std: float, default 0.01,
+    ff_std: float, default 0.01,
 
     Returns:
     --------
@@ -516,7 +549,7 @@ def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) 
     
     if verbose >= 2:
         import matplotlib.pyplot as plt
-        from ..common import DEFAULT_FIG_SIZE_PER_SEC
+        from utils.common import DEFAULT_FIG_SIZE_PER_SEC
         # figsize=(int(DEFAULT_FIG_SIZE_PER_SEC*len(s)/freq), 6)
 
         print('(level 3 of) the wavelet in use looks like:')
@@ -706,6 +739,7 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
     WaveletDenoiseResult, with field_names: 'is_ecg', 'amplified_ratio', 'amplified_signal', 'raw_r_peaks'
     
     TODO:
+    -----
 
     """
     if amplify_mode not in ['ecg', 'qrs', 'all', 'none']:
@@ -741,7 +775,7 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
     
     if verbose >= 2:
         import matplotlib.pyplot as plt
-        from ..common import DEFAULT_FIG_SIZE_PER_SEC
+        from utils.common import DEFAULT_FIG_SIZE_PER_SEC
         # figsize=(int(DEFAULT_FIG_SIZE_PER_SEC*len(s)/freq), 6)
 
         print('(level 3 of) the wavelet used looks like:')
@@ -1293,8 +1327,9 @@ def hampel(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_outli
     --------
     new_series: ndarray,
         the filtered signal
-    outlier_indices: list of int, if `return_outlier` is True,
-        indices of the outliers
+    outlier_indices: list of int,
+        indices of the outliers, if `return_outlier` is True,
+        otherwise empty list
 
     References:
     -----------
@@ -1303,9 +1338,14 @@ def hampel(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_outli
     [3] Hampel, F. R. (1974). The influence curve and its role in robust estimation. Journal of the american statistical association, 69(346), 383-393.
     """
     if use_jit:
-        return _hampel_jit(input_series, window_size, n_sigmas, return_outlier)
+        _h = _hampel_jit(input_series, window_size, n_sigmas, return_outlier)
     else:
-        return _hampel(input_series, window_size, n_sigmas, return_outlier)
+        _h = _hampel(input_series, window_size, n_sigmas, return_outlier)
+    if len(_h) > 0:
+        new_series, outlier_indices = _h
+    else:
+        new_series, outlier_indices = _h, []
+    return new_series, outlier_indices
 
 @jit(nopython=True)
 def _hampel_jit(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_outlier:bool=True) -> Union[np.ndarray, Tuple[np.ndarray, List[int]]]:
@@ -1406,12 +1446,24 @@ class MovingAverage(object):
     """
     def __init__(self, data:ArrayLike, **kwargs):
         """
+        Parameters:
+        -----------
+        data: array_like,
+            the series data to compute its moving average
         """
         self.data = np.array(data)
         self.verbose = kwargs.get("verbose", 0)
 
     def cal(self, method:str, **kwargs) -> np.ndarray:
         """
+        Parameters:
+        -----------
+        method: str,
+            method for computing moving average, can be one of
+            - 'sma', 'simple', 'simple moving average'
+            - 'ema', 'ewma', 'exponential', 'exponential weighted', 'exponential moving average', 'exponential weighted moving average'
+            - 'cma', 'cumulative', 'cumulative moving average'
+            - 'wma', 'weighted', 'weighted moving average'
         """
         m = method.lower().replace('_', ' ')
         if m in ['sma', 'simple', 'simple moving average']:
@@ -1429,6 +1481,14 @@ class MovingAverage(object):
     def _sma(self, window:int=5, center:bool=False, **kwargs) -> np.ndarray:
         """
         simple moving average
+
+        Parameters:
+        -----------
+        window: int, default 5,
+            window length of the moving average
+        center: bool, default False,
+            if True, when computing the output value at each point, the window will be centered at that point;
+            otherwise the previous `window` points of the current point will be used
         """
         smoothed = []
         if center:
@@ -1454,6 +1514,11 @@ class MovingAverage(object):
         exponential moving average,
         which is also the function used in Tensorboard Scalar panel,
         whose parameter `smoothing` is the `weight` here
+
+        Parameters:
+        -----------
+        weight: float, default 0.6,
+            weight of the previous data point
         """
         smoothed = []
         prev = self.data[0]
@@ -1480,6 +1545,11 @@ class MovingAverage(object):
     def _wma(self, window:int=5, **kwargs) -> np.ndarray:
         """
         weighted moving average
+
+        Parameters:
+        -----------
+        window: int, default 5,
+            window length of the moving average
         """
         # smoothed = []
         # total = []

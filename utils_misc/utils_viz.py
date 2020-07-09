@@ -7,8 +7,9 @@ from numbers import Real
 from typing import Union, Optional, List, Tuple, NoReturn
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from easydict import EasyDict as ED
 
-from ..common import ArrayLike
+from utils.common import ArrayLike
 
 
 __all__ = [
@@ -30,12 +31,18 @@ def plot_single_lead_ecg(s:ArrayLike, freq:Real, use_idx:bool=False, **kwargs) -
         sampling frequency of `s`
     use_idx: bool, default False,
         use idx instead of time for the x-axis
+    kwargs: dict,
+        keyword arguments, including
+        - "waves": Dict[str, np.ndarray], consisting of
+            "ppeaks", "qpeaks", "rpeaks", "speaks", "tpeaks",
+            "ponsets", "poffsets", "qonsets", "soffsets", "tonsets", "toffsets"
 
     contributors: Jeethan, WEN Hao
     """
     default_fig_sz = 120
     line_len = freq * 25  # 25 seconds
     nb_lines, residue = divmod(len(s), line_len)
+    waves = ED(kwargs.get("waves", ED()))
     if residue > 0:
         nb_lines += 1
     for idx in range(nb_lines):
@@ -59,6 +66,11 @@ def plot_single_lead_ecg(s:ArrayLike, freq:Real, use_idx:bool=False, **kwargs) -
         ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
         ax.set_xlim(secs[0], secs[-1])
         ax.set_ylim(-1.5, 1.5)
+        if waves:
+            for w, w_indices in waves.items():
+                epoch_w = [wi-idx_start for wi in w_indices if idx_start <= wi < idx_end]
+                for wi in epoch_w:
+                    ax.axvline(wi, linestyle='dashed', linewidth=0.7, color='magenta')
         if use_idx:
             plt.xlabel('Samples')
         else:
