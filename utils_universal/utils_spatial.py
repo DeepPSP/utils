@@ -269,7 +269,7 @@ class ConvexCone2D(GeometricObject):
         """ finished, checked,
 
         Parameters:
-        ----------
+        -----------
         apex: array_like,
             point in 2d Cartesian space, apex of the 2D convex cone
         axis_vec: array_like, optional,
@@ -283,9 +283,11 @@ class ConvexCone2D(GeometricObject):
             vector of the right (compared to the axis vector) border line
 
         NOTE:
+        -----
         `axis_vec` and `angle`, or `left_vec` and `right_vec` should be specified at the same time
 
         TODO:
+        -----
         1. add more functions
         2. when degenerates to a ray, should raise error or just warning?
         """
@@ -495,7 +497,14 @@ class Fan2D(ConvexCone2D):
 
         Parameters:
         -----------
-        to write
+        radius: real number,
+        apex: array_like,
+        axis_vec: array_like, optional,
+        angle: array_like, optional,
+        left_vec: array_like, optional,
+        right_vec: array_like, optional,
+        kwargs: dict,
+            extra key word arguments
         """
         super().__init__(apex, axis_vec, angle, left_vec, right_vec, **kwargs)
         self.radius = radius
@@ -515,6 +524,11 @@ class Fan2D(ConvexCone2D):
 
         Parameters:
         -----------
+        point: array_like,
+        strict: bool, default False,
+
+        Returns:
+        --------
         to write
         """
         dist_to_apex = LA.norm(np.array(point)-self.apex)
@@ -550,12 +564,20 @@ class Ellipse(GeometricObject):
     def __init__(self, center:ArrayLike, axis_vecs:ArrayLike):
         """ not finished,
 
+        Parameters:
+        -----------
+        center: array_like,
+        axis_vec: array_like,
         """
         pass
 
     
     def intersect_with(self, other):
         """
+
+        Parameters:
+        -----------
+        other:
         """
         pass
 
@@ -578,6 +600,10 @@ class Circle(Ellipse):
     """
     def __init__(self, center:ArrayLike, radius:Real):
         """
+        Parameters:
+        -----------
+        center: array_like,
+        radius: real number,
         """
         pass
 

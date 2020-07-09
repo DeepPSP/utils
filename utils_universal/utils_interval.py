@@ -185,7 +185,8 @@ def intervals_union(interval_list:GeneralizedInterval, join_book_endeds:bool=Tru
     
     Returns:
     --------
-    GeneralizedInterval, the union of the intervals in `interval_list`
+    processed: GeneralizedInterval,
+        the union of the intervals in `interval_list`
     """
     interval_sort_key = lambda i: i[0]
     # list_add = lambda list1, list2: list1+list2
@@ -250,10 +251,12 @@ def generalized_intervals_union(interval_list:Union[List[GeneralizedInterval],Tu
 
     Returns:
     --------
-    GeneralizedInterval, the union of `interval_list`
+    iu: GeneralizedInterval,
+        the union of `interval_list`
     """
     all_intervals = [itv for gnr_itv in interval_list for itv in gnr_itv]
-    return intervals_union(interval_list=all_intervals, join_book_endeds=join_book_endeds)
+    iu = intervals_union(interval_list=all_intervals, join_book_endeds=join_book_endeds)
+    return iu
 
 
 def intervals_intersection(interval_list:GeneralizedInterval, drop_degenerate:bool=True) -> Interval:
@@ -270,7 +273,8 @@ def intervals_intersection(interval_list:GeneralizedInterval, drop_degenerate:bo
     
     Returns:
     --------
-    Interval, the intersection of all intervals in `interval_list`
+    its: Interval,
+        the intersection of all intervals in `interval_list`
     """
     if [] in interval_list:
         return []
@@ -279,9 +283,10 @@ def intervals_intersection(interval_list:GeneralizedInterval, drop_degenerate:bo
     potential_start = max([item[0] for item in interval_list])
     potential_end = min([item[-1] for item in interval_list])
     if (potential_end > potential_start) or (potential_end == potential_start and not drop_degenerate):
-        return [potential_start, potential_end]
+        its = [potential_start, potential_end]
     else:
-        return []
+        its = []
+    return its
 
 
 def generalized_intervals_intersection(generalized_interval:GeneralizedInterval, another_generalized_interval:GeneralizedInterval, drop_degenerate:bool=True) -> GeneralizedInterval:
@@ -299,13 +304,14 @@ def generalized_intervals_intersection(generalized_interval:GeneralizedInterval,
     
     Returns:
     --------
-    a GeneralizedInterval, the intersection of `generalized_interval` and `another_generalized_interval`
+    its: GeneralizedInterval,
+        the intersection of `generalized_interval` and `another_generalized_interval`
     """
     this = intervals_union(generalized_interval)
     another = intervals_union(another_generalized_interval)
     # 注意，此时this, another都是按区间起始升序排列的，
     # 而且这二者都是一系列区间的不交并
-    ret = []
+    its = []
     # 以下流程可以优化
     cut_idx = 0
     for item in this:
@@ -314,11 +320,11 @@ def generalized_intervals_intersection(generalized_interval:GeneralizedInterval,
         for idx, item_prime in enumerate(another):
             tmp = intervals_intersection([item,item_prime], drop_degenerate=drop_degenerate)
             if len(tmp) > 0:
-                ret.append(tmp)
+                its.append(tmp)
                 intersected_indices.append(idx)
         if len(intersected_indices) > 0:
             cut_idx = intersected_indices[-1]
-    return ret
+    return its
 
 
 def generalized_interval_complement(total_interval:Interval, generalized_interval:GeneralizedInterval) -> GeneralizedInterval:
@@ -520,31 +526,39 @@ def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:int, sp
     return ret, ret_traceback
 
 
-def find_max_cont_len(sub_list:Interval, tot_len:Real) -> dict:
+def find_max_cont_len(sublist:Interval, tot_rng:Real) -> dict:
     """ finished, checked,
+
+    find the maximum length of continuous (consecutive) sublists of `sublist`,
+    whose element are integers within the range from 0 to `tot_rng`,
+    along with the position of this sublist and the sublist itself.
+
+    eg, tot_rng=10, sublist=[0,2,3,4,7,9],
+    then 3, 1, [2,3,4] will be returned
 
     Parameters:
     -----------
-    to write
+    sublist: Interval,
+        a sublist
+    tot_rng: real number,
+        the total range
 
     Returns:
     --------
-    to write
-
-    设sub_list为[0,1,2,...,tot_len-1]的一个子列，
-    计算sub_list的最常的连续子列的长度，该子列在sub_list中起始位置，以及该最长连续子列
-    例如，tot_len=10, sub_list=[0,2,3,4,7,9],
-    那么返回3, 1, [2,3,4]
+    ret: dict, with items
+        - 'max_cont_len'
+        - 'max_cont_sublist_start'
+        - 'max_cont_sublist'
     """
-    complementary_sub_list = [-1] + [i for i in range(tot_len) if i not in sub_list] + [tot_len]
-    diff_list = np.diff(np.array(complementary_sub_list))
+    complementary_sublist = [-1] + [i for i in range(tot_rng) if i not in sublist] + [tot_rng]
+    diff_list = np.diff(np.array(complementary_sublist))
     max_cont_len = np.max(diff_list) - 1
-    max_cont_sub_list_start = np.argmax(diff_list)
-    max_cont_sub_list = sub_list[max_cont_sub_list_start: max_cont_sub_list_start + max_cont_len]
+    max_cont_sublist_start = np.argmax(diff_list)
+    max_cont_sublist = sublist[max_cont_sublist_start: max_cont_sublist_start + max_cont_len]
     ret = {
         'max_cont_len': max_cont_len,
-        'max_cont_sub_list_start': max_cont_sub_list_start,
-        'max_cont_sub_list': max_cont_sub_list
+        'max_cont_sublist_start': max_cont_sublist_start,
+        'max_cont_sublist': max_cont_sublist
     }
     return ret
 
@@ -556,14 +570,16 @@ def interval_len(interval:Interval) -> Real:
 
     Parameters:
     -----------
-    to write
+    interval: Interval
 
     Returns:
     --------
-    to write
+    itv_len: real number,
+        the `length` of `interval`
     """
     interval.sort()
-    return interval[-1] - interval[0] if len(interval) > 0 else -1
+    itv_len = interval[-1] - interval[0] if len(interval) > 0 else -1
+    return itv_len
 
 
 def generalized_interval_len(generalized_interval:GeneralizedInterval) -> Real:
