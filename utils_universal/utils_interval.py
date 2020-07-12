@@ -6,8 +6,8 @@ NOTE:
     `interval` refers to interval of the form [a,b]
     `generalized_interval` refers to some (finite) union of `interval`s
 TODO:
-    unify `interval` and `generalized_interval`,
-    by letting `interval` be of the form [[a,b]]
+    1. unify `interval` and `generalized_interval`, by letting `interval` be of the form [[a,b]]
+    2. distinguish openness and closedness
 
 """
 
