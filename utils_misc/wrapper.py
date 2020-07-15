@@ -14,6 +14,11 @@ __all__ = [
 
 def indicator_enter_leave_func(verbose:int=0):
     """
+
+    Parameters:
+    -----------
+    verbose: int,
+        printing verbosity
     """
     def dec_outer(fn:callable):
         @wraps(fn)
@@ -32,6 +37,10 @@ def indicator_enter_leave_func(verbose:int=0):
 
 def trivial_jit(signature_or_function=None, locals={}, target='cpu', cache=False, pipeline_class=None, **options):
     """
+
+    Parameters:
+    -----------
+    ref. `numba.jit`
     """
     def dec(fn:callable):
         return fn
