@@ -13,6 +13,7 @@ import pandas as pd
 __all__ = [
     "df_weights",
     "df_weights_abbr",
+    "df_weights_fullname",
     "dx_mapping_scored",
     "dx_mapping_unscored",
     "dx_mapping_all",
@@ -189,6 +190,18 @@ df_weights_abbr.columns = \
 
 df_weights_abbr.index = \
     df_weights_abbr.index.map(lambda i: snomed_ct_code_to_abbr(i))
+
+
+snomed_ct_code_to_fullname = \
+    lambda i: dx_mapping_all[dx_mapping_all["SNOMED CT Code"]==int(i)]["Dx"].values[0]
+
+df_weights_fullname = df_weights.copy()
+
+df_weights_fullname.columns = \
+    df_weights_fullname.columns.map(lambda i: snomed_ct_code_to_fullname(i))
+
+df_weights_fullname.index = \
+    df_weights_fullname.index.map(lambda i: snomed_ct_code_to_fullname(i))
 
 
 
