@@ -17,7 +17,7 @@ from easydict import EasyDict as ED
 
 __all__ = [
     "AF",
-    "I_AVB",
+    "IAVB",
     "LBBB", "RBBB",
     "PAC", "PJC", "PVC", "SPB",
     "STD", "STE",
@@ -25,6 +25,7 @@ __all__ = [
 
 
 AF = ED({
+    "fullname": "atrial fibrillation",
     "url": [
         "https://litfl.com/atrial-fibrillation-ecg-library/",
         "https://en.wikipedia.org/wiki/Atrial_fibrillation#Screening",
@@ -40,7 +41,20 @@ AF = ED({
     ],
 })
 
-I_AVB = {
+AFL = ED({
+    "fullname": "atrial flutter",
+    "url": [],
+    "knowledge": [],
+})
+
+Brady = ED({
+    "fullname": "bradycardia",
+    "url": [],
+    "knowledge": [],
+})
+
+IAVB = {
+    "fullname": "1st degree av block",
     "url": [
         "https://litfl.com/first-degree-heart-block-ecg-library/",
         "https://en.wikipedia.org/wiki/Atrioventricular_block#First-degree_Atrioventricular_Block"
@@ -54,6 +68,7 @@ I_AVB = {
 }
 
 LBBB = ED({
+    "fullname": "left bundle branch block",
     "url": [
         "https://litfl.com/left-bundle-branch-block-lbbb-ecg-library/",
         "https://en.wikipedia.org/wiki/Left_bundle_branch_block",
@@ -70,6 +85,7 @@ LBBB = ED({
 })
 
 RBBB = ED({
+    "fullname": "right bundle branch block",
     "url": [
         "https://litfl.com/right-bundle-branch-block-rbbb-ecg-library/",
         "https://en.wikipedia.org/wiki/Right_bundle_branch_block",
@@ -81,7 +97,50 @@ RBBB = ED({
     ],
 })
 
+CRBBB = ED({
+    "fullname": "complete right bundle branch block",
+    "url": [],
+    "knowledge": [],
+})
+
+IRBBB = ED({
+    "fullname": "incomplete right bundle branch block",
+    "url": [],
+    "knowledge": [],
+})
+
+LAnFB = ED({
+    "fullname": "left anterior fascicular block",
+    "url": [],
+    "knowledge": [],
+})
+
+LAD = ED({
+    "fullname": "left axis deviation",
+    "url": [],
+    "knowledge": [],
+})
+
+LQRSV = ED({
+    "fullname": "low qrs voltages",
+    "url": [],
+    "knowledge": [],
+})
+
+NSIVCB = ED({
+    "fullname": "nonspecific intraventricular conduction disorder",
+    "url": [],
+    "knowledge": [],
+})
+
+PR = ED({
+    "fullname": "pacing rhythm",
+    "url": [],
+    "knowledge": [],
+})
+
 PAC = ED({
+    "fullname": "premature atrial contraction",
     "url": [
         "https://litfl.com/premature-atrial-complex-pac/",
         "https://en.wikipedia.org/wiki/Premature_atrial_contraction",
@@ -95,6 +154,7 @@ PAC = ED({
 })
 
 PJC = ED({
+    "fullname": "premature junctional contraction",
     "url": [
         "https://litfl.com/premature-junctional-complex-pjc/",
         "https://en.wikipedia.org/wiki/Premature_junctional_contraction",
@@ -107,6 +167,7 @@ PJC = ED({
 })
 
 PVC = ED({
+    "fullname": "premature ventricular contractions",
     "url": [
         "https://litfl.com/premature-ventricular-complex-pvc-ecg-library/",
         "https://en.wikipedia.org/wiki/Premature_ventricular_contraction",
@@ -120,14 +181,84 @@ PVC = ED({
     ],
 })
 
-SPB = ED({
+LPR = ED({
+    "fullname": "prolonged pr interval",
+    "url": [],
+    "knowledge": [],
+})
+
+LQT = ED({
+    "fullname": "prolonged qt interval",
+    "url": [],
+    "knowledge": [],
+})
+
+QAb = ED({
+    "fullname": "qwave abnormal",
+    "url": [],
+    "knowledge": [],
+})
+
+RAD = ED({
+    "fullname": "right axis deviation",
+    "url": [],
+    "knowledge": [],
+})
+
+SA = ED({
+    "fullname": "sinus arrhythmia",
+    "url": [],
+    "knowledge": [],
+})
+
+SB = ED({
+    "fullname": "sinus bradycardia",
+    "url": [],
+    "knowledge": [],
+})
+
+SNR = ED({
+    "fullname": "sinus rhythm",  # the NORMAL rhythm
+    "url": [],
+    "knowledge": [],
+})
+
+STach = ED({
+    "fullname": "sinus tachycardia",
+    "url": [],
+    "knowledge": [],
+})
+
+SVPB = ED({
+    "fullname": "supraventricular premature beats",
     "url": [
         "https://en.wikipedia.org/wiki/Premature_atrial_contraction#Supraventricular_extrasystole",
     ],
     "knowledge": PAC["knowledge"] + PJC["knowledge"],
 })
 
+TAb = ED({
+    "fullname": "t wave abnormal",
+    "url": [],
+    "knowledge": [],
+})
+
+TInv = ED({
+    "fullname": "t wave inversion",
+    "url": [],
+    "knowledge": [],
+})
+
+VPB = ED({
+    "fullname": "ventricular premature beats",
+    "url": [],
+    "knowledge": [],
+})
+
+SPB = SVPB  # alias
+
 STD = ED({
+    "fullname": "",
     "url": [
         "",
     ],
@@ -137,6 +268,7 @@ STD = ED({
 })
 
 STE = ED({
+    "fullname": "",
     "url": [
         "",
     ],
