@@ -5,13 +5,14 @@ commonly used utilities, that do not belong to a particular category
 import os
 import subprocess
 import collections
-import numpy as np
 import time
 from copy import deepcopy
 from logging import Logger
 from datetime import datetime, timedelta
 from typing import Union, Optional, Any, Iterable, List, Tuple, Dict, Callable, NoReturn
 from numbers import Real
+
+import numpy as np
 
 
 __all__ = [

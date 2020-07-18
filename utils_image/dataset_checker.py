@@ -5,13 +5,14 @@ File: dataset_checker.py
 Author: wenhao
 remarks: utilities for image and annotation checking
 """
+from random import shuffle
+from typing import Union, Optional, List
+
 import os
 import numpy as np
 import pandas as pd
-from random import shuffle
 import cv2
 import matplotlib.pyplot as plt
-from typing import Union, Optional, List
 
 
 class ObjectDetectionCheck(object):

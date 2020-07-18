@@ -6,9 +6,10 @@ Date: 2019/12/3
 remarks: utilities for io of images
 """
 import os
-import numpy as np
 from typing import Tuple, Union, Optional, Tuple, NoReturn
 from random import shuffle
+
+import numpy as np
 import cv2
 
 from utils.common import ArrayLike

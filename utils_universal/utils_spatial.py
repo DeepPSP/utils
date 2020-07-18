@@ -12,17 +12,18 @@ implemented geometric objects in sympy:
     Curve,
     Parabola
 """
+import random
+import warnings
+from typing import Union, Optional, List, NoReturn
+from numbers import Real
+
 import numpy as np
 import math
-import random
 import numpy.linalg as LA
 from numpy import pi as PI
 # import cmath
 # from scipy.spatial import ConvexHull, Delaunay, Rectangle
 from scipy import spatial as ss
-from numbers import Real
-from typing import Union, Optional, List, NoReturn
-import warnings
 
 from utils.common import ArrayLike, modulo
 from utils.utils_universal import intervals_intersection
@@ -712,6 +713,7 @@ class BoundingBox(ss.Rectangle):
             perform union inplace or return a new instance
 
         Returns:
+        --------
         BoudingBox or None
         """
         if (not force) and self.intersect_with(other) is None:
@@ -868,10 +870,11 @@ def convex_hull_inflation(ch:ss.ConvexHull, inflation_ratio:float=0.2, vertices_
 
     Parameters:
     -----------
+    to write
 
     Returns:
     --------
-
+    to write
     """
     ch_vertices = ch.points[ch.vertices]
     center_of_mass = np.mean(ch.points,axis=0)
@@ -969,6 +972,14 @@ def split_2d_plane_into_convex_cones(center:ArrayLike, split_vecs:ArrayLike, **k
 def get_rot_mat_2d(angle:Real) -> np.ndarray:
     """
     angle in radians
+
+    Parameters:
+    -----------
+    to write
+
+    Returns:
+    --------
+    to write
     """
     rot_mat = np.array([[math.cos(angle), -math.sin(angle)], [math.sin(angle), math.cos(angle)]])
     return rot_mat
@@ -978,6 +989,10 @@ def get_line_2d(point1:ArrayLike, point2:ArrayLike) -> np.ndarray:
     """
 
     get the line passing through `point1` and `point2`
+
+    Parameters:
+    -----------
+    to write
 
     Returns:
     --------
@@ -995,6 +1010,14 @@ def get_line_2d(point1:ArrayLike, point2:ArrayLike) -> np.ndarray:
 
 def is_pass_through_2d(line:np.ndarray, point:ArrayLike) -> np.ndarray:
     """
+
+    Parameters:
+    -----------
+    to write
+
+    Returns:
+    --------
+    to write
     """
     return np.dot(line, np.array(point).tolist()+[1]) == 0
 
@@ -1023,6 +1046,14 @@ def get_perpendicular_line_2d(line:np.ndarray, point:ArrayLike) -> np.ndarray:
 
 def get_line_intersection_2d(line1:np.ndarray, line2:np.ndarray) -> np.ndarray:
     """
+
+    Parameters:
+    -----------
+    to write
+
+    Returns:
+    --------
+    to write
     """
     system = np.array([line1, line2])
     A = system[:,:2]
@@ -1037,6 +1068,14 @@ def get_line_intersection_2d(line1:np.ndarray, line2:np.ndarray) -> np.ndarray:
 def affine_trans_2d(points:np.ndarray, shift:np.ndarray, rotation:Real) -> np.ndarray:
     """
     rotation in radians
+
+    Parameters:
+    -----------
+    to write
+
+    Returns:
+    --------
+    to write
     """
     rot_mat = get_rot_mat_2d(rotation)
     transformed = np.apply_along_axis(
@@ -1050,6 +1089,14 @@ def affine_trans_2d(points:np.ndarray, shift:np.ndarray, rotation:Real) -> np.nd
 
 def vec2rad(vec:ArrayLike, val_start_from:Real=0) -> float:
     """
+
+    Parameters:
+    -----------
+    to write
+
+    Returns:
+    --------
+    to write
     """
     _v = np.array(vec).flatten()
     if len(_v) != 2:
@@ -1066,6 +1113,14 @@ def vec2rad(vec:ArrayLike, val_start_from:Real=0) -> float:
 
 def vec2polar(vec:ArrayLike) -> np.ndarray:
     """
+
+    Parameters:
+    -----------
+    to write
+
+    Returns:
+    --------
+    to write
     """
     _v = np.array(vec).flatten()
     if len(_v) != 2:
@@ -1083,6 +1138,14 @@ def vec2polar(vec:ArrayLike) -> np.ndarray:
 
 def rearrange_vectors_2d(vectors:ArrayLike) -> np.ndarray:
     """ rearrange 2d vectors anticlockwise
+
+    Parameters:
+    -----------
+    to write
+
+    Returns:
+    --------
+    to write
     """
     vec_radians = [vec2rad(item) for item in vectors]
     return np.array(vectors)[np.argsort(vec_radians)]
@@ -1099,6 +1162,10 @@ def rearrange_convex_contour_points_2d(points:ArrayLike) -> np.ndarray:
     -----------
     points: array_like,
         array of points in a 2d convex contour
+
+    Returns:
+    --------
+    to write
     """
     _p = np.array(points)
     center_of_mass = np.mean(_p, axis=0)
@@ -1110,6 +1177,14 @@ def rearrange_convex_contour_points_2d(points:ArrayLike) -> np.ndarray:
 def smallest_circle(points:ArrayLike, method:str='msw') -> dict:
     """
     one can use `cv2.minEnclosingCircle` instead
+
+    Parameters:
+    -----------
+    to write
+
+    Returns:
+    --------
+    to write
     """
     if method.lower() == 'msw':
         return _smallest_circle_msw(points, [])
@@ -1119,12 +1194,28 @@ def smallest_circle(points:ArrayLike, method:str='msw') -> dict:
 
 def _smallest_circle_msw(points:ArrayLike, base:ArrayLike) -> dict:
     """
+
+    Parameters:
+    -----------
+    to write
+
+    Returns:
+    --------
+    to write
     """
     pass
 
 
 def _smallest_circle_welzl(points:ArrayLike, base:ArrayLike) -> dict:
     """
+
+    Parameters:
+    -----------
+    to write
+
+    Returns:
+    --------
+    to write
     """
     if len(points) == 0 or len(base) == 3:
         return _smallest_circle_trivial(base)
@@ -1145,6 +1236,14 @@ def _smallest_circle_welzl(points:ArrayLike, base:ArrayLike) -> dict:
 
 def _smallest_circle_trivial(points:Optional[ArrayLike]=None) -> Union[dict, None]:
     """
+
+    Parameters:
+    -----------
+    to write
+
+    Returns:
+    --------
+    to write
     """
     if points is None or len(points) == 0:
         return None
@@ -1172,6 +1271,13 @@ def _smallest_circle_trivial(points:Optional[ArrayLike]=None) -> Union[dict, Non
 def get_circle_passing_through(p1:ArrayLike, p2:ArrayLike, p3:ArrayLike) -> dict:
     """
 
+    Parameters:
+    -----------
+    to write
+
+    Returns:
+    --------
+    to write
     """
     _p1, _p2, _p3 = np.array(p1), np.array(p2), np.array(p3)
 
@@ -1201,6 +1307,14 @@ def get_circle_passing_through(p1:ArrayLike, p2:ArrayLike, p3:ArrayLike) -> dict
 
 def merge_boxes(box1:ArrayLike, box2:ArrayLike, **kwargs) -> Union[np.ndarray, NoReturn]:
     """
+
+    Parameters:
+    -----------
+    to write
+
+    Returns:
+    --------
+    to write
     """
     ymin1, xmin1, ymax1, xmax1 = box1
     ymin2, xmin2, ymax2, xmax2 = box2

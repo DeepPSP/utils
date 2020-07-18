@@ -30,7 +30,12 @@ FFmpeg, libsndfile, praat, MAD,
 installation for centos7:
 https://gist.github.com/wenh06/de3f1a35b242df8059ce7c24e4c1784c
 '''
+import os
 import wave
+from collections import namedtuple
+from numbers import Real
+from typing import Union, Optional, List, NoReturn
+
 import librosa
 import parselmouth as pm
 import soundfile as sf
@@ -42,19 +47,15 @@ try:
     import pyAudioAnalysis as paa
 except:
     paa = None
-import os
 import numpy as np
-from collections import namedtuple
-from numbers import Real
-from typing import Union, Optional, List, NoReturn
 from parselmouth.praat import call
 from scipy.interpolate import interp1d
 
 from ._praat import PMSound
-from database_reader.utils.common import ArrayLike
-from database_reader.utils.utils_signal import butter_bandpass_filter, MovingAverage
-from database_reader.utils.utils_universal import generalized_intervals_intersection
-from database_reader.utils.utils_misc import indicator_enter_leave_func
+from utils.common import ArrayLike
+from utils.utils_signal import butter_bandpass_filter, MovingAverage
+from utils.utils_universal import generalized_intervals_intersection
+from utils.utils_misc import indicator_enter_leave_func
 
 
 _DEFAULT_BACKEND = 'praat'

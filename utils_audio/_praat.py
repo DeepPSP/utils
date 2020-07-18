@@ -2,11 +2,12 @@
 """
 improved wrapped praat Sound
 """
+from numbers import Real
+from typing import Union, Optional, List, NoReturn
+
 import numpy as np
 import parselmouth as pm
 from parselmouth.praat import call
-from numbers import Real
-from typing import Union, Optional, List, NoReturn
 
 from database_reader.utils.common import ArrayLike
 

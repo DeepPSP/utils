@@ -15,17 +15,17 @@ existing packages for image augmentation:
     Augmentor
     ...
 """
+from copy import deepcopy
+from numbers import Real
+from typing import Union, Optional, Any, Callable, Tuple, Dict, List, NoReturn
 
 import cv2
 import pandas as pd
 import numpy as np
 from numpy.random import randint, choice, uniform
-from copy import deepcopy
-from numbers import Real
-from typing import Union, Optional, Any, Callable, Tuple, Dict, List, NoReturn
 
-from database_reader.utils.common import ArrayLike, ArrayLike_Int, ArrayLike_Float
-from database_reader.utils.common import angle_d2r
+from utils.common import ArrayLike, ArrayLike_Int, ArrayLike_Float
+from utils.common import angle_d2r
 
 
 __all__ = [

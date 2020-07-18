@@ -6,20 +6,20 @@ from:
 
 NOTE: totally not checked
 """
+from numbers import Real
+from typing import Optional, List
 
+import numpy as np
+from skimage import segmentation
+from skimage.morphology import dilation
+from skimage.morphology import disk
+from skimage.transform import resize
 import tensorflow
 if tensorflow.__version__.startswith("1."):
     import tensorflow as tf
 else:
     import tensorflow.compat.v1 as tf
     tf.disable_v2_behavior()
-import numpy as np
-from skimage import segmentation
-from skimage.morphology import dilation
-from skimage.morphology import disk
-from skimage.transform import resize
-from numbers import Real
-from typing import Optional, List
 
 from utils.common import ArrayLike
 from .io import normalize_image

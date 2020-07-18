@@ -4,10 +4,10 @@ Savitzky-Golay Filter with SURE(Stein's unbiased risk estimator)
 
 currently very very slow!
 """
-
-import numpy as np
 from numbers import Number
 from typing import Union, Optional, Any, Dict, List, Tuple
+
+import numpy as np
 
 from utils.common import ArrayLike
 from .utils_signal import noise_std_estimator, uni_polyn_der, eval_uni_polyn

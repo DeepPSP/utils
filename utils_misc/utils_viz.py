@@ -2,9 +2,10 @@
 """
 utilities for visualization
 """
-import numpy as np
 from numbers import Real
 from typing import Union, Optional, List, Tuple, NoReturn
+
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from easydict import EasyDict as ED

@@ -13,14 +13,14 @@ TODO:
 
 experiment result: backend 'cv2' is 10-100 times faster than backend 'naive'
 """
+from copy import deepcopy
+from numbers import Real
+from typing import Union, Optional, NoReturn
 
 import cv2
 import colour
 import numpy as np
 from PIL import Image
-from copy import deepcopy
-from numbers import Real
-from typing import Union, Optional, NoReturn
 
 from utils import common
 from utils.common import ArrayLike, ArrayLike_Int

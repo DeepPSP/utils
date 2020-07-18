@@ -2,16 +2,17 @@
 """
 utilities for signal processing, which numpy, scipy, etc. lack
 """
-import numpy as np
-import pywt
-import scipy
 from copy import deepcopy
-from math import atan2, factorial
-from scipy import interpolate
-from scipy.signal import butter, lfilter
 from collections import namedtuple
 from numbers import Number, Real
 from typing import Union, List, NamedTuple, Optional, Tuple
+
+import numpy as np
+import pywt
+import scipy
+from math import atan2, factorial
+from scipy import interpolate
+from scipy.signal import butter, lfilter
 try:
     from numba import jit
 except:

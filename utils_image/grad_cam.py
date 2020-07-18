@@ -4,14 +4,15 @@ Grad-CAM and Grad-CAM++ for visualization of CNN models
 
 TODO: implement a torch version
 """
+from typing import Union, Optional, Tuple, List
+from numbers import Real
+
 from keras.layers.core import Layer
 from keras.models import Model
 import keras.backend as K
 import tensorflow as tf
 import numpy as np
 import cv2
-from typing import Union, Optional, Tuple, List
-from numbers import Real
 
 from utils.common import ArrayLike, modulo
 

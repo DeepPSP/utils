@@ -10,13 +10,13 @@ TODO:
     2. distinguish openness and closedness
 
 """
-
-import numpy as np
+import time
 from copy import deepcopy
 from functools import reduce
-import time
 from numbers import Real
 from typing import Union, Optional, Any, List, Tuple
+
+import numpy as np
 
 from utils.common import ArrayLike
 
