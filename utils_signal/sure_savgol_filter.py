@@ -129,7 +129,9 @@ def generate_savgol_matrix(order:int, radius:int) -> np.ndarray:
     Parameters:
     -----------
     order: int,
+        order of the filter
     radius: int,
+        radius of the window of the filter
 
     Returns:
     --------
@@ -180,14 +182,18 @@ def savgol_polyn_coeffs(x:ArrayLike, order:int) -> Tuple[np.ndarray]:
 def sure_savgol_objective_func(order:int, radius:int, data:ArrayLike, verbose:int=0) -> float:
     """ finished, checked,
 
-    the SURE objective function with Savitzky-Golay filter for an instance centered in data
+    the SURE objective function with Savitzky-Golay filter for an instance centered in `data`
 
     Parameters:
     ----------
     order: int,
+        order of the filter
     radius: int,
+        radius of the window of the filter
     data: array_like,
+        input data for the objective function
     verbose: int, default 0,
+        printing verbosity
 
     Returns:
     --------
@@ -230,14 +236,18 @@ def sure_savgol_objective_func(order:int, radius:int, data:ArrayLike, verbose:in
 def reg_sure_savgol_objective_func(order:int, radius:int, data:ArrayLike, verbose:int=0) -> float:
     """ finished, checked
     
-    the 'regularized' SURE objective function with Savitzky-Golay filter for an instance centered in data
+    the 'regularized' SURE objective function with Savitzky-Golay filter for an instance centered in `data`
 
     Parameters:
     ----------
     order: int,
+        order of the filter
     radius: int,
+        radius of the window of the filter
     data: array_like,
+        input data for the objective function
     verbose: int, default 0,
+        printing verbosity
 
     Returns:
     --------

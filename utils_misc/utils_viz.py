@@ -20,7 +20,7 @@ __all__ = [
 
 
 def plot_single_lead_ecg(s:ArrayLike, freq:Real, use_idx:bool=False, **kwargs) -> NoReturn:
-    """ not finished
+    """ not finished,
 
     single lead ECG plot,
 

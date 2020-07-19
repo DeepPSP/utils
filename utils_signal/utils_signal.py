@@ -285,7 +285,7 @@ def _plot(x, mph, mpd, threshold, edge, valley, ax, ind):
 def phasor_transform(s:ArrayLike, rv:Real) -> np.ndarray:
     """ finished, checked,
 
-    phasor transform, applied to s, with sensitivity controlled by rv
+    phasor transform, applied to `s`, with sensitivity controlled by `rv`
 
     Reference:
     ----------
@@ -383,7 +383,7 @@ def uni_polyn_der(coeff:ArrayLike, order:int=1, coeff_asc:bool=True) -> np.ndarr
 def eval_uni_polyn(x:Union[Real,list,tuple,np.ndarray], coeff:ArrayLike, coeff_asc:bool=True) -> Union[int,float,np.ndarray]:
     """ finished, checked,
 
-    evaluate x at the univariate polynomial defined by coeff
+    evaluate `x` at the univariate polynomial defined by `coeff`
 
     Parameters:
     -----------
@@ -397,7 +397,8 @@ def eval_uni_polyn(x:Union[Real,list,tuple,np.ndarray], coeff:ArrayLike, coeff_a
 
     Returns:
     --------
-    to write
+    value_at_x: real number or sequence of real numbers,
+        value(s) of the univariate polynomial defined by `coeff` at point(s) of `x`
     """
     polyn_order = len(coeff)-1
     if len(coeff) == 0:
@@ -405,11 +406,13 @@ def eval_uni_polyn(x:Union[Real,list,tuple,np.ndarray], coeff:ArrayLike, coeff_a
     
     if coeff_asc:
         if isinstance(x, (int,float)):
-            return np.sum(np.array(coeff)*np.array([np.power(x,k) for k in range(polyn_order+1)]))
+            value_at_x = \
+                np.sum(np.array(coeff)*np.array([np.power(x,k) for k in range(polyn_order+1)]))
         else:
-            return np.array([eval_uni_polyn(p, coeff) for p in x])
+            value_at_x = np.array([eval_uni_polyn(p, coeff) for p in x])
     else:
-        return eval_uni_polyn(x, coeff[::-1], coeff_asc=True)
+        value_at_x = eval_uni_polyn(x, coeff[::-1], coeff_asc=True)
+    return value_at_x
 
 
 def noise_std_estimator(data:ArrayLike) -> float:
