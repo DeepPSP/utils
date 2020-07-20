@@ -172,8 +172,8 @@ def detect_peaks(x:ArrayLike,
     ind = np.unique(np.hstack((ine, ire, ife)))
 
     if verbose >= 1:
-        print('before filtering by mpd = {}, and threshold = {}, ind = {}'.format(mpd, threshold, ind.tolist()))
-        print('additionally, left_threshold = {}, right_threshold = {}, length of data = {}'.format(left_threshold, right_threshold, len(data)))
+        print(f'before filtering by mpd = {mpd}, and threshold = {threshold}, ind = {ind.tolist()}')
+        print(f'additionally, left_threshold = {left_threshold}, right_threshold = {right_threshold}, length of data = {len(data)}')
     
     # handle NaN's
     if ind.size and indnan.size:
@@ -181,13 +181,13 @@ def detect_peaks(x:ArrayLike,
         ind = ind[np.in1d(ind, np.unique(np.hstack((indnan, indnan-1, indnan+1))), invert=True)]
 
     if verbose >= 1:
-        print('after handling nan values, ind = {}'.format(ind.tolist()))
+        print(f'after handling nan values, ind = {ind.tolist()}')
     
     # peaks are only valid within [mpb, len(data)-mpb[
     ind = np.array([pos for pos in ind if mpd<=pos<len(data)-mpd])
     
     if verbose >= 1:
-        print('after fitering out elements too close to border by mpd = {}, ind = {}'.format(mpd, ind.tolist()))
+        print(f'after fitering out elements too close to border by mpd = {mpd}, ind = {ind.tolist()}')
 
     # first and last values of data cannot be peaks
     # if ind.size and ind[0] == 0:
@@ -199,7 +199,7 @@ def detect_peaks(x:ArrayLike,
         ind = ind[data[ind] >= mph]
     
     if verbose >= 1:
-        print('after filtering by mph = {}, ind = {}'.format(mph, ind.tolist()))
+        print(f'after filtering by mph = {mph}, ind = {ind.tolist()}')
     
     # remove peaks - neighbors < threshold
     _left_threshold = left_threshold if left_threshold > 0 else threshold
@@ -209,15 +209,15 @@ def detect_peaks(x:ArrayLike,
         dx = np.max(np.vstack([data[ind]-data[ind+idx] for idx in range(-mpd, 0)]), axis=0)
         ind = np.delete(ind, np.where(dx < _left_threshold)[0])
         if verbose >= 2:
-            print('from left, dx = {}'.format(dx.tolist()))
-            print('after deleting those dx < _left_threshold = {}, ind = {}'.format(_left_threshold, ind.tolist()))
+            print(f'from left, dx = {dx.tolist()}'.)
+            print(f'after deleting those dx < _left_threshold = {_left_threshold}, ind = {ind.tolist()}')
         dx = np.max(np.vstack([data[ind]-data[ind+idx] for idx in range(1, mpd+1)]), axis=0)
         ind = np.delete(ind, np.where(dx < _right_threshold)[0])
         if verbose >= 2:
-            print('from right, dx = {}'.format(dx.tolist()))
-            print('after deleting those dx < _right_threshold = {}, ind = {}'.format(_right_threshold, ind.tolist()))
+            print(f'from right, dx = {dx.tolist()}')
+            print(f'after deleting those dx < _right_threshold = {_right_threshold}, ind = {ind.tolist()}')
     if verbose >= 1:
-        print('after filtering by threshold, ind =', ind.tolist())
+        print(f'after filtering by threshold, ind = {ind.tolist()}')
     # detect small peaks closer than minimum peak distance
     if ind.size and mpd > 1:
         ind = ind[np.argsort(data[ind])][::-1]  # sort ind by peak height
@@ -234,7 +234,7 @@ def detect_peaks(x:ArrayLike,
     ind = np.array([item for item in ind if data[item]==np.max(data[item-mpd:item+mpd+1])])
 
     if verbose >= 1:
-        print('after filtering by mpd, ind = {}'.format(ind.tolist()))
+        print(f'after filtering by mpd, ind = {ind.tolist()}')
 
     if show:
         if indnan.size:
@@ -534,6 +534,7 @@ def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) 
     --------
     True if the signal `s` is valid ecg signal, else return False
     """
+    nl = '\n'
     sig_len = len(s)
     spacing = 1000/freq
 
@@ -572,7 +573,7 @@ def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) 
 
     if pow(2,tot_level) > sig_len:
         # raise ValueError('length of signal is too short')
-        print('length ({}) of signal is too short (should be at least {}) to perform wavelet denoising'.format(sig_len,pow(2,tot_level)))
+        print(f'length ({sig_len}) of signal is too short (should be at least {pow(2,tot_level)}) to perform wavelet denoising')
         return False
     
     base_len = pow(2,tot_level)
@@ -583,9 +584,9 @@ def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) 
         s_padded = np.array(s)
 
     if verbose >= 1:
-        print('tot_level = {}, qrs_levels = {}'.format(tot_level, qrs_levels))
-        print('sig_len = {}, padded length = {}'.format(sig_len, len(s_padded)-sig_len))
-        print('shape of s_padded is', s_padded.shape)
+        print(f'tot_level = {tot_level}, qrs_levels = {qrs_levels}')
+        print(f'sig_len = {sig_len}, padded length = {len(s_padded)-sig_len}')
+        print(f'shape of s_padded is {s_padded.shape}')
     
     # perform swt
     coeffs = pywt.swt(
@@ -617,17 +618,17 @@ def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) 
             for idx in range(nb_lines):
                 c = qrs_sig[idx*line_len:(idx+1)*line_len]
                 _, ax = plt.subplots(figsize=(default_fig_sz,6))
-                ax.plot(c, label='level {}'.format(lv))
+                ax.plot(c, label=f'level {lv}')
                 ax.legend(loc='best')
-                ax.set_title('level {}'.format(lv), fontsize=24)
+                ax.set_title(f'level {lv}', fontsize=24)
                 plt.show()
             c = qrs_sig[nb_lines*line_len:]  # tail left
             if len(c) > 0:
                 fig_sz = int(default_fig_sz*(len(s)-nb_lines*line_len)/line_len)
                 _, ax = plt.subplots(figsize=(fig_sz,6))
-                ax.plot(c, label='level {}'.format(lv))
+                ax.plot(c, label=f'level {lv}')
                 ax.legend(loc='best')
-                ax.set_title('level {}'.format(lv), fontsize=24)
+                ax.set_title(f'level {lv}', fontsize=24)
                 plt.show()
 
     qrs_power = np.power(np.sum(np.array(qrs_signals)[:,slice_len:-slice_len], axis=0), 2)
@@ -640,7 +641,7 @@ def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) 
     qrs_amp = np.percentile(qrs_amplitudes, 50) * 0.5
 
     if verbose >= 1:
-        print('qrs_amplitudes = {}\nqrs_amp = {}'.format(qrs_amplitudes, qrs_amp))
+        print(f'qrs_amplitudes = {qrs_amplitudes}{nl}qrs_amp = {qrs_amp}')
 
     raw_r_peaks = detect_peaks(
         x=qrs_power,
@@ -652,7 +653,7 @@ def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) 
     raw_rr_intervals = np.diff(raw_r_peaks)*spacing
 
     if verbose >= 1:
-        print('raw_r_peaks = {}\nraw_rr_intervals = {}'.format(raw_r_peaks.tolist(), raw_rr_intervals.tolist()))
+        print(f'raw_r_peaks = {raw_r_peaks.tolist()}{nl}raw_rr_intervals = {raw_rr_intervals.tolist()}')
         s_ = s[slice_len:-slice_len]
         if verbose >= 2:
             default_fig_sz = 120
@@ -709,7 +710,7 @@ def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) 
     # TODO: compute confidence level via sample entropy
 
     if verbose >= 1:
-        print('overall is_ecg_confidence = {}'.format(is_ecg_confidence))
+        print(f'overall is_ecg_confidence = {is_ecg_confidence}')
     
     return True if is_ecg_confidence >= is_ecg_confidence_threshold else False
 
@@ -746,6 +747,7 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
     -----
 
     """
+    nl = '\n'
     if amplify_mode not in ['ecg', 'qrs', 'all', 'none']:
         raise ValueError("Invalid amplify_mode! amplify_mode must be one of "
         "'ecg', 'qrs', 'all', 'none'.")
@@ -805,7 +807,7 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
 
     if pow(2,tot_level) > sig_len:
         # raise ValueError('length of signal is too short')
-        print('length ({}) of signal is too short (should be at least {}) to perform wavelet denoising'.format(sig_len,pow(2,tot_level)))
+        print(f'length ({sig_len}) of signal is too short (should be at least {pow(2,tot_level)}) to perform wavelet denoising')
         ret = WaveletDenoiseResult(is_ecg=False, amplified_ratio=1.0, amplified_signal=deepcopy(s), raw_r_peaks=np.array([]), side_len=slice_len, wavelet_name=wavelet_name, wavelet_coeffs=[])
         return ret
     
@@ -817,9 +819,9 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
         s_padded = np.array(s)
 
     if verbose >= 1:
-        print('tot_level = {}, qrs_levels = {}, ecg_levels = {}'.format(tot_level, qrs_levels, ecg_levels))
-        print('sig_len = {}, padded length = {}'.format(sig_len, len(s_padded)-sig_len))
-        print('shape of s_padded is', s_padded.shape)
+        print(f'tot_level = {tot_level}, qrs_levels = {qrs_levels}, ecg_levels = {ecg_levels}')
+        print(f'sig_len = {sig_len}, padded length = {len(s_padded)-sig_len}')
+        print(f'shape of s_padded is {s_padded.shape}')
     
     # perform swt
     raw_coeffs = pywt.swt(
@@ -851,17 +853,17 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
             for idx in range(nb_lines):
                 c = qrs_sig[idx*line_len:(idx+1)*line_len]
                 _, ax = plt.subplots(figsize=(default_fig_sz,6))
-                ax.plot(c, label='level {}'.format(lv))
+                ax.plot(c, label=f'level {lv}')
                 ax.legend(loc='best')
-                ax.set_title('level {}'.format(lv), fontsize=24)
+                ax.set_title(f'level {lv}', fontsize=24)
                 plt.show()
             c = qrs_sig[nb_lines*line_len:]  # tail left
             if len(c) > 0:
                 fig_sz = int(default_fig_sz*(len(s)-nb_lines*line_len)/line_len)
                 _, ax = plt.subplots(figsize=(fig_sz,6))
-                ax.plot(c, label='level {}'.format(lv))
+                ax.plot(c, label=f'level {lv}')
                 ax.legend(loc='best')
-                ax.set_title('level {}'.format(lv), fontsize=24)
+                ax.set_title(f'level {lv}', fontsize=24)
                 plt.show()
 
     qrs_power = np.power(np.sum(np.array(qrs_signals)[:,slice_len:-slice_len], axis=0), 2)
@@ -874,7 +876,7 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
     qrs_amp = np.percentile(qrs_amplitudes, 50) * 0.5
 
     if verbose >= 1:
-        print('qrs_amplitudes = {}\nqrs_amp = {}'.format(qrs_amplitudes, qrs_amp))
+        print(f'qrs_amplitudes = {qrs_amplitudes}{nl}qrs_amp = {qrs_amp}')
 
     raw_r_peaks = detect_peaks(
         x=qrs_power,
@@ -886,7 +888,7 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
     raw_rr_intervals = np.diff(raw_r_peaks)*spacing
 
     if verbose >= 1:
-        print('raw_r_peaks = {}\nraw_rr_intervals = {}'.format(raw_r_peaks.tolist(), raw_rr_intervals.tolist()))
+        print(f'raw_r_peaks = {raw_r_peaks.tolist()}{nl}raw_rr_intervals = {raw_rr_intervals.tolist()}')
         s_ = s[slice_len:-slice_len]
         if verbose >= 2:
             default_fig_sz = 120
@@ -943,7 +945,7 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
     # TODO: compute confidence level via sample entropy
 
     if verbose >= 1:
-        print('overall is_ecg_confidence = {}'.format(is_ecg_confidence))
+        print(f'overall is_ecg_confidence = {is_ecg_confidence}')
     
     if is_ecg_confidence >= is_ecg_confidence_threshold:
         qrs_amplitudes = []
@@ -1001,8 +1003,8 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
             s_rec = deepcopy(s)
         
         if verbose >= 1:
-            print('levels used for the purpose of amplification are {} to {} (inclusive)'.format(levels_in_use[0], levels_in_use[1]-1))
-            print('amplify_ratio = {}\nqrs_amplitudes = {}'.format(amplify_ratio, qrs_amplitudes))
+            print(f'levels used for the purpose of amplification are {levels_in_use[0]} to {levels_in_use[1]-1} (inclusive)')
+            print(f'amplify_ratio = {amplify_ratio}{nl}qrs_amplitudes = {qrs_amplitudes}')
             if verbose >= 2:
                 default_fig_sz = 120
                 line_len = freq * 25  # 25 seconds
@@ -1066,7 +1068,7 @@ def wavelet_rec_iswt(coeffs:List[List[np.ndarray]], levels:ArrayLike_Int, wavele
     nb_levels = len(coeffs)
 
     if verbose >= 1:
-        print('sig_shape = {}, nb_levels = {}'.format(sig_shape, nb_levels))
+        print(f'sig_shape = {sig_shape}, nb_levels = {nb_levels}')
     
     if (nb_levels < np.array(levels)).any():
         raise ValueError('Invalid levels')
@@ -1113,10 +1115,10 @@ def resample_irregular_timeseries(s:ArrayLike, output_fs:Real=2, method:str="spl
     pandas also has the function to regularly resample irregular timeseries
     """
     if method not in ["spline", "interp1d"]:
-        raise ValueError("method {} not implemented".format(method))
+        raise ValueError(f"method {method} not implemented")
 
     if verbose >= 1:
-        print("len(s) = {}".format(len(s)))
+        print(f"len(s) = {len(s)}")
 
     if len(s) == 0:
         return np.array([])
@@ -1130,9 +1132,9 @@ def resample_irregular_timeseries(s:ArrayLike, output_fs:Real=2, method:str="spl
         xnew = np.array(tnew)
 
     if verbose >= 1:
-        print('time_series start ts = {}, end ts = {}'.format(time_series[0][0], time_series[-1][0]))
-        print('tot_len = {}'.format(tot_len))
-        print('xnew start = {}, end = {}'.format(xnew[0], xnew[-1]))
+        print(f'time_series start ts = {time_series[0][0]}, end ts = {time_series[-1][0]}')
+        print(f'tot_len = {tot_len}')
+        print(f'xnew start = {xnew[0]}, end = {xnew[-1]}')
 
     if method == "spline":
         m = len(time_series)
@@ -1271,7 +1273,7 @@ def butter_bandpass(lowcut:Real, highcut:Real, fs:Real, order:int, verbose:int=0
         btype = 'band'
     
     if verbose >= 1:
-        print('by the setup of lowcut and highcut, the filter type falls to {}, with Wn = {}'.format(btype, Wn))
+        print(f'by the setup of lowcut and highcut, the filter type falls to {btype}, with Wn = {Wn}')
     
     b, a = butter(order, Wn, btype=btype)
     return b, a
@@ -1310,7 +1312,7 @@ def butter_bandpass_filter(data:ArrayLike, lowcut:Real, highcut:Real, fs:Real, o
 
 
 def hampel(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_outlier:bool=True, use_jit:bool=False) -> Union[np.ndarray, Tuple[np.ndarray, List[int]]]:
-    """
+    """ finished, not checked, (potentially with bugs)
 
     Hampel filter
 
@@ -1633,7 +1635,8 @@ def smooth(x:np.ndarray, window_len:int=11, window:str='hanning', mode:str='vali
     if window == 'flat': #moving average
         w = np.ones(radius,'d')
     else:
-        w = eval('np.'+window+'(radius)')
+        # w = eval('np.'+window+'(radius)')
+        w = eval(f'np.{window}(radius)')
 
     y = np.convolve(w/w.sum(), s, mode=mode)
     y = y[(radius//2-1):-(radius//2)-1]
