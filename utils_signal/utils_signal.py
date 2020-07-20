@@ -1562,3 +1562,84 @@ class MovingAverage(object):
         deno = np.sum(conv)
         smoothed = np.convolve(conv, self.data, mode='same') / deno
         return smoothed
+
+
+def smooth(x:np.ndarray, window_len:int=11, window:str='hanning', mode:str='valid', keep_dtype:bool=True) -> np.ndarray:
+    """ finished, checked
+    
+    smooth the 1d data using a window with requested size.
+    
+    This method is based on the convolution of a scaled window with the signal.
+    The signal is prepared by introducing reflected copies of the signal 
+    (with the window size) in both ends so that transient parts are minimized
+    in the begining and end part of the output signal.
+    
+    Parameters:
+    -----------
+    x: ndarray,
+        the input signal 
+    window_len: int, default 11,
+        the length of the smoothing window,
+        (previously should be an odd integer, currently can be any (positive) integer)
+    window: str, default 'hanning',
+        the type of window from 'flat', 'hanning', 'hamming', 'bartlett', 'blackman',
+        flat window will produce a moving average smoothing
+    mode: str, default 'valid',
+        ref. np.convolve
+    keep_dtype: bool, default True,
+        dtype of the returned value keeps the same with that of `x` or not
+
+    Returns:
+    --------
+    y: ndarray,
+        the smoothed signal
+        
+    Example:
+    --------
+    >>> t = linspace(-2, 2, 0.1)
+    >>> x = sin(t) + randn(len(t)) * 0.1
+    >>> y = smooth(x)
+    
+    See also: 
+    ---------
+    np.hanning, np.hamming, np.bartlett, np.blackman, np.convolve
+    scipy.signal.lfilter
+ 
+    TODO: the window parameter could be the window itself if an array instead of a string
+
+    NOTE: length(output) != length(input), to correct this: return y[(window_len/2-1):-(window_len/2)] instead of just y.
+
+    References:
+    -----------
+    [1] https://scipy-cookbook.readthedocs.io/items/SignalSmooth.html
+    """
+    radius = min(len(x), window_len)
+    radius = radius if radius%2 == 1 else radius-1
+
+    if x.ndim != 1:
+        raise ValueError("smooth only accepts 1 dimension arrays.")
+
+    # if x.size < radius:
+    #     raise ValueError("Input vector needs to be bigger than window size.")
+
+    if radius < 3:
+        return x
+    
+    if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
+        raise ValueError("Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'")
+
+    s = np.r_[x[radius-1:0:-1], x, x[-2:-radius-1:-1]]
+    #print(len(s))
+    if window == 'flat': #moving average
+        w = np.ones(radius,'d')
+    else:
+        w = eval('np.'+window+'(radius)')
+
+    y = np.convolve(w/w.sum(), s, mode=mode)
+    y = y[(radius//2-1):-(radius//2)-1]
+    assert len(x) == len(y)
+
+    if keep_dtype:
+        y = y.astype(x.dtype)
+    
+    return y
