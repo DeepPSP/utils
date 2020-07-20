@@ -74,7 +74,7 @@ def dataset_to_tfrecords(img_dirs:Union[str, List[str]], ann_dirs:Union[str, Lis
         elif ann_fmt.lower() == 'yolo':
             df_tmp = yolo_to_df(img_dir=i, ann_dir=a, save_path=None, class_map=class_map, **kwargs)
         else:
-            raise ValueError("annotation format {} not recognized".format(ann_fmt))
+            raise ValueError(f"annotation format {ann_fmt} not recognized")
         df_info = pd.concat([df_info, df_tmp])
     df_info = df_info.reset_index(drop=True)
     
@@ -90,20 +90,20 @@ def dataset_to_tfrecords(img_dirs:Union[str, List[str]], ann_dirs:Union[str, Lis
     if csv_save_path is not None:
         if not os.path.exists(csv_save_path):
             os.makedirs(csv_save_path)
-        df_info.to_csv(os.path.join(csv_save_path, "all_{}.csv".format(save_suffix)), index=False)
-        df_train.to_csv(os.path.join(csv_save_path, "train_{}.csv".format(save_suffix)), index=False)
-        df_test.to_csv(os.path.join(csv_save_path, "test_{}.csv".format(save_suffix)), index=False)
+        df_info.to_csv(os.path.join(csv_save_path, f"all_{save_suffix}.csv"), index=False)
+        df_train.to_csv(os.path.join(csv_save_path, f"train_{save_suffix}.csv"), index=False)
+        df_test.to_csv(os.path.join(csv_save_path, f"test_{save_suffix}.csv"), index=False)
 
     if not os.path.exists(tfrecords_save_path):
         os.makedirs(tfrecords_save_path)
     nb_train = df_to_tfrecord(
         df=df_train,
-        save_path=os.path.join(tfrecords_save_path, "train_{}.record".format(save_suffix)),
+        save_path=os.path.join(tfrecords_save_path, f"train_{save_suffix}.record"),
         pbtxt_dict=pbtxt_dict,
     )
     nb_test = df_to_tfrecord(
         df=df_test,
-        save_path=os.path.join(tfrecords_save_path, "test_{}.record".format(save_suffix)),
+        save_path=os.path.join(tfrecords_save_path, f"test_{save_suffix}.record"),
         pbtxt_dict=pbtxt_dict,
     )
     ret = {"nb_train":nb_train, "nb_test":nb_test}
@@ -144,7 +144,7 @@ def voc_to_df(img_dir:str, ann_dir:str, save_path:Optional[str]=None, class_map:
         img_file = img_file[0]
         root = tree.getroot()
         if len(root.findall('object')) == 0:
-            print('{} has no bounding box annotation'.format(xml_file))
+            print(f'{xml_file} has no bounding box annotation')
         for member in root.findall('object'):
             fw = int(root.find('size').find('width').text)
             fh = int(root.find('size').find('height').text)
@@ -410,8 +410,8 @@ def df_to_tfrecord(df:pd.DataFrame, save_path:str, pbtxt_dict:Dict[str,int]) -> 
         writer.write(tf_example.SerializeToString())
         nb_samples += 1
     writer.close()
-    print('Successfully created the TFRecords: {}'.format(save_path))
-    print('nb_samples =', nb_samples)
+    print(f'Successfully created the TFRecords: {save_path}')
+    print(f'nb_samples = {nb_samples}')
     return nb_samples
 
 

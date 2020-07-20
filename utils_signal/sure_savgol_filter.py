@@ -74,9 +74,9 @@ def fit_savgol_sure(data:ArrayLike, orders:Union[int,List[int],Tuple[int]], radi
         expanded_data = np.array(expanded_data)
         
         if verbose >= 1:
-            print("all_radii are", all_radii)
-            print("max_radius =", max_radius)
-            print("len(data) = {0}, len(expanded_data) = {1}".format(len(data),len(expanded_data)))
+            print(f"all_radii are {all_radii}")
+            print(f"max_radius = {max_radius}")
+            print(f"len(data) = {len(data)}, len(expanded_data) = {len(expanded_data)}")
             
         opt_radii = []
         for idx, _ in enumerate(data):
@@ -84,7 +84,7 @@ def fit_savgol_sure(data:ArrayLike, orders:Union[int,List[int],Tuple[int]], radi
             costs = [cost_func(orders, r, x, verbose) for r in all_radii]
             
             if verbose >= 2:
-                print("costs =", costs)
+                print(f"costs = {costs}")
             
             pos = np.argmin(costs)
             opt_radii.append(all_radii[pos])
@@ -101,8 +101,8 @@ def fit_savgol_sure(data:ArrayLike, orders:Union[int,List[int],Tuple[int]], radi
         expanded_data = np.array(expanded_data)
 
         if verbose >= 1:
-            print("all_orders are", all_orders)
-            print("len(data) = {0}, len(expanded_data) = {1}".format(len(data),len(expanded_data)))
+            print(f"all_orders are {all_orders}")
+            print(f"len(data) = {len(data)}, len(expanded_data) = {len(expanded_data)}")
 
         opt_orders = []
         for idx, _ in enumerate(data):
@@ -110,13 +110,13 @@ def fit_savgol_sure(data:ArrayLike, orders:Union[int,List[int],Tuple[int]], radi
             costs = [cost_func(o, radii, x, verbose) for o in all_orders]
             
             if verbose >= 2:
-                print("costs =", costs)
+                print(f"costs = {costs}")
             
             pos = np.argmin(costs)
             opt_orders.append(all_orders[pos])
             filtered.append(savgol_polyn_coeffs(x,all_orders[pos])[0][0])
         if verbose >= 1:
-            print("opt_orders =", opt_orders)
+            print(f"opt_orders = {opt_orders}")
 
     filtered = np.array(filtered)
         
@@ -212,7 +212,7 @@ def sure_savgol_objective_func(order:int, radius:int, data:ArrayLike, verbose:in
     estimated_noise_var = np.power(noise_std_estimator(data),2)
     
     if verbose >= 1:
-        print("estimated_noise_var =", estimated_noise_var)
+        print(f"estimated_noise_var = {estimated_noise_var}")
     
     _x = data[halflen-radius:halflen+radius+1]
     f,H = savgol_polyn_coeffs(_x, order)
@@ -222,11 +222,11 @@ def sure_savgol_objective_func(order:int, radius:int, data:ArrayLike, verbose:in
     partial_f_x = np.array([eval_uni_polyn(i-radius, H[:,i]) for i in range(2*radius+1)])
     
     if verbose >= 1:
-        print("_x =", _x)
-        print("f =", f)
-        # print("der_f =", der_f)
-        print("f_x =", f_x)
-        print("partial_f_x =", partial_f_x)
+        print(f"_x = {_x}")
+        print(f"f = {f}")
+        # print(f"der_f = {der_f}")
+        print(f"f_x = {f_x}")
+        print(f"partial_f_x = {partial_f_x}")
     
     cost = (np.sum(f_x*f_x - 2*f_x*_x) + 2*estimated_noise_var*np.sum(partial_f_x))/(2*radius+1)
     
@@ -277,11 +277,11 @@ def reg_sure_savgol_objective_func(order:int, radius:int, data:ArrayLike, verbos
     partial_f_x = np.array([eval_uni_polyn(i-radius, H[:,i]) for i in range(2*radius+1)])
     
     if verbose >= 1:
-        print("_x =", _x)
-        print("f =", f)
+        print(f"_x = {_x}")
+        print(f"f = {f}")
         # print("der_f =", der_f)
-        print("f_x =", f_x)
-        print("partial_f_x =", partial_f_x)
+        print(f"f_x = {f_x}")
+        print(f"partial_f_x = {partial_f_x}")
     
     cost = (np.sum(f_x*f_x - 2*f_x*_x + u*estimated_noise_var*partial_f_x*partial_f_x) + 2*estimated_noise_var*np.sum(partial_f_x))/(2*radius+1)
     

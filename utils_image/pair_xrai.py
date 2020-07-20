@@ -405,8 +405,7 @@ class XRAI(SaliencyMask):
             for baseline in x_baselines:
                 if baseline.shape != x_value.shape:
                     raise ValueError(
-                        "Baseline size {} does not match input size {}".format(
-                            baseline.shape, x_value.shape))
+                        f"Baseline size {baseline.shape} does not match input size {x_value.shape}")
         return x_baselines
 
     def _predict(self, x:tf.Tensor):
@@ -510,9 +509,7 @@ class XRAI(SaliencyMask):
             _ba = np.array(base_attribution)
             if _ba.shape != x_value.shape:
                 raise ValueError(
-                'The base attribution shape should be the same as the shape of '
-                '`x_value`. Expected {}, got {}'.format(
-                    x_value.shape, _ba.shape))
+                f'The base attribution shape should be the same as the shape of `x_value`. Expected {x_value.shape}, got {_ba.shape}')
 
         # Calculate IG attribution if not provided by the caller.
         if base_attribution is None:
@@ -555,8 +552,7 @@ class XRAI(SaliencyMask):
                 gain_fun=_gain_density,
                 integer_segments=extra_parameters.flatten_xrai_segments)
         else:
-            raise ValueError('Unknown algorithm type: {}'.format(
-                extra_parameters.algorithm))
+            raise ValueError(f'Unknown algorithm type: {extra_parameters.algorithm}')
 
         results = XRAIOutput(attr_map)
         results.baselines = x_baselines

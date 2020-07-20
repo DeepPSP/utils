@@ -199,7 +199,7 @@ class PMSound(pm.Sound):
         kwargs: dict, optional,
             'tolerance1', 'tolerance2' for `method` 'marple', both default 1.0e-6
         """
-        cmd = "To LPC ({})".format(method)
+        cmd = f"To LPC ({method})"
         if method in ['autocorrelation', 'covariance', 'burg']:
             lpc = call(self, cmd, prediction_order, window_length, time_step, pre_emphasis_frequency)
         elif method == 'marple':

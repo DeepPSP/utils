@@ -208,7 +208,7 @@ class Voice(object):
             raise NotImplementedError
 
         if self.verbose >= 1:
-            print("len(self.values) = {}, self.freq = {}".format(len(self.values), self.freq))
+            print(f"len(self.values) = {len(self.values)}, self.freq = {self.freq}")
 
 
     def resample(self, new_freq:Real) -> NoReturn:
@@ -250,7 +250,7 @@ class Voice(object):
         """
         fn, ext = os.path.splitext(filename)
         fmt = ext.replace('.', '') or fmt
-        fn = fn + '.{}'.format(fmt)
+        fn = f'{fn}.{fmt}'
         if not self._loaded:
             self.load(backend='librosa', sr=freq)
             freq = self.freq
@@ -826,8 +826,8 @@ class Voice(object):
         split_indices = [0] + (np.where(np.diff(voice_indices)>1)[0]+1).tolist() + [len(voice_indices)]
             
         if self.verbose >= 1:
-            print("voice_indices = {}".format(voice_indices))
-            print("split_indices = {}".format(split_indices))
+            print(f"voice_indices = {voice_indices}")
+            print(f"split_indices = {split_indices}")
             
         self.syllable_segments = []
         for idx in range(len(split_indices)-1):
@@ -836,9 +836,9 @@ class Voice(object):
             start_t = t_arr[start_idx]
             end_t = t_arr[end_idx]
             if self.verbose >= 2:
-                print("at the {}-th candidate segment,".format(idx))
-                print("start_idx = {}, end_idx = {}".format(start_idx, end_idx))
-                print("start_t = {}, end_t = {}, diff = {}".format(start_t, end_t, end_t-start_t))
+                print(f"at the {idx}-th candidate segment,")
+                print(f"start_idx = {start_idx}, end_idx = {end_idx}")
+                print(f"start_t = {start_t}, end_t = {end_t}, diff = {end_t-start_t}")
             if end_t - start_t <= t_threshold:
                 continue
             ori_indices = np.where((start_t<=self.ts())&(end_t>=self.ts()))[0]
@@ -889,9 +889,9 @@ class Voice(object):
             syllable_time_ranges = []
 
         if self.verbose >= 1:
-            print("vowel_indices = {}".format(vowel_indices.tolist()))
-            print("split_indices = {}".format(split_indices))
-            print("syllable_time_ranges = {}".format(syllable_time_ranges))
+            print(f"vowel_indices = {vowel_indices.tolist()}")
+            print(f"split_indices = {split_indices}")
+            print(f"syllable_time_ranges = {syllable_time_ranges}")
             
         self.vowels = []
         for idx in range(len(split_indices)-1):
@@ -900,9 +900,9 @@ class Voice(object):
             start_t = t_arr[start_idx]
             end_t = t_arr[end_idx]
             if self.verbose >= 2:
-                print("at the {}-th candidate segment,".format(idx))
-                print("start_idx = {}, end_idx = {}".format(start_idx, end_idx))
-                print("start_t = {}, end_t = {}, diff = {}".format(start_t, end_t, end_t-start_t))
+                print(f"at the {idx}-th candidate segment,")
+                print(f"start_idx = {start_idx}, end_idx = {end_idx}")
+                print(f"start_t = {start_t}, end_t = {end_t}, diff = {end_t-start_t}")
             if trim_by_syllable:
                 trimed_time_range = generalized_intervals_intersection(
                     generalized_interval=[[start_t, end_t]],
@@ -917,7 +917,7 @@ class Voice(object):
             else:
                 start_t, end_t = -1, -1
             if self.verbose >= 2:
-                print("after trimed by syllable_time_ranges, start_t = {}, end_t = {}, diff = {}".format(start_t, end_t, end_t-start_t))
+                print(f"after trimed by syllable_time_ranges, start_t = {start_t}, end_t = {end_t}, diff = {end_t-start_t}")
             if start_t >= 0:
                 self.vowels.append(
                     VoiceVowel(

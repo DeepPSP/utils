@@ -678,6 +678,7 @@ class BoundingBox(ss.Rectangle):
         --------
         BoundingBox or None
         """
+        nl = "\n"
         x_itv = intervals_intersection(
             interval_list=[[self.xmin, self.xmax], [other.xmin, other.xmax]],
             drop_degenerate=False,
@@ -689,7 +690,7 @@ class BoundingBox(ss.Rectangle):
 
         if self.verbose >= 1:
             print("intersection info:")
-            print("x_itv = {}\ny_itv = {}".format(x_itv, y_itv))
+            print(f"x_itv = {x_itv}{nl}y_itv = {y_itv}")
         
         if any([len(x_itv)==0, len(y_itv)==0]):
             return None
@@ -918,16 +919,17 @@ def split_2d_plane_into_convex_cones(center:ArrayLike, split_vecs:ArrayLike, **k
     svs_radians = [vec2rad(item) for item in svs]
     if (np.diff(svs_radians) >= PI).any() or svs_radians[0]-(svs_radians[-1]-2*PI) >= PI:
         raise ValueError("given the provided `axis_vecs`, concave cone will occur")
-
+    
+    nl = "\n"
     if verbose >= 1:
         print("after rearranging,")
-        print("split vectors = {}\ntheir radians = {}".format(svs, svs_radians))
+        print(f"split vectors = {svs}{nl}their radians = {svs_radians}")
 
     svs += [svs[0]]
 
     if verbose >= 1:
         print("after augmentation,")
-        print("split vectors = {}".format(svs))
+        print(f"split vectors = {svs}")
 
     convex_cones = []
     for idx, s in enumerate(svs[:-1]):
@@ -947,7 +949,7 @@ def split_2d_plane_into_convex_cones(center:ArrayLike, split_vecs:ArrayLike, **k
         kw = {
             "xlim": kwargs.get("xlim", None),
             "ylim": kwargs.get("ylim", None),
-            "title": "2D space split by {} convex cones with common apex".format(len(convex_cones)),
+            "title": f"2D space split by {len(convex_cones)} convex cones with common apex",
         }
         kw = {k:v for k,v in kw.items() if v is not None}
         fill_alpha = kwargs.get("alpha", 0.5)

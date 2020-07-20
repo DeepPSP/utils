@@ -209,7 +209,7 @@ def detect_peaks(x:ArrayLike,
         dx = np.max(np.vstack([data[ind]-data[ind+idx] for idx in range(-mpd, 0)]), axis=0)
         ind = np.delete(ind, np.where(dx < _left_threshold)[0])
         if verbose >= 2:
-            print(f'from left, dx = {dx.tolist()}'.)
+            print(f'from left, dx = {dx.tolist()}')
             print(f'after deleting those dx < _left_threshold = {_left_threshold}, ind = {ind.tolist()}')
         dx = np.max(np.vstack([data[ind]-data[ind+idx] for idx in range(1, mpd+1)]), axis=0)
         ind = np.delete(ind, np.where(dx < _right_threshold)[0])

@@ -422,7 +422,7 @@ def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:Real, s
         # elif isinstance(item, int):
         #     to_cover_intervals.append([item, item+1])
         # else:
-        #     raise ValueError("{0} is not an integer or an interval".format(item))
+        #     raise ValueError(f"{item} is not an integer or an interval")
     # to_cover_intervals = interval_union(to_cover_intervals)
 
     for interval in to_cover_intervals:
@@ -448,7 +448,7 @@ def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:Real, s
     to_cover_intervals[-1][0] = min(to_cover_intervals[-1][0], tot_end - min_len)
 
     if verbose >= 2:
-        print('to_cover_intervals after two tails adjusted', to_cover_intervals)
+        print(f'`to_cover_intervals` after two tails adjusted to {to_cover_intervals}')
 
     # merge intervals whose distances (might be negative) are less than `split_threshold`
     merge_flag = True
@@ -479,7 +479,7 @@ def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:Real, s
                 to_cover_intervals = new_intervals
                 break
     if verbose >= 2:
-        print('to_cover_intervals after merging intervals whose gaps < split_threshold', to_cover_intervals)
+        print(f'`to_cover_intervals` after merging intervals whose gaps < split_threshold are {to_cover_intervals}')
 
     # currently, distance between any two intervals in `to_cover_intervals` are larger than `split_threshold`
     # but any interval except the head and tail might has length less than `min_len`
@@ -506,7 +506,7 @@ def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:Real, s
         this_start, this_end = item
         next_start, next_end = to_cover_intervals[idx + 1]
         potential_end = max(this_end, start + min_len)
-        # print('start', start)
+        # print(f'start = {start}')
         # print('potential_end', potential_end)
         # if distance from `potential_end` to `next_start` is not enough
         # and has not reached the end of `to_cover_intervals`
@@ -523,7 +523,7 @@ def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:Real, s
             start = next_start
             if idx == len(to_cover_intervals) - 2:
                 ret.append([next_start, max(next_start + min_len, next_end)])
-        # print('ret', ret)
+        # print(f'ret = {ret}')
     if traceback:
         for item in ret:
             record = []

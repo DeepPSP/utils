@@ -159,7 +159,7 @@ def exif_color_space(img: Image, verbose:int=0) -> str:
     else:
         img_cs = 'unknown'
         if verbose >= 1:
-            print ('This image uses UNKNOWN color space ({}, {})'.format(exif.get(0xA001),exif.get(0x0001)))
+            print (f'This image uses UNKNOWN color space ({exif.get(0xA001)}, {exif.get(0x0001)})')
     return img_cs
 
 

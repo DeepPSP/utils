@@ -73,9 +73,9 @@ def image_augmentation(img:np.ndarray, num:int, aug_operations:Optional[List[str
 
     _illegal_operations = [op for op in ops if op not in legal_operations]
     if len(_illegal_operations) == 1:
-        raise ValueError("The operation `{}` on the input image is illegal!".format(_illegal_operations[0]))
+        raise ValueError(f"The operation `{_illegal_operations[0]}` on the input image is illegal!")
     elif len(_illegal_operations) > 1:
-        raise ValueError("The operation `{}` on the input image are illegal!".format(_illegal_operations))
+        raise ValueError(f"The operation `{_illegal_operations}` on the input image are illegal!")
 
     rotation_angle = kwargs.get('rotation_angle', __DEFAULT_ROTATION_ANGLE)
     shift_ratio = kwargs.get('shift_ratio', __DEFAULT_SHIFT_RATIO)
@@ -131,7 +131,7 @@ def _image_rotation(img:np.ndarray, angle:Real, num:int, verbose:int=0) -> np.nd
     angles = uniform(-_angle, _angle, num)
 
     if verbose >= 1:
-        print('angles = {}'.format(angles))
+        print(f'angles = {angles}')
     
     for a in angles:
         M = cv2.getRotationMatrix2D((ncols/2,nrows/2),a,1)
@@ -170,8 +170,8 @@ def _image_shift(img:np.ndarray, ratio:float, num:int, verbose:int=0) -> np.ndar
         shifts.append(next(c))
     
     if verbose >= 1:
-        print('shift_y = {},shift_x = {}'.format(shift_y,shift_x))
-        print('shifts = {}'.format(shifts))
+        print(f'shift_y = {shift_y},shift_x = {shift_x}')
+        print(f'shifts = {shifts}')
     
     for x,y in shifts:
         M = np.array([[1,0,x],[0,1,y]], dtype=np.float32)
@@ -206,8 +206,9 @@ def _shear_transformation(img:np.ndarray, angle:Real, num:int, verbose:int=0) ->
     radians = uniform(-_angle, _angle, num)
     alphas = np.tan(radians)
 
+    nl = '\n'
     if verbose >= 1:
-        print('radians = {}\nalphas = {}'.format(radians,alphas))
+        print(f'radians = {radians}{nl}alphas = {alphas}')
     
     for a in alphas:
         M = np.array([[1,a,0],[0,1,0]], dtype=np.float32)
@@ -242,8 +243,9 @@ def _image_zoom(img:np.ndarray, ratio:float, num:int, verbose:int=0) -> np.ndarr
 
     ratios = uniform(-_ratio, _ratio, num)
 
+    nl = '\n'
     if verbose >= 1:
-        print('ratios = {}'.format(ratios))
+        print(f'ratios = {ratios}')
 
     for r in ratios:
         if r == 0:
@@ -261,7 +263,7 @@ def _image_zoom(img:np.ndarray, ratio:float, num:int, verbose:int=0) -> np.ndarr
             pts1 = np.array([[0,0], [nrows,0], [0,ncols], [nrows,ncols]], dtype=np.float32)
         
         if verbose >= 2:
-            print('for ratio = {},\npts1 = {}\npts2 = {}'.format(r, pts1, pts2))
+            print(f'for ratio = {r}{nl}pts1 = {pts1}{nl}pts2 = {pts2}')
         
         M = cv2.getPerspectiveTransform(pts1, pts2)
         l_zoomed.append(cv2.warpPerspective(img,M,(ncols,nrows)))

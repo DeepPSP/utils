@@ -20,16 +20,17 @@ def indicator_enter_leave_func(verbose:int=0):
     verbose: int,
         printing verbosity
     """
+    nl = "\n"
     def dec_outer(fn:callable):
         @wraps(fn)
         def dec_inner(*args, **kwargs):
             if verbose >= 1:
-                print("\n"+"*"*10+"  entering function {}  ".format(fn.__name__)+"*"*10)
+                print(f"{nl}{'*'*6}  entering function {fn.__name__}  {'*'*6}")
                 start = time.time()
             response = fn(*args, **kwargs)
             if verbose >= 1:
-                print("\n"+"*"*10+"  execution of function {} used {} second(s)  ".format(fn.__name__, time.time()-start)+"*"*10)
-                print("\n"+"*"*10+"  leaving function {}  ".format(fn.__name__)+"*"*10+"\n")
+                print(f"{nl}{'*'*6}  execution of function {fn.__name__} used {time.time()-start} second(s)  {'*'*6}")
+                print(f"{nl}{'*'*6}  leaving function {fn.__name__}  {'*'*6}{nl}")
             return response
         return dec_inner
     return dec_outer

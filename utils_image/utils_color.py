@@ -126,7 +126,7 @@ def compatible_imshow(img_path:str, return_fmt:Optional[str]=None, **kwargs) -> 
     elif 'gray' in fmt or 'grey' in fmt:
         rt_img = _rgb_to_grey(rgb_img, **kwargs)
     else:
-        raise ValueError("format {} not implemented yet!".format(return_fmt))
+        raise ValueError(f"format {return_fmt} not implemented yet!")
 
     return rt_img
 
@@ -197,7 +197,7 @@ def convert_color(img:np.ndarray, src_fmt:str, dst_fmt:str, backend:Optional[str
     """
     src = src_fmt.lower()
     dst = dst_fmt.lower()
-    err = ValueError("Color space conversion from {} to {} is not implemented yet".format(src_fmt, dst_fmt))
+    err = ValueError(f"Color space conversion from {src_fmt} to {dst_fmt} is not implemented yet")
     if src == dst:
         dst_img = img.copy()
     elif src == 'rgb':
@@ -287,7 +287,7 @@ def _rgb_to_grey(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.nda
     elif backend.lower() == 'naive':
         pass
     else:
-        raise ValueError("no backend named {} for converting color space from {} to {}".format(backend, 'RGB', 'GREY'))
+        raise ValueError(f"no backend named {backend} for converting color space from `RGB` to `GREY`")
     return grey
 
 
@@ -332,7 +332,7 @@ def _rgb_to_ciexyz(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.n
         cie_xyz = np.apply_along_axis(lambda v:np.dot(M,v), -1, var_rgb)
         cie_xyz = cie_xyz.astype(np.float32)
     else:
-        raise ValueError("no backend named {} for converting color space from {} to {}".format(backend, 'RGB', 'CIEXYZ'))
+        raise ValueError(f"no backend named {backend} for converting color space from `RGB` to `CIEXYZ`")
     return cie_xyz
 
 
@@ -453,7 +453,7 @@ def _ciexyz_to_cielab(img:np.ndarray, illuminant:str='D65', observer:int=2, back
         cie_lab = np.apply_along_axis(lambda v:np.array([116*_aux_func(v[1])-16, 500*(_aux_func(v[0])-_aux_func(v[1])), 200*(_aux_func(v[1])-_aux_func(v[2]))]), -1, img/common.ILLUMINANT_D65_2_XYZ)
         cie_lab = cie_lab.astype(np.float32)
     else:
-        raise ValueError("no backend named {} for converting color space from {} to {}".format(backend, 'CIEXYZ', 'CIELAB'))
+        raise ValueError(f"no backend named {backend} for converting color space from `CIEXYZ` to `CIELAB`")
     return cie_lab
 
 
@@ -491,7 +491,7 @@ def _rgb_to_cielab(img:np.ndarray, illuminant:str='D65', observer:int=2, backend
         cie_xyz = _rgb_to_ciexyz(img)
         cie_lab = _ciexyz_to_cielab(cie_xyz, illuminant=illuminant, observer=observer, backend=backend)
     else:
-        raise ValueError("no backend named {} for converting color space from {} to {}".format(backend, 'RGB', 'CIELAB'))
+        raise ValueError(f"no backend named {backend} for converting color space from `RGB` to `CIELAB`")
     return cie_lab
 
 
@@ -527,7 +527,7 @@ def _rgb_to_cieluv(img:np.ndarray, illuminant:str='D65', observer:int=2, backend
     elif backend.lower() == 'naive':
         pass
     else:
-        raise ValueError("no backend named {} for converting color space from {} to {}".format(backend, 'RGB', 'CIELUV'))
+        raise ValueError(f"no backend named {backend} for converting color space from `RGB` to `CIELUV`")
     return cieluv
 
 
@@ -559,7 +559,7 @@ def _rgb_to_ycbcr(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.nd
     elif backend.lower() == 'naive':
         pass
     else:
-        raise ValueError("no backend named {} for converting color space from {} to {}".format(backend, 'RGB', 'YCbCr'))
+        raise ValueError(f"no backend named {backend} for converting color space from `RGB` to `YCbCr`")
     return ycbcr
 
 
@@ -597,7 +597,7 @@ def _rgb_to_yiq(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.ndar
         M = common.MAT_RGB_TO_YIQ
         yiq = np.apply_along_axis(lambda v:np.dot(M,v), -1, _rescale_rgb(img))
     else:
-        raise ValueError("no backend named {} for converting color space from {} to {}".format(backend, 'RGB', 'YIQ'))
+        raise ValueError(f"no backend named {backend} for converting color space from `RGB` to `YIQ`")
     return yiq
 
 
@@ -687,7 +687,7 @@ def _rgb_to_cmyk(img:np.ndarray, scale:Real=1, backend:Optional[str]=None, **kwa
             arr=cmyk,
         )
     else:
-        raise ValueError("no backend named {} for converting color space from {} to {}".format(backend, 'RGB', 'CMYK'))
+        raise ValueError(f"no backend named {backend} for converting color space from `RGB` to `CMYK`")
     if scale in [100,100.0]:
         cmyk = 100.0*cmyk
     return cmyk
@@ -960,6 +960,6 @@ def exif_color_space(img: Image.Image, verbose:int=0) -> str:
     else:
         img_cs = 'unknown'
         if verbose >= 1:
-            print ('This image uses UNKNOWN color space ({}, {})'.format(exif.get(0xA001),exif.get(0x0001)))
+            print (f'This image uses UNKNOWN color space ({exif.get(0xA001)}, {exif.get(0x0001)})')
     return img_cs
     

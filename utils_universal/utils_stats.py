@@ -113,11 +113,11 @@ def kmeans2_is_correct(data:np.ndarray, centroids:np.ndarray, labels:np.ndarray,
     nb_clusters2 = len(set(labels))
 
     if verbose >= 1:
-        print('nb_clusters(len(centroids)) = {0}, nb_clusters2(len(set(labels))) = {1}'.format(nb_clusters,nb_clusters2))
+        print(f'nb_clusters(len(centroids)) = {nb_clusters}, nb_clusters2(len(set(labels))) = {nb_clusters2}')
         if verbose >= 2:
-            print('data =',data)
-            print('centroids =', centroids)
-            print('labels =', labels)
+            print(f'data = {data}')
+            print(f'centroids = {centroids}')
+            print(f'labels = {labels}')
     
     if nb_clusters != nb_clusters2:
         return False
@@ -130,8 +130,8 @@ def kmeans2_is_correct(data:np.ndarray, centroids:np.ndarray, labels:np.ndarray,
     
     to_check = [lb for lb in range(nb_clusters) if (labels==lb).sum()>1]
     if verbose >= 1:
-        print('to_check =', to_check)
-        print('np.sign(data-centroids[lb]) =', [np.sign(data-centroids[lb]) for lb in to_check])
+        print(f'to_check = {to_check}')
+        print(f'np.sign(data-centroids[lb]) = {[np.sign(data-centroids[lb]) for lb in to_check]}')
     return all([len(set(np.sign(data-centroids[lb])))>=2 for lb in to_check])  # == 2 or == 3
 
 
@@ -153,7 +153,7 @@ def is_outlier(to_check_val:Real, normal_vals:Union[List[int],List[float],Tuple[
     lower_bound = perc25 - 1.5 * iqr
     upper_bound = perc75 + 1.5 * iqr
     if verbose >= 1:
-        print('75 percentile = {0}, 25 percentile = {1}, iqr = {2}, lower_bound = {3}, upper_bound = {4}'.format(perc75, perc25, iqr, lower_bound, upper_bound))
+        print(f'75 percentile = {perc75}, 25 percentile = {perc25}, iqr = {iqr}, lower_bound = {lower_bound}, upper_bound = {upper_bound}')
     return not lower_bound <= to_check_val <= upper_bound
 
 
@@ -750,7 +750,7 @@ def _train_test_split_dataframe_strafified(df:pd.DataFrame, split_cols:List[str]
     }
     
     if verbose >= 1:
-        print("item_names = {}".format(item_names))
+        print(f"item_names = {item_names}")
     
     for n in item_names:
         random.shuffle(item_indices[n])
@@ -760,7 +760,7 @@ def _train_test_split_dataframe_strafified(df:pd.DataFrame, split_cols:List[str]
         item_test_indices = item_indices[n][:int(round(test_ratio*len(item_indices[n])))]
         test_indices += item_test_indices
         if verbose >= 2:
-            print("for the item `{}`, len(item_test_indices) = {}".format(n, len(item_test_indices)))
+            print(f"for the item `{n}`, len(item_test_indices) = {len(item_test_indices)}")
     
     df_test = df.loc[df.index.isin(test_indices)].reset_index(drop=True)
     df_train = df.loc[~df.index.isin(test_indices)].reset_index(drop=True)
