@@ -623,9 +623,10 @@ def diff_with_step(a:ArrayLike, step:int=1, **kwargs) -> np.ndarray:
     d: ndarray:
         the difference array
     """
-    if step >= len(a):
-        raise ValueError(f"step ({step}) should be less than the length ({len(a)}) of `a`")
-    d = a[step:] - a[:-step]
+    _a = np.array(a)
+    if step >= len(_a):
+        raise ValueError(f"step ({step}) should be less than the length ({len(_a)}) of `a`")
+    d = _a[step:] - _a[:-step]
     return d
 
 
