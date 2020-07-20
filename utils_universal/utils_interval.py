@@ -613,7 +613,7 @@ def diff_with_step(a:ArrayLike, step:int=1, **kwargs) -> np.ndarray:
     Parameters:
     -----------
     a: array_like,
-        the input array
+        the input data
     step: int, default 1,
         the step to compute the difference
     kwargs: dict,
@@ -623,7 +623,9 @@ def diff_with_step(a:ArrayLike, step:int=1, **kwargs) -> np.ndarray:
     d: ndarray:
         the difference array
     """
-    d = np.array([a[n+step]-a[n] for n in range(len(a)-step)])
+    if step >= len(a):
+        raise ValueError(f"step ({step}) should be less than the length ({len(a)}) of `a`")
+    d = a[step:] - a[:-step]
     return d
 
 
