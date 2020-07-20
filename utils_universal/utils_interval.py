@@ -113,10 +113,11 @@ def in_interval(val:Real, interval:Interval) -> bool:
 
     Returns:
     --------
-    bool,
+    is_in: bool,
     """
     interval.sort()
-    return True if interval[0] <= val <= interval[-1] else False
+    is_in = True if interval[0] <= val <= interval[-1] else False
+    return is_in
 
 
 def in_generalized_interval(val:Real, generalized_interval:GeneralizedInterval) -> bool:
@@ -131,12 +132,14 @@ def in_generalized_interval(val:Real, generalized_interval:GeneralizedInterval) 
 
     Returns:
     --------
-    bool,
+    is_in: bool,
     """
+    is_in = False
     for interval in generalized_interval:
         if in_interval(val, interval):
-            return True
-    return False
+            is_in = True
+            break
+    return is_in
 
 
 def get_confidence_interval(data:Optional[ArrayLike]=None, val:Optional[Real]=None, rmse:Optional[float]=None, confidence:float=0.95, **kwargs) -> np.ndarray:
@@ -206,24 +209,21 @@ def intervals_union(interval_list:GeneralizedInterval, join_book_endeds:bool=Tru
             next_start, next_end = processed[idx + 1]
             # it is certain that this_start <= next_start
             if this_end < next_start:
-                # 两区间首尾分开
+                # the case where two consecutive intervals are disjoint
                 new_intervals.append([this_start, this_end])
                 if idx == len(processed) - 2:
                     new_intervals.append([next_start, next_end])
             elif this_end == next_start:
-                # 两区间首尾正好在一点
-                # 需要区别对待单点区间以及有长度的区间
-                # 以及join_book_endeds的情况
-                # 来判断是否合并
+                # the case where two consecutive intervals are book-ended
+                # concatenate if `join_book_endeds` is True, 
+                # or one interval degenerates (to a single point)
                 if (this_start == this_end or next_start == next_end) or join_book_endeds:
-                    # 单点区间以及join_book_endeds为True时合并
                     new_intervals.append([this_start, max(this_end, next_end)])
                     new_intervals += processed[idx + 2:]
                     merge_flag = True
                     processed = new_intervals
                     break
                 else:
-                    # 都是有长度的区间且join_book_endeds为False则不合并
                     new_intervals.append([this_start, this_end])
                     if idx == len(processed) - 2:
                         new_intervals.append([next_start, next_end])
@@ -309,10 +309,10 @@ def generalized_intervals_intersection(generalized_interval:GeneralizedInterval,
     """
     this = intervals_union(generalized_interval)
     another = intervals_union(another_generalized_interval)
-    # 注意，此时this, another都是按区间起始升序排列的，
-    # 而且这二者都是一系列区间的不交并
+    # NOTE: from now on, `this`, `another` are in ascending ordering
+    # and are disjoint unions of intervals
     its = []
-    # 以下流程可以优化
+    # TODO: optimize the following process
     cut_idx = 0
     for item in this:
         another = another[cut_idx:]
@@ -360,27 +360,40 @@ def generalized_interval_complement(total_interval:Interval, generalized_interva
     return cpl
 
 
-def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:int, split_threshold:int, traceback:bool=False, **kwargs) -> Tuple[GeneralizedInterval,list]:
+def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:Real, split_threshold:Real, traceback:bool=False, **kwargs) -> Tuple[GeneralizedInterval,list]:
     """ finished, checked,
 
-    获取覆盖to_cover中每一项的满足min_len, split_threshold条件的最佳覆盖
+    compute an optimal covering (disjoint union of intervals) that covers `to_cover` such that
+    each interval in the covering is of length at least `min_len`,
+    and any two intervals in the covering have distance at least `split_threshold`
 
     Parameters:
     -----------
-    total_interval: 总的大区间
-    to_cover: 需要覆盖的点和区间的列表
-    min_len: 每一个覆盖的最小长度
-    split_threshold: 覆盖之间的最小距离
-    traceback: 是否记录每个covering覆盖了的to_cover的项（的index）
-    注意单位保持一致！
-    如果to_cover的范围超过total_interval的范围，会抛出异常
+    total_interval: Interval,
+        the total interval that the covering is picked from
+    to_cover: list,
+        a list of intervals to cover
+    min_len: real number,
+        minimun length of the intervals of the covering
+    split_threshold: real number,
+        minumun distance of intervals of the covering
+    traceback: bool, default False,
+        if True, a list containing the list of indices of the intervals in the original `to_cover`,
+        that each interval in the covering covers
+
+    Raises:
+    -------
+    if any of the intervals in `to_cover` exceeds the range of `total_interval`,
+    ValueError will be raised
 
     Returns:
     --------
     (ret, ret_traceback)
-        ret是一个GeneralizedInterval，满足min_len, split_threshold的条件；
-        ret_traceback是一个list，
-        其中每一项是一个list，记录了ret中对应的interval覆盖的to_cover中的项的indices
+        ret: GeneralizedInterval,
+            the covering that satisfies the given conditions
+        ret_traceback: list，
+            contains the list of indices of the intervals in the original `to_cover`,
+            that each interval in the covering covers
     """
     start_time = time.time()
     verbose = kwargs.get('verbose', 0)
@@ -388,7 +401,7 @@ def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:int, sp
     tot_start, tot_end = tmp[0], tmp[-1]
 
     if verbose >= 1:
-        print('total_interval =', total_interval, 'with_length =', tot_end-tot_start)
+        print(f'total_interval = {total_interval}, with_length = {tot_end-tot_start}')
 
     if tot_end - tot_start < min_len:
         ret = [[tot_start, tot_end]]
@@ -404,7 +417,7 @@ def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:int, sp
         replica_for_traceback = deepcopy(to_cover_intervals)
 
     if verbose >= 2:
-        print('to_cover_intervals after all converted to intervals', to_cover_intervals)
+        print(f'to_cover_intervals after all converted to intervals = {to_cover_intervals}')
 
         # elif isinstance(item, int):
         #     to_cover_intervals.append([item, item+1])
@@ -419,7 +432,7 @@ def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:int, sp
     to_cover_intervals.sort(key=interval_sort_key)
 
     if verbose >= 2:
-        print('to_cover_intervals after sorted', to_cover_intervals)
+        print(f'to_cover_intervals after sorted = {to_cover_intervals}')
 
     # if to_cover_intervals[0][0] < tot_start or to_cover_intervals[-1][-1] > tot_end:
     #     raise IndexError("some item in to_cover list exceeds the range of total_interval")
@@ -429,15 +442,15 @@ def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:int, sp
         item[-1] = min(item[-1], tot_end)
     # to_cover_intervals = [item for item in to_cover_intervals if item[-1] > item[0]]
 
-    # 确保第一个区间的末尾到tot_start的距离不低于min_len
+    # ensure that the distance from the first interval to `tot_start` is at least `min_len`
     to_cover_intervals[0][-1] = max(to_cover_intervals[0][-1], tot_start + min_len)
-    # 确保最后一个区间的起始到tot_end的距离不低于min_len
+    # ensure that the distance from the last interval to `tot_end` is at least `min_len`
     to_cover_intervals[-1][0] = min(to_cover_intervals[-1][0], tot_end - min_len)
 
     if verbose >= 2:
         print('to_cover_intervals after two tails adjusted', to_cover_intervals)
 
-    # 将间隔（有可能是负的，即有重叠）小于split_threshold的区间合并
+    # merge intervals whose distances (might be negative) are less than `split_threshold`
     merge_flag = True
     while merge_flag:
         merge_flag = False
@@ -449,7 +462,7 @@ def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:int, sp
             next_start, next_end = to_cover_intervals[idx + 1]
             if next_start - this_end >= split_threshold:
                 if split_threshold == (next_start - next_end) == 0 or split_threshold == (this_start - this_end) == 0:
-                    # 需要单独处理 split_threshold ==0 以及正好有连着的单点集这种情况
+                    # the case where split_threshold ==0 and the degenerate case should be dealth with separately
                     new_intervals.append([this_start, max(this_end, next_end)])
                     new_intervals += to_cover_intervals[idx + 2:]
                     merge_flag = True
@@ -468,13 +481,13 @@ def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:int, sp
     if verbose >= 2:
         print('to_cover_intervals after merging intervals whose gaps < split_threshold', to_cover_intervals)
 
-    # 此时，to_cover_intervals中所有区间的间隔都大于split_threshold
-    # 但是除了头尾两个区间之外的区间的长度可能小于min_len
+    # currently, distance between any two intervals in `to_cover_intervals` are larger than `split_threshold`
+    # but any interval except the head and tail might has length less than `min_len`
     ret = []
     ret_traceback = []
     if len(to_cover_intervals) == 1:
-        # 注意，此时to_cover_intervals只有一个，这个元素（区间）的长度应该不小于min_len
-        # 保险起见还是计算一下
+        # NOTE: here, there's only one `to_cover_intervals`,
+        # whose length should be at least `min_len`
         mid_pt = (to_cover_intervals[0][0]+to_cover_intervals[0][-1]) // 2
         half_len = min_len // 2
         if mid_pt - tot_start < half_len:
@@ -495,14 +508,15 @@ def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:int, sp
         potential_end = max(this_end, start + min_len)
         # print('start', start)
         # print('potential_end', potential_end)
-        # 如果potential_end到next_start的间隔不够长，
-        # 则进入下一循环（如果不到to_cover_intervals尾部）
+        # if distance from `potential_end` to `next_start` is not enough
+        # and has not reached the end of `to_cover_intervals`
+        # continue to the next loop
         if next_start - potential_end < split_threshold:
             if idx < len(to_cover_intervals) - 2:
                 continue
             else:
-                # 此时 idx==len(to_cover_intervals)-2
-                # next_start (从而start也是) 到 tot_end 距离至少为min_len
+                # now, idx==len(to_cover_intervals)-2
+                # distance from `next_start` (hence `start`) to `tot_end` is at least `min_len`
                 ret.append([start, max(start + min_len, next_end)])
         else:
             ret.append([start, potential_end])
@@ -521,7 +535,7 @@ def get_optimal_covering(total_interval:Interval, to_cover:list, min_len:int, sp
             ret_traceback.append(record)
     
     if verbose >= 1:
-        print('the final result of get_optimal_covering is ret = {0}, ret_traceback = {1}, the whole process used {2} second(s)'.format(ret, ret_traceback, time.time()-start_time))
+        print(f'the final result of get_optimal_covering is ret = {ret}, ret_traceback = {ret_traceback}, the whole process used {time.time()-start_time} second(s)')
     
     return ret, ret_traceback
 
@@ -587,7 +601,8 @@ def generalized_interval_len(generalized_interval:GeneralizedInterval) -> Real:
 
     compute the length of a generalized interval. -1 for the empty interval []
     """
-    return sum([interval_len(item) for item in intervals_union(generalized_interval)])
+    gi_len = sum([interval_len(item) for item in intervals_union(generalized_interval)])
+    return gi_len
 
 
 def diff_with_step(a:ArrayLike, step:int=1, **kwargs) -> np.ndarray:
@@ -597,13 +612,19 @@ def diff_with_step(a:ArrayLike, step:int=1, **kwargs) -> np.ndarray:
 
     Parameters:
     -----------
-    to write
+    a: array_like,
+        the input array
+    step: int, default 1,
+        the step to compute the difference
+    kwargs: dict,
 
     Returns:
     --------
-    to write
+    d: ndarray:
+        the difference array
     """
-    return np.array([a[n+step]-a[n] for n in range(len(a)-step)])
+    d = np.array([a[n+step]-a[n] for n in range(len(a)-step)])
+    return d
 
 
 def find_extrema(signal:Optional[ArrayLike]=None, mode:str='both') -> np.ndarray:
@@ -612,17 +633,15 @@ def find_extrema(signal:Optional[ArrayLike]=None, mode:str='both') -> np.ndarray
 
     Parameters:
     -----------
-    signal : array
-        Input signal.
-    mode : str, optional
-        Whether to find maxima ('max'), minima ('min'), or both ('both').
+    signal: ndarray
+        input signal.
+    mode: str, optional
+        whether to find maxima ('max'), minima ('min'), or both ('both').
     
     Returns:
     --------
-    extrema : array
-        Indices of the extrama points.
-    values : array
-        Signal values at the extrema points.
+    extrema : ndarray
+        indices of the extrama points.
     """
     # check inputs
     if signal is None:
