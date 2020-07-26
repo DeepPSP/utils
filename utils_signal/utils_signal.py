@@ -21,7 +21,7 @@ except:
 from utils.common import ArrayLike, ArrayLike_Int
 
 
-np.set_printoptions(precision=5,suppress=True)
+np.set_printoptions(precision=5, suppress=True)
 
 
 __all__ = [
@@ -254,32 +254,30 @@ def _plot(x, mph, mpd, threshold, edge, valley, ax, ind):
 
     Parameters: ref. the function `detect_peaks`
     """
-    try:
+    if 'plt' not in dir():
         import matplotlib.pyplot as plt
-    except ImportError:
-        print('matplotlib is not available.')
-    else:
-        if ax is None:
-            _, ax = plt.subplots(1, 1, figsize=(8, 4))
+    
+    if ax is None:
+        _, ax = plt.subplots(1, 1, figsize=(8, 4))
 
-        ax.plot(x, 'b', lw=1)
-        if ind.size:
-            label = 'valley' if valley else 'peak'
-            label = label + 's' if ind.size > 1 else label
-            ax.plot(ind, x[ind], '+', mfc=None, mec='r', mew=2, ms=8,
-                    label='%d %s' % (ind.size, label))
-            ax.legend(loc='best', framealpha=.5, numpoints=1)
-        ax.set_xlim(-.02*x.size, x.size*1.02-1)
-        ymin, ymax = x[np.isfinite(x)].min(), x[np.isfinite(x)].max()
-        yrange = ymax - ymin if ymax > ymin else 1
-        ax.set_ylim(ymin - 0.1*yrange, ymax + 0.1*yrange)
-        ax.set_xlabel('Data #', fontsize=14)
-        ax.set_ylabel('Amplitude', fontsize=14)
-        mode = 'Valley detection' if valley else 'Peak detection'
-        ax.set_title("%s (mph=%s, mpd=%d, threshold=%s, edge='%s')"
-                     % (mode, str(mph), mpd, str(threshold), edge))
-        # plt.grid()
-        plt.show()
+    ax.plot(x, 'b', lw=1)
+    if ind.size:
+        label = 'valley' if valley else 'peak'
+        label = label + 's' if ind.size > 1 else label
+        ax.plot(ind, x[ind], '+', mfc=None, mec='r', mew=2, ms=8,
+                label='%d %s' % (ind.size, label))
+        ax.legend(loc='best', framealpha=.5, numpoints=1)
+    ax.set_xlim(-.02*x.size, x.size*1.02-1)
+    ymin, ymax = x[np.isfinite(x)].min(), x[np.isfinite(x)].max()
+    yrange = ymax - ymin if ymax > ymin else 1
+    ax.set_ylim(ymin - 0.1*yrange, ymax + 0.1*yrange)
+    ax.set_xlabel('Data #', fontsize=14)
+    ax.set_ylabel('Amplitude', fontsize=14)
+    mode = 'Valley detection' if valley else 'Peak detection'
+    ax.set_title("%s (mph=%s, mpd=%d, threshold=%s, edge='%s')"
+                    % (mode, str(mph), mpd, str(threshold), edge))
+    # plt.grid()
+    plt.show()
 
 
 def phasor_transform(s:ArrayLike, rv:Real) -> np.ndarray:
@@ -1086,7 +1084,7 @@ def wavelet_rec_iswt(coeffs:List[List[np.ndarray]], levels:ArrayLike_Int, wavele
     return sig_rec
 
 
-def resample_irregular_timeseries(s:ArrayLike, output_fs:Real=2, method:str="spline", return_with_time:bool=False, tnew:Optional[ArrayLike]=None, options:dict={}, verbose:int=0) -> np.ndarray:
+def resample_irregular_timeseries(s:ArrayLike, output_fs:Real=2, method:str="spline", return_with_time:bool=False, tnew:Optional[ArrayLike]=None, interp_kw:dict={}, verbose:int=0) -> np.ndarray:
     """ finished, checked,
 
     resample the 2d irregular timeseries `s` into a 1d or 2d regular time series with frequency `output_fs`,
@@ -1104,7 +1102,7 @@ def resample_irregular_timeseries(s:ArrayLike, output_fs:Real=2, method:str="spl
         return a 2d array, with the 0-th coordinate being time
     tnew: array_like, optional,
         the array of time of the output array
-    options: dict, default {},
+    interp_kw: dict, default {},
         additional options for the corresponding methods in scipy.interpolate
 
     Returns:
@@ -1138,16 +1136,16 @@ def resample_irregular_timeseries(s:ArrayLike, output_fs:Real=2, method:str="spl
 
     if method == "spline":
         m = len(time_series)
-        w = options.get("w", np.ones(shape=(m,)))
-        # s = options.get("s", np.random.uniform(m-np.sqrt(2*m),m+np.sqrt(2*m)))
-        s = options.get("s", m-np.sqrt(2*m))
-        options.update(w=w, s=s)
+        w = interp_kw.get("w", np.ones(shape=(m,)))
+        # s = interp_kw.get("s", np.random.uniform(m-np.sqrt(2*m),m+np.sqrt(2*m)))
+        s = interp_kw.get("s", m-np.sqrt(2*m))
+        interp_kw.update(w=w, s=s)
 
-        tck = interpolate.splrep(time_series[:,0],time_series[:,1],**options)
+        tck = interpolate.splrep(time_series[:,0],time_series[:,1],**interp_kw)
 
         regular_timeseries = interpolate.splev(xnew, tck)
     elif method == "interp1d":
-        f = interpolate.interp1d(time_series[:,0],time_series[:,1],**options)
+        f = interpolate.interp1d(time_series[:,0],time_series[:,1],**interp_kw)
 
         regular_timeseries = f(xnew)
     
