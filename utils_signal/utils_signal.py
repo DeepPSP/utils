@@ -12,7 +12,7 @@ import pywt
 import scipy
 from math import atan2, factorial
 from scipy import interpolate
-from scipy.signal import butter, lfilter
+from scipy.signal import butter, lfilter, filtfilt
 try:
     from numba import jit
 except:
@@ -1303,9 +1303,10 @@ def butter_bandpass_filter(data:ArrayLike, lowcut:Real, highcut:Real, fs:Real, o
     References:
     -----------
     [1] https://scipy-cookbook.readthedocs.io/items/ButterworthBandpass.html
+    [2] https://dsp.stackexchange.com/questions/19084/applying-filter-in-scipy-signal-use-lfilter-or-filtfilt
     """
     b, a = butter_bandpass(lowcut, highcut, fs, order=order)
-    y = lfilter(b, a, data)
+    y = filtfilt(b, a, data)
     return y
 
 
@@ -1604,6 +1605,7 @@ def smooth(x:np.ndarray, window_len:int=11, window:str='hanning', mode:str='vali
     ---------
     np.hanning, np.hamming, np.bartlett, np.blackman, np.convolve
     scipy.signal.lfilter
+    scipy.signal.filtfilt
  
     TODO: the window parameter could be the window itself if an array instead of a string
 
