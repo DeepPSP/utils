@@ -580,7 +580,7 @@ def find_max_cont_len(sublist:Interval, tot_rng:Real) -> dict:
 def interval_len(interval:Interval) -> Real:
     """ finished, checked,
 
-    compute the length of an interval. -1 for the empty interval []
+    compute the length of an interval. 0 for the empty interval []
 
     Parameters:
     -----------
@@ -592,14 +592,23 @@ def interval_len(interval:Interval) -> Real:
         the `length` of `interval`
     """
     interval.sort()
-    itv_len = interval[-1] - interval[0] if len(interval) > 0 else -1
+    itv_len = interval[-1] - interval[0] if len(interval) > 0 else 0
     return itv_len
 
 
 def generalized_interval_len(generalized_interval:GeneralizedInterval) -> Real:
     """ finished, checked,
 
-    compute the length of a generalized interval. -1 for the empty interval []
+    compute the length of a generalized interval. 0 for the empty interval []
+
+    Parameters:
+    -----------
+    generalized_interval: GeneralizedInterval
+
+    Returns:
+    --------
+    gi_len: real number,
+        the `length` of `generalized_interval`
     """
     gi_len = sum([interval_len(item) for item in intervals_union(generalized_interval)])
     return gi_len
