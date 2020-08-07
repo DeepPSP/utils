@@ -2,13 +2,14 @@
 """
 docstring, to write
 """
-from typing import Union, Tuple, List
+from typing import Union, Tuple, List, Sequence
 from numbers import Number
 
 
 __all__ = [
     "LCSubStr",
     "dict_depth", "dict_to_str",
+    "str2bool",
 ]
 
 
