@@ -719,7 +719,7 @@ def max_disjoint_covering(intervals:GeneralizedInterval, allow_book_endeds:bool=
     intervals: GeneralizedInterval,
         a sequence of intervals
     allow_book_endeds: bool, default True,
-        if True, book-ended intervals will be considered valid
+        if True, book-ended intervals will be considered valid (disjoint)
 
     Returns:
     --------

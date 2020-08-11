@@ -12,7 +12,7 @@ from copy import deepcopy
 from logging import Logger
 from datetime import datetime, timedelta
 from typing import Union, Optional, Any, Iterable, List, Tuple, Sequence, Dict, Callable, NoReturn
-from numbers import Real
+from numbers import Real, Number
 
 import numpy as np
 
