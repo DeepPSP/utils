@@ -39,6 +39,7 @@ __all__ = [
     "diff_with_step",
     "find_extrema",
     "is_intersect",
+    "max_disjoint_covering",
 ]
 
 
@@ -704,3 +705,45 @@ def is_intersect(interval:Union[GeneralizedInterval,Interval], another_interval:
         return any([is_intersect(itv, another_interval) for itv in interval])
     else:  # not is_generalized and not is_another_generalized
         return any([overlaps(interval, another_interval)>0])
+
+
+def max_disjoint_covering(intervals:GeneralizedInterval, allow_book_endeds:bool=True) -> GeneralizedInterval:
+    """ finished, checked,
+
+    find the largest (the largest interval length) covering of a sequence of intervals
+
+    NOTE: the problem seems slightly different from the problem discussed in refs
+
+    Parameters:
+    -----------
+    intervals: GeneralizedInterval,
+        a sequence of intervals
+    allow_book_endeds: bool, default True,
+        if True, book-ended intervals will be considered valid
+
+    Returns:
+    --------
+    covering: GeneralizedInterval,
+        the maximum non-overlapping (disjoint) subset of `intervals`
+
+    References:
+    -----------
+    [1] https://en.wikipedia.org/wiki/Maximum_disjoint_set
+    [2] https://www.geeksforgeeks.org/maximal-disjoint-intervals/
+    """
+    if len(intervals) <= 1:
+        return intervals
+    l_itv = [sorted(itv) for itv in intervals]
+    l_itv = sorted(l_itv, key=lambda itv: itv[1])
+    if allow_book_endeds:
+        candidates = [[itv] for itv in l_itv if overlaps(itv, l_itv[0]) > 0]
+    else:
+        candidates = [[itv] for itv in l_itv if overlaps(itv, l_itv[0]) >= 0]
+    for idx, l in enumerate(candidates):
+        if allow_book_endeds:
+            tmp = [itv for itv in l_itv if itv[0] >= l[0][1]]
+        else:
+            tmp = [itv for itv in l_itv if itv[0] > l[0][1]]
+        candidates[idx] = l + max_disjoint_covering(tmp, allow_book_endeds=allow_book_endeds)
+    covering = max(candidates, key=generalized_interval_len)
+    return covering

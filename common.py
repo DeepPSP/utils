@@ -11,7 +11,7 @@ from glob import glob
 from copy import deepcopy
 from logging import Logger
 from datetime import datetime, timedelta
-from typing import Union, Optional, Any, Iterable, List, Tuple, Dict, Callable, NoReturn
+from typing import Union, Optional, Any, Iterable, List, Tuple, Sequence, Dict, Callable, NoReturn
 from numbers import Real
 
 import numpy as np
@@ -32,9 +32,9 @@ __all__ = [
 ]
 
 
-ArrayLike = Union[list,tuple,np.ndarray]
-ArrayLike_Float = Union[List[float],Tuple[float],np.ndarray]
-ArrayLike_Int = Union[List[int],Tuple[int],np.ndarray]
+ArrayLike = Union[Sequence, np.ndarray]
+ArrayLike_Float = Union[Sequence[float], np.ndarray]
+ArrayLike_Int = Union[Sequence[int], np.ndarray]
 MilliSecond = int
 Second = int
 
