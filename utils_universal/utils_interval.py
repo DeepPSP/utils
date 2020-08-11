@@ -707,7 +707,7 @@ def is_intersect(interval:Union[GeneralizedInterval,Interval], another_interval:
         return any([overlaps(interval, another_interval)>0])
 
 
-def max_disjoint_covering(intervals:GeneralizedInterval, allow_book_endeds:bool=True) -> GeneralizedInterval:
+def max_disjoint_covering(intervals:GeneralizedInterval, allow_book_endeds:bool=True, with_traceback:bool=True, verbose:int=0) -> Tuple[GeneralizedInterval, List[int]]:
     """ finished, checked,
 
     find the largest (the largest interval length) covering of a sequence of intervals
@@ -720,11 +720,16 @@ def max_disjoint_covering(intervals:GeneralizedInterval, allow_book_endeds:bool=
         a sequence of intervals
     allow_book_endeds: bool, default True,
         if True, book-ended intervals will be considered valid (disjoint)
+    with_traceback: bool, default True,
+        if True, the indices of the intervals in the input `intervals` of the output covering 
+        will also be returned
 
     Returns:
     --------
     covering: GeneralizedInterval,
         the maximum non-overlapping (disjoint) subset of `intervals`
+    covering_inds: list of int,
+        indices in `intervals` of the intervals of `covering_inds`
 
     References:
     -----------
@@ -732,18 +737,60 @@ def max_disjoint_covering(intervals:GeneralizedInterval, allow_book_endeds:bool=
     [2] https://www.geeksforgeeks.org/maximal-disjoint-intervals/
     """
     if len(intervals) <= 1:
-        return intervals
+        covering = deepcopy(intervals)
+        return covering, list(range(len(covering)))
+    
     l_itv = [sorted(itv) for itv in intervals]
-    l_itv = sorted(l_itv, key=lambda itv: itv[1])
+    ordering = np.argsort([itv[-1] for itv in l_itv])
+    l_itv = [l_itv[idx] for idx in ordering]
+    # l_itv = sorted(l_itv, key=lambda itv: itv[-1])
+
+    if verbose >= 1:
+        print(f"the sorted intervals are {l_itv}, whose indices in the original input `intervals` are {ordering}")
+
     if allow_book_endeds:
-        candidates = [[itv] for itv in l_itv if overlaps(itv, l_itv[0]) > 0]
+        candidates_inds = [[idx] for idx,itv in enumerate(l_itv) if overlaps(itv, l_itv[0]) > 0]
     else:
-        candidates = [[itv] for itv in l_itv if overlaps(itv, l_itv[0]) >= 0]
-    for idx, l in enumerate(candidates):
+        candidates_inds = [[idx] for idx,itv in enumerate(l_itv) if overlaps(itv, l_itv[0]) >= 0]
+    candidates = [[l_itv[inds[0]]] for inds in candidates_inds]
+
+    if verbose >= 1:
+        print(f"candidates heads = {candidates}, with corresponding indices in the sorted list of input intervals = {candidates_inds}")
+
+    for c_idx, (cl, ci) in enumerate(zip(candidates, candidates_inds)):
+        if interval_len(cl[0]) == 0:
+            continue
         if allow_book_endeds:
-            tmp = [itv for itv in l_itv if itv[0] >= l[0][1]]
+            tmp_inds = [
+                idx for idx,itv in enumerate(l_itv) if itv[0] >= cl[0][-1] and interval_len(itv) > 0
+            ]
         else:
-            tmp = [itv for itv in l_itv if itv[0] > l[0][1]]
-        candidates[idx] = l + max_disjoint_covering(tmp, allow_book_endeds=allow_book_endeds)
-    covering = max(candidates, key=generalized_interval_len)
-    return covering
+            tmp_inds = [
+                idx for idx,itv in enumerate(l_itv) if itv[0] > cl[0][-1] and interval_len(itv) > 0
+            ]
+        if verbose >= 2:
+            print(f"for the {c_idx}-th candidate, tmp_inds = {tmp_inds}")
+        if len(tmp_inds) > 0:
+            tmp = [l_itv[idx] for idx in tmp_inds]
+            tmp_candidates, tmp_candidates_inds = \
+                max_disjoint_covering(
+                    intervals=tmp,
+                    allow_book_endeds=allow_book_endeds,
+                    with_traceback=with_traceback,
+                    # verbose=verbose,
+                )
+            candidates[c_idx] = cl + tmp_candidates
+            candidates_inds[c_idx] = ci + [tmp_inds[i] for i in tmp_candidates_inds]
+
+    if verbose >= 1:
+        print(f"the processed candidates are {candidates}, with corresponding indices in the sorted list of input intervals = {candidates_inds}")
+    
+    # covering = max(candidates, key=generalized_interval_len)
+    max_idx = np.argmax([generalized_interval_len(c) for c in candidates])
+    covering = candidates[max_idx]
+    if with_traceback:
+        covering_inds = candidates_inds[max_idx]
+        covering_inds = [ordering[i] for i in covering_inds]  # map to the original indices
+    else:
+        covering_inds = []
+    return covering, covering_inds
