@@ -3,10 +3,10 @@
 remarks: commonly used functions related to intervals
 
 NOTE:
-    `interval` refers to interval of the form [a,b]
-    `generalized_interval` refers to some (finite) union of `interval`s
+    `Interval` refers to interval of the form [a,b]
+    `GeneralizedInterval` refers to some (finite) union of `Interval`s
 TODO:
-    1. unify `interval` and `generalized_interval`, by letting `interval` be of the form [[a,b]]
+    1. unify `Interval` and `GeneralizedInterval`, by letting `Interval` be of the form [[a,b]]
     2. distinguish openness and closedness
 
 """
@@ -14,7 +14,7 @@ import time
 from copy import deepcopy
 from functools import reduce
 from numbers import Real
-from typing import Union, Optional, Any, List, Tuple
+from typing import Union, Optional, Any, List, Tuple, Sequence
 
 import numpy as np
 
@@ -44,8 +44,8 @@ __all__ = [
 
 
 EMPTY_SET = []
-Interval = Union[List[Real], Tuple[Real], type(EMPTY_SET)]
-GeneralizedInterval = Union[List[Interval], Tuple[Interval], type(EMPTY_SET)]
+Interval = Union[Sequence[Real], type(EMPTY_SET)]
+GeneralizedInterval = Union[Sequence[Interval], type(EMPTY_SET)]
 
 
 def overlaps(interval:Interval, another:Interval) -> int:
@@ -102,7 +102,7 @@ def validate_interval(interval:Union[Interval, GeneralizedInterval], join_book_e
         return False, []
 
 
-def in_interval(val:Real, interval:Interval) -> bool:
+def in_interval(val:Real, interval:Interval, left_closed:bool=True, right_closed:bool=False) -> bool:
     """ finished, checked,
 
     check whether val is inside interval or not
@@ -111,17 +111,26 @@ def in_interval(val:Real, interval:Interval) -> bool:
     -----------
     val: real number,
     interval: Interval,
+    left_closed: bool, default True,
+    right_closed: bool, default False,
 
     Returns:
     --------
     is_in: bool,
     """
-    interval.sort()
-    is_in = True if interval[0] <= val <= interval[-1] else False
+    itv = sorted(interval)
+    if left_closed:
+        is_in = (itv[0] <= val)
+    else:
+        is_in = (itv[0] < val)
+    if right_closed:
+        is_in = is_in and (val <= itv[-1])
+    else:
+        is_in = is_in and (val < itv[-1])
     return is_in
 
 
-def in_generalized_interval(val:Real, generalized_interval:GeneralizedInterval) -> bool:
+def in_generalized_interval(val:Real, generalized_interval:GeneralizedInterval, left_closed:bool=True, right_closed:bool=False) -> bool:
     """ finished, checked,
 
     check whether val is inside generalized_interval or not
@@ -130,6 +139,8 @@ def in_generalized_interval(val:Real, generalized_interval:GeneralizedInterval) 
     -----------
     val: real number,
     generalized_interval: union of `Interval`s,
+    left_closed: bool, default True,
+    right_closed: bool, default False,
 
     Returns:
     --------
@@ -137,7 +148,7 @@ def in_generalized_interval(val:Real, generalized_interval:GeneralizedInterval) 
     """
     is_in = False
     for interval in generalized_interval:
-        if in_interval(val, interval):
+        if in_interval(val, interval, left_closed, right_closed):
             is_in = True
             break
     return is_in
@@ -712,7 +723,10 @@ def max_disjoint_covering(intervals:GeneralizedInterval, allow_book_endeds:bool=
 
     find the largest (the largest interval length) covering of a sequence of intervals
 
-    NOTE: the problem seems slightly different from the problem discussed in refs
+    NOTE:
+    -----
+    1. the problem seems slightly different from the problem discussed in refs
+    2. intervals with non-positive length will be ignored
 
     Parameters:
     -----------
