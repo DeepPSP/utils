@@ -113,6 +113,7 @@ class ObjectDetectionCheck(object):
             linewidth = max(1, int(round(max(img.shape[:2])/200)))
             df_img = self.df_check_images[self.df_check_images['filename']==self.current_image]
             try:
+                from IPython.display import display
                 display(df_img)
             except:
                 print(df_img)

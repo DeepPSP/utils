@@ -2,7 +2,7 @@
 """
 docstring, to write
 """
-from typing import Union, Tuple, List, Sequence
+from typing import Union, Tuple, List, Sequence, NoReturn
 from numbers import Number
 
 
@@ -10,6 +10,7 @@ __all__ = [
     "LCSubStr",
     "dict_depth", "dict_to_str",
     "str2bool",
+    "printmd",
 ]
 
 
@@ -178,3 +179,24 @@ def str2bool(v:Union[str, bool]) -> bool:
     else:
         raise ValueError('Boolean value expected.')
     return b
+
+
+def printmd(md_str:str) -> NoReturn:
+    """ finished, checked,
+
+    printing bold, colored, etc., text
+
+    Parameters:
+    -----------
+    md_str: str,
+        string in the markdown style
+
+    References:
+    -----------
+    [1] https://stackoverflow.com/questions/23271575/printing-bold-colored-etc-text-in-ipython-qtconsole
+    """
+    try:
+        from IPython.display import Markdown, display
+        display(Markdown(md_str))
+    except:
+        print(md_str)
