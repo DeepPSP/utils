@@ -21,7 +21,7 @@ __all__ = [
     "ArrayLike", "ArrayLike_Float", "ArrayLike_Int",
     "MilliSecond", "Second",
     "DEFAULT_FIG_SIZE_PER_SEC",
-    "idx_to_ts",
+    "idx2ts", "ms2samples", "samples2ms",
     "timestamp_to_local_datetime_string",
     "modulo",
     "angle_d2r",
@@ -42,7 +42,7 @@ Second = int
 DEFAULT_FIG_SIZE_PER_SEC = 4.8
 
 
-def idx_to_ts(idx:int, start_ts:MilliSecond, fs:int) -> MilliSecond:
+def idx2ts(idx:int, start_ts:MilliSecond, fs:int) -> MilliSecond:
     """ finished, checked,
     
     Parameters:
@@ -59,6 +59,48 @@ def idx_to_ts(idx:int, start_ts:MilliSecond, fs:int) -> MilliSecond:
     int, the timestamp of the point at index `idx`
     """
     return int(start_ts + idx * 1000 // fs)
+
+
+def ms2samples(t:Real, fs:Real) -> int:
+    """ finished, checked,
+
+    convert time `t` with units in ms to number of samples
+
+    Parameters:
+    -----------
+    t: real number,
+        time with units in ms
+    fs: real number,
+        sampling frequency of a signal
+
+    Returns:
+    --------
+    n_samples: int,
+        number of samples corresponding to time `t`
+    """
+    n_samples = t * fs // 1000
+    return n_samples
+
+
+def samples2ms(n_samples:int, fs:Real) -> Real:
+    """ finished, checked,
+
+    inverse function of `ms2samples`
+
+    Parameters:
+    -----------
+    n_samples: int,
+        number of sample points
+    fs: real number,
+        sampling frequency of a signal
+
+    Returns:
+    --------
+    t: real number,
+        time duration correponding to `n_samples`
+    """
+    t = n_samples * 1000 / fs
+    return t
 
 
 def timestamp_to_local_datetime_string(ts:int, ts_in_second:bool=False, fmt:str="%Y-%m-%d %H:%M:%S") -> str:
