@@ -16,7 +16,7 @@ from scipy import linalg
 from scipy.linalg import solve_triangular
 from scipy.spatial import distance as scipy_dist
 
-from utils.common import ArrayLike
+from ..common import ArrayLike
 
 
 __all__ = [

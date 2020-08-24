@@ -52,10 +52,10 @@ from parselmouth.praat import call
 from scipy.interpolate import interp1d
 
 from ._praat import PMSound
-from utils.common import ArrayLike
-from utils.utils_signal import butter_bandpass_filter, MovingAverage
-from utils.utils_universal import generalized_intervals_intersection
-from utils.utils_misc import indicator_enter_leave_func
+from ..common import ArrayLike
+from ..utils_signal import butter_bandpass_filter, MovingAverage
+from ..utils_universal import generalized_intervals_intersection
+from ..utils_misc import indicator_enter_leave_func
 
 
 _DEFAULT_BACKEND = 'praat'

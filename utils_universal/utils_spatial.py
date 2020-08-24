@@ -25,8 +25,8 @@ from numpy import pi as PI
 # from scipy.spatial import ConvexHull, Delaunay, Rectangle
 from scipy import spatial as ss
 
-from utils.common import ArrayLike, modulo
-from utils.utils_universal import intervals_intersection
+from ..common import ArrayLike, modulo
+from ..utils_universal import intervals_intersection
 
 
 __all__ = [

@@ -9,7 +9,7 @@ import numpy as np
 import parselmouth as pm
 from parselmouth.praat import call
 
-from database_reader.utils.common import ArrayLike
+from ..common import ArrayLike
 
 
 __all__ = [

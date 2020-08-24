@@ -18,7 +18,7 @@ from typing import Union, Optional, Any, List, Tuple, Sequence
 
 import numpy as np
 
-from utils.common import ArrayLike
+from ..common import ArrayLike
 
 
 __all__ = [

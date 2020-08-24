@@ -24,8 +24,10 @@ import pandas as pd
 import numpy as np
 from numpy.random import randint, choice, uniform
 
-from utils.common import ArrayLike, ArrayLike_Int, ArrayLike_Float
-from utils.common import angle_d2r
+from ..common import (
+    ArrayLike, ArrayLike_Int, ArrayLike_Float,
+    angle_d2r
+)
 
 
 __all__ = [

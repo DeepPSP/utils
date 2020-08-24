@@ -12,7 +12,7 @@ from random import shuffle
 import numpy as np
 import cv2
 
-from utils.common import ArrayLike
+from ..common import ArrayLike
 
 
 __all__ = [
@@ -141,7 +141,7 @@ def get_coordinates(geotags:dict) -> Tuple[float]:
 
 def exif_color_space(img: Image, verbose:int=0) -> str:
     """
-    查看从文件读取的Image的color profile信息
+    read color profile info. of Image
     """
     exif = img._getexif() or {}
     if exif.get(0xA001) == 1 or exif.get(0x0001) == 'R98':

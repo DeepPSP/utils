@@ -22,9 +22,9 @@ import colour
 import numpy as np
 from PIL import Image
 
-from utils import common
-from utils.common import ArrayLike, ArrayLike_Int
-from utils.utils_universal import ConvexCone2D, filter_by_percentile
+from .. import common
+from ..common import ArrayLike, ArrayLike_Int
+from ..utils_universal import ConvexCone2D, filter_by_percentile
 
 __all__ = [
     "generate_pure_color_image",

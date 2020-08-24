@@ -14,7 +14,7 @@ import tensorflow as tf
 import numpy as np
 import cv2
 
-from utils.common import ArrayLike, modulo
+from ..common import ArrayLike, modulo
 
 
 __all__ = [

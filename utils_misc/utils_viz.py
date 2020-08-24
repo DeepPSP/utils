@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from easydict import EasyDict as ED
 
-from utils.common import ArrayLike
+from ..common import ArrayLike
 
 
 __all__ = [
