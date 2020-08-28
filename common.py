@@ -15,6 +15,8 @@ from typing import Union, Optional, Any, Iterable, List, Tuple, Sequence, Dict, 
 from numbers import Real, Number
 
 import numpy as np
+from wfdb.io import _header
+from wfdb import Record, MultiRecord
 
 
 __all__ = [
@@ -404,8 +406,6 @@ def wfdb_rdheader(header_data:List[str]) -> Union[Record, MultiRecord]:
     head_data: list of str,
         lines of the .hea header file
     """
-    from wfdb.io import _header
-    from wfdb import Record, MultiRecord
     # Read the header file. Separate comment and non-comment lines
     header_lines, comment_lines = [], []
     for line in header_data:

@@ -552,7 +552,7 @@ class Fan2D(ConvexCone2D):
     def __repr__(self):
         """
         """
-        return f"Fan2D(apex={self.apex}, axis_vec={self.axis_vec}, angle={self.angle}, radius={self.radius})"f
+        return f"Fan2D(apex={self.apex}, axis_vec={self.axis_vec}, angle={self.angle}, radius={self.radius})"
 
 
 class Ellipse(GeometricObject):
