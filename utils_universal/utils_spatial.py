@@ -151,13 +151,13 @@ class LineSegment2D(GeometricObject):
     def __str__(self):
         """
         """
-        return "Line segment in the 2D real space, with end points = {}".format(self.ends)
+        return f"Line segment in the 2D real space, with end points = {self.ends}"
 
 
     def __repr__(self):
         """
         """
-        return "LineSegment2D(points={})".format(self.ends)
+        return f"LineSegment2D(points={self.ends})"
 
 
 class Triangle2D(GeometricObject):
@@ -248,13 +248,13 @@ class Triangle2D(GeometricObject):
     def __str__(self):
         """
         """
-        return "Triangle in the 2D real space, with apexes = {}".format(self.apexes)
+        return f"Triangle in the 2D real space, with apexes = {self.apexes}"
 
 
     def __repr__(self):
         """
         """
-        return "Triangle2D(apexes={})".format(self.apexes)
+        return f"Triangle2D(apexes={self.apexes})"
 
 
 class ConvexCone2D(GeometricObject):
@@ -479,13 +479,13 @@ class ConvexCone2D(GeometricObject):
     def __str__(self):
         """
         """
-        return "Convex cone in the 2D real space, with apex = {}, axis vector = {}, angle = {}".format(self.apex, self.axis_vec, self.angle)
+        return f"Convex cone in the 2D real space, with apex = {self.apex}, axis vector = {self.axis_vec}, angle = {self.angle}"
 
 
     def __repr__(self):
         """
         """
-        return "ConvexCone2D(apex={}, axis_vec={}, angle={})".format(self.apex, self.axis_vec, self.angle)
+        return f"ConvexCone2D(apex={self.apex}, axis_vec={self.axis_vec}, angle={self.angle})"
 
 
 class Fan2D(ConvexCone2D):
@@ -546,13 +546,13 @@ class Fan2D(ConvexCone2D):
     def __str__(self):
         """
         """
-        return "Fan in the 2D real space, with apex = {}, axis vector = {}, angle = {}, radius = {}".format(self.apex, self.axis_vec, self.angle, self.radius)
+        return f"Fan in the 2D real space, with apex = {self.apex}, axis vector = {self.axis_vec}, angle = {self.angle}, radius = {self.radius}"
 
 
     def __repr__(self):
         """
         """
-        return "Fan2D(apex={}, axis_vec={}, angle={}, radius={})".format(self.apex, self.axis_vec, self.angle, self.radius)
+        return f"Fan2D(apex={self.apex}, axis_vec={self.axis_vec}, angle={self.angle}, radius={self.radius})"f
 
 
 class Ellipse(GeometricObject):
@@ -783,13 +783,13 @@ class BoundingBox(ss.Rectangle):
     def __str__(self):
         """
         """
-        return "Bounding box in the 2D real space, with ymin = {}, xmin = {}, ymax = {}, xmax = {}".format(self.ymin, self.xmin, self.ymax, self.xmax)
+        return f"Bounding box in the 2D real space, with ymin = {self.ymin}, xmin = {self.xmin}, ymax = {self.ymax}, xmax = {self.xmax}"
 
 
     def __repr__(self):
         """
         """
-        return "BoundingBox(ymin={}, xmin={}, ymax={}, xmax={})".format(self.ymin, self.xmin, self.ymax, self.xmax)
+        return f"BoundingBox(ymin={self.ymin}, xmin={self.xmin}, ymax={self.ymax}, xmax={self.xmax})"
 
 
 class Rectangle2D(ss.Rectangle):

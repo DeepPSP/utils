@@ -624,8 +624,7 @@ class XRAI(SaliencyMask):
                 if mask_pixel_diff < min_pixel_diff:
                     remove_key_queue.append(mask_key)
                     # if _logger.isEnabledFor(logging.DEBUG):
-                    #     _logger.debug("Skipping mask with pixel difference: {:.3g},".format(
-                    #         mask_pixel_diff))
+                    #     _logger.debug(f"Skipping mask with pixel difference: {mask_pixel_diff:.3g},")
                     continue
                 gain = gain_fun(mask, attr, mask2=current_mask)
                 if gain > best_gain:
@@ -646,10 +645,7 @@ class XRAI(SaliencyMask):
             # if _logger.isEnabledFor(logging.DEBUG):
             #     current_attr_sum = np.sum(attr[current_mask])
             #     _logger.debug(
-            #         "{} of {} masks added,"
-            #         "attr_sum: {}, area: {:.3g}/{:.3g}, {} remaining masks".format(
-            #             added_masks_cnt, n_masks, current_attr_sum, current_area_perc,
-            #             area_perc_th, len(remaining_masks)))
+            #         "{added_masks_cnt} of {n_masks} masks added, attr_sum: {current_attr_sum}, area: {current_area_perc:.3g}/{area_perc_th:.3g}, {len(remaining_masks)} remaining masks")
             added_masks_cnt += 1
 
         uncomputed_mask = output_attr == -np.inf
@@ -717,7 +713,7 @@ class XRAI(SaliencyMask):
             mask_pixel_diff = _get_diff_cnt(added_mask, current_mask)
             if mask_pixel_diff < min_pixel_diff:
                 # if _logger.isEnabledFor(logging.DEBUG):
-                #     _logger.debug("Skipping mask with pixel difference: {:.3g},".format(mask_pixel_diff))
+                #     _logger.debug("Skipping mask with pixel difference: {mask_pixel_diff:.3g},")
                 continue
             mask_gain = gain_fun(mask_diff, attr)
             masks_trace.append((mask_diff, mask_gain))
@@ -726,10 +722,7 @@ class XRAI(SaliencyMask):
             # if _logger.isEnabledFor(logging.DEBUG):
             #     current_attr_sum = np.sum(attr[current_mask])
             #     current_area_perc = np.mean(current_mask)
-            #     _logger.debug("{} of {} masks processed,"
-            #                 "attr_sum: {}, area: {:.3g}/{:.3g}".format(
-            #                     i + 1, n_masks, current_attr_sum, current_area_perc,
-            #                     area_perc_th))
+            #     _logger.debug("{i + 1} of {n_masks} masks processed, attr_sum: {current_attr_sum}, area: {current_area_perc:.3g}/{area_perc_th:.3g}")
         uncomputed_mask = output_attr == -np.inf
         # Assign the uncomputed areas a value such that sum is same as ig
         output_attr[uncomputed_mask] = gain_fun(uncomputed_mask, attr)
