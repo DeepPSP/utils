@@ -758,7 +758,6 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
     
     TODO:
     -----
-
     """
     nl = '\n'
     if amplify_mode not in ['ecg', 'qrs', 'all', 'none']:
@@ -1224,7 +1223,7 @@ def resample_discontinuous_irregular_timeseries(s:ArrayLike, allowd_gap:Optional
 def sft(s:ArrayLike) -> np.ndarray:
     """
 
-    slow Fourier transform
+    slow Fourier transform, just for fun
     """
     N = len(s)
     _s = np.array(s)
@@ -1233,7 +1232,8 @@ def sft(s:ArrayLike) -> np.ndarray:
 
 
 def butter_bandpass(lowcut:Real, highcut:Real, fs:Real, order:int, verbose:int=0) -> Tuple[np.ndarray, np.ndarray]:
-    """
+    """ finished, checked,
+
     Butterworth Bandpass Filter Design
 
     Parameters:
@@ -1293,7 +1293,8 @@ def butter_bandpass(lowcut:Real, highcut:Real, fs:Real, order:int, verbose:int=0
 
 
 def butter_bandpass_filter(data:ArrayLike, lowcut:Real, highcut:Real, fs:Real, order:int, verbose:int=0) -> np.ndarray:
-    """
+    """ finished, checked,
+
     Butterworth Bandpass
 
     Parameters:
@@ -1410,7 +1411,7 @@ def _hampel(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_outl
 
 
 def detect_flat_lines(s:np.ndarray, window:int, tolerance:Real=0, verbose:int=0, **kwargs) -> Tuple[np.ndarray, float]:
-    """ finished,
+    """ finished, checked,
 
     detect flat (with tolerance) lines of length >= `window`
 
@@ -1456,7 +1457,7 @@ def detect_flat_lines(s:np.ndarray, window:int, tolerance:Real=0, verbose:int=0,
 
 
 class MovingAverage(object):
-    """
+    """ finished, checked, to be improved,
 
     moving average
 
@@ -1581,7 +1582,7 @@ class MovingAverage(object):
 
 
 def smooth(x:np.ndarray, window_len:int=11, window:str='hanning', mode:str='valid', keep_dtype:bool=True) -> np.ndarray:
-    """ finished, checked
+    """ finished, checked,
     
     smooth the 1d data using a window with requested size.
     
@@ -1601,7 +1602,7 @@ def smooth(x:np.ndarray, window_len:int=11, window:str='hanning', mode:str='vali
         the type of window from 'flat', 'hanning', 'hamming', 'bartlett', 'blackman',
         flat window will produce a moving average smoothing
     mode: str, default 'valid',
-        ref. np.convolve
+        ref. `np.convolve`
     keep_dtype: bool, default True,
         dtype of the returned value keeps the same with that of `x` or not
 
@@ -1616,7 +1617,7 @@ def smooth(x:np.ndarray, window_len:int=11, window:str='hanning', mode:str='vali
     >>> x = sin(t) + randn(len(t)) * 0.1
     >>> y = smooth(x)
     
-    See also: 
+    See also:
     ---------
     np.hanning, np.hamming, np.bartlett, np.blackman, np.convolve
     scipy.signal.lfilter
@@ -1650,8 +1651,7 @@ def smooth(x:np.ndarray, window_len:int=11, window:str='hanning', mode:str='vali
     if window == 'flat': #moving average
         w = np.ones(radius,'d')
     else:
-        # w = eval('np.'+window+'(radius)')
-        w = eval(f'np.{window}(radius)')
+        w = eval(f'np.{window}({radius})')
 
     y = np.convolve(w/w.sum(), s, mode=mode)
     y = y[(radius//2-1):-(radius//2)-1]
@@ -1684,10 +1684,12 @@ def ensure_lead_fmt(values:Sequence[Real], n_leads:int=12, fmt:str="lead_first")
     out_values = np.array(values)
     lead_dim = np.where(np.array(out_values.shape) == n_leads)[0]
     if not any([[0] == lead_dim or [1] == lead_dim]):
-        raise ValueError(f"not valid {n_leads}-lead signal")
+        raise ValueError(f"not valid {n_leads}-lead 1d signal")
     lead_dim = lead_dim[0]
+
     if (lead_dim == 1 and fmt.lower() in ["lead_first", "channel_first"]) \
         or (lead_dim == 0 and fmt.lower() in ["lead_last", "channel_last"]):
         out_values = out_values.T
         return out_values
+
     return out_values

@@ -21,7 +21,7 @@ __all__ = [
 
 
 def fit_savgol_sure(data:ArrayLike, orders:Union[int,List[int],Tuple[int]], radii:Union[int,List[int],Tuple[int]], mode:str='reflect', sure_reg:bool=False, verbose:int=0) -> np.ndarray:
-    """ finished, to improve time complexity,
+    """ finished, to reduce time complexity,
 
     best paramters for ecg denoising:
         orders=[1,5]
@@ -124,7 +124,7 @@ def fit_savgol_sure(data:ArrayLike, orders:Union[int,List[int],Tuple[int]], radi
 
 
 def generate_savgol_matrix(order:int, radius:int) -> np.ndarray:
-    """
+    """ finished, checked,
 
     Parameters:
     -----------
