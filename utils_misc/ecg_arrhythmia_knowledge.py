@@ -1,16 +1,41 @@
 # -*- coding: utf-8 -*-
 """
-knowledge about ECG arrhythmia, and corresponding Dx maps
+knowledge about ECG arrhythmia
 
-Standard_12Leads_ECG:
+Standard 12Leads ECG:
 ---------------------
     Inferior leads: II, III, aVF
     Lateral leads: I, aVL, V5-6
-    Septal leads: V1, aVR
+    Septal leads: aVR, V1
     Anterior leads: V2-4
     -----------------------------------
     Chest (precordial) leads: V1-6
-    Limb leads: I, II, III, aVF, aVR, aVL
+    Limb leads: I, II, III, aVR, aVL, aVF
+
+ECG rhythm (https://litfl.com/ecg-rhythm-evaluation/):
+------------------------------------------------------
+1. On a 12 lead ECG, ECG rhythm is usually a 10 second recording from Lead II
+2. 7 steps to analyze:
+    2.1. rate (brady < 60 bpm; 60 bpm <= normal <= 100 bpm; tachy > 100 bpm)
+    2.2. pattern (temporal) of QRS complex (regular or irregular; if irregular, regularly irregular or irregularly irregular)
+    2.3. morphology (spatial) of QRS complex (narrow <= 120 ms; wide > 120 ms)
+    2.4. P waves (absent or present; morphology; PR interval)
+    2.5. relation of P waves and QRS complexes (atrial rate and ventricular rate, AV association or AV disassociation)
+    2.6. onset and termination (abrupt or gradual)
+    (2.7. response to vagal manoeuvres)
+
+ECG waves:
+----------
+https://ecgwaves.com/topic/ecg-normal-p-wave-qrs-complex-st-segment-t-wave-j-point/
+
+References:
+-----------
+[1] https://litfl.com/
+[2] https://ecgwaves.com/
+[3] https://ecglibrary.com/ecghome.php
+[4] https://courses.cs.washington.edu/courses/cse466/13au/pdfs/lectures/ECG%20filtering.pdf
+
+NOTE that wikipedia is NOT listed in the References
 """
 from easydict import EasyDict as ED
 
@@ -22,7 +47,7 @@ __all__ = [
     "LPR", "LQT", "QAb", "TAb", "TInv",  # wave morphology
     "LAD", "RAD",  # axis
     "Brady", "LQRSV",  # qrs (RR interval, amplitude)
-    "SA", "SB", "SNR", "STach",  # sinus
+    "SA", "SB", "NSR", "STach",  # sinus
     "PR",  # pacer
     "STD", "STE",  # ST segments
 ]
@@ -40,7 +65,7 @@ AF = ED({  # rr, morphology
         "absence of an isoelectric baseline",
         "variable ventricular rate",
         "QRS complexes usually < 120 ms unless pre-existing bundle branch block, accessory pathway, or rate related aberrant conduction",
-        "fibrillatory waves (f-wave) may be present and can be either fine (amplitude < 0.5mm) or coarse (amplitude >0.5mm)",
+        "fibrillatory waves (f-wave) may be present and can be either fine (amplitude < 0.5mm) or coarse (amplitude > 0.5mm)",
         "fibrillatory waves (f-wave) may mimic P waves leading to misdiagnosis",
     ],
 })
@@ -68,7 +93,7 @@ Brady = ED({  # rr
         "https://en.wikipedia.org/wiki/Bradycardia"
     ],
     "knowledge": [
-        "heart rate (ventricular rate) <60/min in an adult",
+        "heart rate (ventricular rate) < 60/min in an adult",
     ],
 })
 
@@ -183,10 +208,11 @@ PR = ED({  # morphology
     "fullname": "pacing rhythm",
     "url": [
         "https://litfl.com/pacemaker-rhythms-normal-patterns/",
+        "https://www.youtube.com/watch?v=YkB4oX_COi8",
     ],
     "knowledge": [
-        "morphology  is dependent on the pacing mode (AAI, VVI, DDD, Magnet) used",
-        "there are pacing spikes: vertical spikes of short duration, usually 2 ms (500Hz)",  # important
+        "morphology is dependent on the pacing mode (AAI, VVI, DDD, Magnet) used",
+        "there are pacing spikes: vertical spikes of short duration, usually 2 ms (in doubt, viewing signals of the CINC2020 dataset, probably 10-20ms(at most half a small grid)?)",  # important
         "AAI (atrial pacing): pacing spike precedes the p wave",
         "VVI (ventricle pacing): pacing spike precedes the QRS complex; morphology similar to LBBB or RBBB (depending on lead placement)",
     ],
@@ -276,10 +302,14 @@ RAD = ED({  # morphology
     "url": [
         "https://litfl.com/right-axis-deviation-rad-ecg-library/",
         "https://en.wikipedia.org/wiki/Right_axis_deviation",
+        "https://www.ncbi.nlm.nih.gov/books/NBK470532/",
+        "https://ecglibrary.com/axis.html",
+        "https://www.youtube.com/watch?v=PbzDN2_rAFc",
     ],
-    "knowledge": [
+    "knowledge": [  # should combine with LAD to study
         "QRS axis greater than +90°",
-        "POSITIVE (dominant R wave) in lead II, III and aVF; NEGATIVE (dominant S wave) in lead I",
+        "2-lead method: lead I is NEGATIVE; lead aVF is POSITIVE",  # important, ref LAD
+        "3-lead method: lead I is NEGATIVE; lead aVF is POSITIVE (and II, III)",  # important, ref LAD
     ],
 })
 
@@ -288,10 +318,14 @@ LAD = ED({  # morphology
     "url": [
         "https://litfl.com/left-axis-deviation-lad-ecg-library/",
         "https://en.wikipedia.org/wiki/Left_axis_deviation",
+        "https://www.ncbi.nlm.nih.gov/books/NBK470532/",
+        "https://ecglibrary.com/axis.html",
+        "https://www.youtube.com/watch?v=PbzDN2_rAFc",
     ],
-    "knowledge": [
+    "knowledge": [  # should combine with RAD to study
         "QRS axis (-30°, -90°)",
-        "POSITIVE (dominant R wave) in leads I and aVL; NEGATIVE in leads II, III and aVF",  # important
+        "2-lead method: lead I is POSITIVE; lead aVF is NEGATIVE",  # important, ref RAD
+        "3-lead method: POSITIVE in leads I (and aVL?); NEGATIVE in leads II, aVF, (and III?)",  # important, ref RAD
         "LAnFB, LBBB, PR, ventricular ectopics are causes of LAD",
     ],
 })
@@ -303,7 +337,7 @@ SA = ED({  # morphology
         "https://www.healthline.com/health/sinus-arrhythmia",
     ],
     "knowledge": [
-        "sinus rhythm (SNR), with a beat-to-beat variation (more than 120 ms) in the PP interval, producing an irregular ventricular rate",
+        "sinus rhythm (NSR), with a beat-to-beat variation (more than 120 ms) in the PP interval, producing an irregular ventricular rate",
         "PP interval gradually lengthens and shortens in a cyclical fashion, usually corresponding to the phases of the respiratory cycle",
         "normal sinus P waves (upright in leads I and II) with a constant morphology (i.e. not PAC)",
         "constant PR interval (i.e. not Mobitz I AV block)",
@@ -317,11 +351,11 @@ SB = ED({  # rr, morphology
         "https://en.wikipedia.org/wiki/Sinus_bradycardia",
     ],
     "knowledge": [
-        "sinus rhythm (SNR); with a resting heart rate of < 60 bpm in adults (Brady)",
+        "sinus rhythm (NSR); with a resting heart rate of < 60 bpm in adults (Brady)",
     ],
 })
 
-SNR = ED({  # rr, morphology
+NSR = ED({  # rr, morphology
     "fullname": "sinus rhythm",  # the NORMAL rhythm
     "url": [
         "https://litfl.com/normal-sinus-rhythm-ecg-library/",
@@ -342,7 +376,7 @@ STach = ED({  # rr, morphology,
         "https://en.wikipedia.org/wiki/Sinus_tachycardia",
     ],
     "knowledge": [
-        "sinus rhythm (SNR), with a resting heart rate of > 100 bpm in adults",
+        "sinus rhythm (NSR), with a resting heart rate of > 100 bpm in adults",
     ],
 })
 
@@ -388,7 +422,9 @@ SPB = SVPB  # alias
 STD = ED({
     "fullname": "st depression",
     "url": [
-        "",
+        "https://litfl.com/st-segment-ecg-library/",
+        "https://ecgwaves.com/st-segment-normal-abnormal-depression-elevation-causes/",
+        "https://en.wikipedia.org/wiki/ST_elevation",
     ],
     "knowledge": [
         "",
@@ -398,7 +434,9 @@ STD = ED({
 STE = ED({
     "fullname": "st elevation",
     "url": [
-        "",
+        "https://litfl.com/st-segment-ecg-library/",
+        "https://ecgwaves.com/st-segment-normal-abnormal-depression-elevation-causes/",
+        "https://en.wikipedia.org/wiki/ST_depression",
     ],
     "knowledge": [
         "",
