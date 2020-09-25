@@ -60,7 +60,7 @@ def bboxes_iou(bboxes_a:Tensor, bboxes_b:Tensor, fmt:str='voc', iou_type:str='io
 
     References:
     -----------
-    [1] 
+    [1] Zheng, Zhaohui, et al. "Enhancing Geometric Factors in Model Learning and Inference for Object Detection and Instance Segmentation." arXiv preprint arXiv:2005.03572 (2020).
     [2] https://github.com/chainer/chainercv
     """
     if bboxes_a.shape[1] != 4 or bboxes_b.shape[1] != 4:
