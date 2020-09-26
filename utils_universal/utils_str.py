@@ -5,12 +5,17 @@ docstring, to write
 from typing import Union, Tuple, List, Sequence, NoReturn
 from numbers import Number
 
+import difflib
+from fuzzysearch import find_near_matches
+from fuzzywuzzy import process, fuzz
+
 
 __all__ = [
     "LCSubStr",
     "dict_depth", "dict_to_str",
     "str2bool",
     "printmd",
+    "local_fuzzy_match_1", "local_fuzzy_match_2",
 ]
 
 
@@ -208,3 +213,103 @@ def printmd(md_str:str) -> NoReturn:
         display(Markdown(md_str))
     except:
         print(md_str)
+
+
+def local_fuzzy_match_1(query_string:str, large_string:str, threshold:float=0.8, best_only:bool=True) -> list:
+    """ finished, checked,
+
+    fuzzy matches `query_string` in `large_string`, using `fuzzywuzzy` and `fuzzysearch`
+
+    Parameters:
+    -----------
+    query_string: str,
+        the query string to find fuzzy matches in `large_string`
+    large_string: str,
+        the large string which contains potential fuzzy matches of `query_string`
+    threshold: float, default 0.8,
+        threshold of fuzzy matching
+    best_only: bool, default True,
+        if True, only the best match will be returned
+
+    Returns:
+    --------
+    result: list,
+        3-element list (if `best_only` is True):
+            - matched text in `large_string`,
+            - start index of the matched text in `large_string`
+            - end index of the matched text in `large_string`
+        or list of such 3-element list (`best_only` is False)
+
+    Reference:
+    ----------
+    https://stackoverflow.com/questions/17740833/checking-fuzzy-approximate-substring-existing-in-a-longer-string-in-python
+    """
+    result = []
+    local_scores = []
+    for word, _ in process.extractBests(query_string, (large_string,), score_cutoff=threshold):
+        max_l_dist = max(1, int(len(query_string)*(1-threshold)))
+        for match in find_near_matches(query_string, word, max_l_dist=max_l_dist):
+            match = word[match.start:match.end]
+            start = large_string.find(match)
+            result.append([match, start, start+len(match)])
+            local_scores.append(fuzz.ratio(match, query_string))
+    if best_only and len(result) > 0:
+        best_idx = np.argmax(local_scores)
+        result = result[best_idx]
+    return result
+
+
+def local_fuzzy_match_2(query_string:str, large_string:str, threshold:float=0.8, best_only:bool=True) -> list:
+    """ finished, checked,
+
+    fuzzy matches 'query_string' in 'large_string', using `difflib`
+
+    Parameters:
+    -----------
+    query_string: str,
+        the query string to find fuzzy matches in `large_string`
+    large_string: str,
+        the large string which contains potential fuzzy matches of `query_string`
+    threshold: float, default 0.8,
+        threshold of fuzzy matching
+    best_only: bool, default True,
+        if True, only the best match will be returned
+
+    Returns:
+    --------
+    result: list,
+        3-element list (if `best_only` is True):
+            - matched text in `large_string`,
+            - start index of the matched text in `large_string`
+            - end index of the matched text in `large_string`
+        or list of such 3-element list (`best_only` is False)
+
+    Reference:
+    ----------
+    https://stackoverflow.com/questions/17740833/checking-fuzzy-approximate-substring-existing-in-a-longer-string-in-python
+    """
+    words = large_string.split()
+    result = []
+    local_scores = []
+    for word in words:
+        s = difflib.SequenceMatcher(None, word, query_string)
+        word_res = []
+        starts = []
+        ends = []
+        for i, j, n in s.get_matching_blocks():
+            if not n:
+                continue
+            word_res.append(word[i:i+n])
+            starts.append(i+large_string.find(word))
+            ends.append(i+n+large_string.find(word))
+        match = ''.join(word_res)
+        if len(match) / float(len(query_string)) >= threshold:
+            start = min(starts)
+            end = max(ends)
+            match = large_string[start:end]
+            result.append([match, start, end])
+            local_scores.append(fuzz.ratio(match, query_string))
+    if best_only and len(result) > 0:
+        best_idx = np.argmax(local_scores)
+        result = result[best_idx]
+    return result
