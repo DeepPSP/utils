@@ -206,7 +206,12 @@ def plot_confusion_matrix(y_true:ArrayLike, y_pred:ArrayLike, classes:Sequence[s
 
 
 class EcgAnimation(object):
-    """
+    """ NOT finished,
+
+    References:
+    -----------
+    [1] http://louistiao.me/posts/notebooks/embedding-matplotlib-animations-in-jupyter-as-interactive-javascript-widgets/
+    [2] https://physionet.org/lightwave/
     """
     __name__ = "EcgAnimation"
     __SIGNAL_FORMATS__ = ["lead_first", "channel_first", "lead_last", "channel_last",]
