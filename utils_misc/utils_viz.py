@@ -8,6 +8,10 @@ from typing import Union, Optional, List, Tuple, Sequence, NoReturn, Any
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from matplotlib import animation, rc
+from IPython.display import display
+from IPython.display import HTML
+import ipywidgets as W
 from easydict import EasyDict as ED
 
 from ..common import ArrayLike
@@ -199,3 +203,46 @@ def plot_confusion_matrix(y_true:ArrayLike, y_pred:ArrayLike, classes:Sequence[s
         plt.savefig(save_path, bbox_inches='tight', transparent=True)
 
     return ax
+
+
+class EcgAnimation(object):
+    """
+    """
+    __name__ = "EcgAnimation"
+    __SIGNAL_FORMATS__ = ["lead_first", "channel_first", "lead_last", "channel_last",]
+
+    def __init__(self, signal:ArrayLike, freq:Real, fmt:Optional[str]=None) -> NoReturn:
+        """ NOT finished,
+
+        Parameters:
+        -----------
+        to write
+        """
+        self.signal = np.array(signal)
+        self.freq = freq
+        self.fmt = fmt.lower() if isinstance(fmt, str) else fmt
+        assert fmt is None or fmt in self.__SIGNAL_FORMATS__
+
+        self._fig, self._ax, self._line = None, None, None
+        self._create_background()
+
+        # self.goto_button = W.Button(description="refresh signal window")
+        # self.Wout = W.Output()
+
+    def _create_background(self) -> NoReturn:
+        """
+        """
+        default_fig_sz = 120
+        line_len = freq * 25  # 25 seconds
+        fig, ax = plt.subplots(figsize=(fig_sz, 6))
+        # ax.plot(secs, mvs, c='black')
+
+        ax.axhline(y=0, linestyle='-', linewidth='1.0', color='red')
+        ax.xaxis.set_major_locator(plt.MultipleLocator(0.2))
+        ax.xaxis.set_minor_locator(plt.MultipleLocator(0.04))
+        ax.yaxis.set_major_locator(plt.MultipleLocator(0.5))
+        ax.yaxis.set_minor_locator(plt.MultipleLocator(0.1))
+        ax.grid(which='major', linestyle='-', linewidth='0.5', color='red')
+        ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
+        # ax.set_ylim(-1.5, 1.5)
+        raise NotImplementedError
