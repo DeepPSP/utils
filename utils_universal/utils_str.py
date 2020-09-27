@@ -15,7 +15,7 @@ __all__ = [
     "dict_depth", "dict_to_str",
     "str2bool",
     "printmd",
-    "local_fuzzy_match_1", "local_fuzzy_match_2",
+    "local_fuzzy_match_1", "local_fuzzy_match_2", "local_fuzzy_match",
 ]
 
 
@@ -215,7 +215,7 @@ def printmd(md_str:str) -> NoReturn:
         print(md_str)
 
 
-def local_fuzzy_match_1(query_string:str, large_string:str, threshold:float=0.8, best_only:bool=True) -> list:
+def local_fuzzy_match_1(query_string:str, large_string:str, threshold:float=0.8, best_only:bool=True, verbose:int=0) -> list:
     """ finished, checked,
 
     fuzzy matches `query_string` in `large_string`, using `fuzzywuzzy` and `fuzzysearch`
@@ -230,6 +230,8 @@ def local_fuzzy_match_1(query_string:str, large_string:str, threshold:float=0.8,
         threshold of fuzzy matching
     best_only: bool, default True,
         if True, only the best match will be returned
+    verbose: int, default 0,
+        print verbosity
 
     Returns:
     --------
@@ -249,17 +251,22 @@ def local_fuzzy_match_1(query_string:str, large_string:str, threshold:float=0.8,
     for word, _ in process.extractBests(query_string, (large_string,), score_cutoff=threshold):
         max_l_dist = max(1, int(len(query_string)*(1-threshold)))
         for match in find_near_matches(query_string, word, max_l_dist=max_l_dist):
-            match = word[match.start:match.end]
+            match = word[match.start: match.end]
             start = large_string.find(match)
+            score = fuzz.token_set_ratio(match, query_string, force_ascii=False)
             result.append([match, start, start+len(match)])
-            local_scores.append(fuzz.ratio(match, query_string))
+            if verbose >= 2:
+                print(f"match = {match} for word = {word}, with score = {score}")
+            local_scores.append(score)
     if best_only and len(result) > 0:
         best_idx = np.argmax(local_scores)
         result = result[best_idx]
+    elif best_only and len(result) == 0:
+        result = ["", -1, -1]
     return result
 
 
-def local_fuzzy_match_2(query_string:str, large_string:str, threshold:float=0.8, best_only:bool=True) -> list:
+def local_fuzzy_match_2(query_string:str, large_string:str, threshold:float=0.8, best_only:bool=True, verbose:int=0) -> list:
     """ finished, checked,
 
     fuzzy matches 'query_string' in 'large_string', using `difflib`
@@ -274,6 +281,8 @@ def local_fuzzy_match_2(query_string:str, large_string:str, threshold:float=0.8,
         threshold of fuzzy matching
     best_only: bool, default True,
         if True, only the best match will be returned
+    verbose: int, default 0,
+        print verbosity
 
     Returns:
     --------
@@ -302,14 +311,75 @@ def local_fuzzy_match_2(query_string:str, large_string:str, threshold:float=0.8,
             word_res.append(word[i:i+n])
             starts.append(i+large_string.find(word))
             ends.append(i+n+large_string.find(word))
-        match = ''.join(word_res)
-        if len(match) / float(len(query_string)) >= threshold:
+        match = "".join(word_res)
+        ratio = len(match) / float(len(query_string))
+        if verbose >= 2:
+            print(f"match = {match} for word = {word}, with ratio = {ratio}")
+        if ratio >= threshold:
             start = min(starts)
             end = max(ends)
-            match = large_string[start:end]
+            match = large_string[start: end]
             result.append([match, start, end])
-            local_scores.append(fuzz.ratio(match, query_string))
+            local_scores.append(fuzz.token_set_ratio(match, query_string, force_ascii=False))
     if best_only and len(result) > 0:
         best_idx = np.argmax(local_scores)
         result = result[best_idx]
+    elif best_only and len(result) == 0:
+        result = ["", -1, -1]
+    return result
+
+
+def local_fuzzy_match(query_string:str, large_string:str, threshold:float=0.8, verbose:int=0) -> list:
+    """ finished, checked,
+
+    fuzzy matches 'query_string' in 'large_string',
+    merged from results obtained using `difflib` and from results using `fuzzywuzzy` and `fuzzysearch`
+
+    Parameters:
+    -----------
+    query_string: str,
+        the query string to find fuzzy matches in `large_string`
+    large_string: str,
+        the large string which contains potential fuzzy matches of `query_string`
+    threshold: float, default 0.8,
+        threshold of fuzzy matching
+    verbose: int, default 0,
+        print verbosity
+
+    Returns:
+    --------
+    result: list,
+        3-element list (if `best_only` is True):
+            - matched text in `large_string`,
+            - start index of the matched text in `large_string`
+            - end index of the matched text in `large_string`
+        or list of such 3-element list (`best_only` is False)
+
+    Reference:
+    ----------
+    https://stackoverflow.com/questions/17740833/checking-fuzzy-approximate-substring-existing-in-a-longer-string-in-python
+    """
+    match_1, start_1, end_1 = local_fuzzy_match_1(
+        query_string, large_string, threshold, best_only=True, verbose=verbose,
+    )
+    match_2, start_2, end_2 = local_fuzzy_match_2(
+        query_string, large_string, threshold, best_only=True, verbose=verbose,
+    )
+    if len(match_1) == 0:
+        match, start, end = match_2, start_2, end_2
+    elif len(match_2) == 0:
+        match, start, end = match_1, start_1, end_1
+    else:
+        start = max(start_1, start_2)
+        end = min(end_1, end_2)
+        if start < end:
+            match = large_string[start: end]
+        else:
+            score_1 = fuzz.token_set_ratio(match_1, large_string, force_ascii=False)
+            score_2 = fuzz.token_set_ratio(match_2, large_string, force_ascii=False)
+            if score_1 > score_2:
+                match, start, end = match_1, start_1, end_1
+            else:
+                match, start, end = match_2, start_2, end_2
+    result = [match, start, end]
     return result
