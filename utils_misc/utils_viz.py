@@ -2,6 +2,7 @@
 """
 utilities for visualization
 """
+import math
 from numbers import Real
 from typing import Union, Optional, List, Tuple, Sequence, NoReturn, Any
 
@@ -212,6 +213,8 @@ class EcgAnimation(object):
     -----------
     [1] http://louistiao.me/posts/notebooks/embedding-matplotlib-animations-in-jupyter-as-interactive-javascript-widgets/
     [2] https://physionet.org/lightwave/
+    [3] https://ipywidgets.readthedocs.io/en/latest/examples/Using%20Interact.html
+    [4] https://kapernikov.com/ipywidgets-with-matplotlib/
     """
     __name__ = "EcgAnimation"
     __SIGNAL_FORMATS__ = ["lead_first", "channel_first", "lead_last", "channel_last",]
@@ -224,30 +227,111 @@ class EcgAnimation(object):
         to write
         """
         self.signal = np.array(signal)
+        if self._auto_infer_units() == "mV":
+            self.signal = 1000 * self.signal
         self.freq = freq
         self.fmt = fmt.lower() if isinstance(fmt, str) else fmt
-        assert fmt is None or fmt in self.__SIGNAL_FORMATS__
+        assert (self.signal.ndim == 1 and fmt is None) \
+            or (self.signal.ndim == 2 and fmt in self.__SIGNAL_FORMATS__)
+
+        if self.signal.ndim == 2:
+            raise NotImplementedError("not implemented for multi-lead signals currently")
+
+        if self.signal.ndim==1 or (self.signal.ndim==2 and self.fmt in ["lead_last", "channel_last"]):
+            self.siglen = self.signal.shape[0]
+            self.duration = self.siglen / self.freq
+        elif self.signal.ndim==2 and self.fmt in ["lead_first", "channel_first"]:
+            self.siglen = self.signal.shape[1]
+            self.duration = self.siglen / self.freq
+
+        self._default_duration_anim = 25  # 25 seconds
+        self._frame_freq = max(25, self.freq//5)
+        self._n_frames = max(1, math.ceil((self.duration-self._default_duration_anim)/self._frame_freq))
 
         self._fig, self._ax, self._line = None, None, None
+        self._show_time_choice()
         self._create_background()
+        self.anim = animation.FuncAnimation(
+            fig=self._fig,
+            func=self._animate,
+            frames=self._n_frames,
+            repeat=False,
+            blit=True,
+        )
 
         # self.goto_button = W.Button(description="refresh signal window")
         # self.Wout = W.Output()
 
-    def _create_background(self) -> NoReturn:
+    def _refresh_start_time(self, time) -> NoReturn:
         """
         """
-        default_fig_sz = 120
-        line_len = freq * 25  # 25 seconds
-        fig, ax = plt.subplots(figsize=(fig_sz, 6))
-        # ax.plot(secs, mvs, c='black')
+        self._start_time = int(time * 1000 / self.freq)
 
-        ax.axhline(y=0, linestyle='-', linewidth='1.0', color='red')
-        ax.xaxis.set_major_locator(plt.MultipleLocator(0.2))
-        ax.xaxis.set_minor_locator(plt.MultipleLocator(0.04))
-        ax.yaxis.set_major_locator(plt.MultipleLocator(0.5))
-        ax.yaxis.set_minor_locator(plt.MultipleLocator(0.1))
-        ax.grid(which='major', linestyle='-', linewidth='0.5', color='red')
-        ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
-        # ax.set_ylim(-1.5, 1.5)
-        raise NotImplementedError
+    def _show_time_choice(self,) -> NoReturn:
+        """
+        """
+        interact_manual = W.interact.options(manual=True, manual_name="Go to")
+        interact_manual(
+            self._refresh_start_time,
+            time=W.FloatSlider(
+                min=0,
+                max=self.duration,
+                description="s",
+            ),
+        )
+
+    def _create_background(self,) -> NoReturn:
+        """
+        """
+        default_fig_sz = 20
+        self._fig, self._ax = plt.subplots(figsize=(default_fig_sz, 6))
+
+        self._ax.axhline(y=0, linestyle='-', linewidth='1.0', color='red')
+        self._ax.xaxis.set_major_locator(plt.MultipleLocator(0.2))
+        self._ax.xaxis.set_minor_locator(plt.MultipleLocator(0.04))
+        self._ax.yaxis.set_major_locator(plt.MultipleLocator(0.5))
+        self._ax.yaxis.set_minor_locator(plt.MultipleLocator(0.1))
+        self._ax.grid(which='major', linestyle='-', linewidth='0.5', color='red')
+        self._ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
+        self._ax.set_xlim(0, self._default_duration_anim)
+        # ax.set_ylim(-np.max(np.abs(self.signal))*1.2, np.max(np.abs(self.signal))*1.2)
+        self._line, = self._ax.plot([], [])
+
+    # def _anim_init(self,) -> tuple:
+    #     self._line.set_data([], [])
+    #     return (self._line,)
+
+    def _animate(self, frame_idx:int) -> NoReturn:
+        """
+        """
+        x_start = self._start_time + frame_idx*self._frame_freq
+        x_end = x_start + self.freq*self._default_duration_anim
+        x = np.linspace(
+            start=x_start/self.freq,
+            end=x_end/self.freq,
+            num=int(self._default_duration_anim*self.freq),
+        )
+        y = np.append(
+            self.signal[x_start: min(self.siglen,x_end)],
+            np.full(shape=(x_end-self.siglen,), fill_value=np.nan)
+        )
+        self._line.set_data(x, y)
+        return (self._line,)
+
+    def _auto_infer_units(self) -> str:
+        """ finished, checked,
+
+        automatically infer the units of `data`,
+
+        Returns:
+        --------
+        units: str,
+            units of `data`, 'μV' or 'mV'
+        """
+        _MAX_mV = 20  # 20mV, seldom an ECG device has range larger than this value
+        max_val = np.max(self.signal) - np.min(self.signal)
+        if max_val > _MAX_mV:
+            units = 'μV'
+        else:
+            units = 'mV'
+        return units
