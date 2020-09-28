@@ -7,6 +7,7 @@ import subprocess
 import collections
 import time
 import re
+from functools import reduce
 from glob import glob
 from copy import deepcopy
 from logging import Logger
@@ -21,10 +22,10 @@ from wfdb import Record, MultiRecord
 
 __all__ = [
     "ArrayLike", "ArrayLike_Float", "ArrayLike_Int",
-    "MilliSecond", "Second",
     "DEFAULT_FIG_SIZE_PER_SEC",
     "idx2ts", "ms2samples", "samples2ms",
     "timestamp_to_local_datetime_string",
+    "list_sum",
     "modulo",
     "angle_d2r",
     "execute_cmd",
@@ -37,8 +38,6 @@ __all__ = [
 ArrayLike = Union[Sequence, np.ndarray]
 ArrayLike_Float = Union[Sequence[float], np.ndarray]
 ArrayLike_Int = Union[Sequence[int], np.ndarray]
-MilliSecond = int
-Second = int
 
 
 DEFAULT_FIG_SIZE_PER_SEC = 4.8
@@ -161,6 +160,24 @@ def time_string_to_timestamp(time_string:str, fmt:str="%Y-%m-%d %H:%M:%S", retur
     else:
         ts = int(round(datetime.strptime(time_string, fmt).timestamp()*1000))
     return ts
+
+
+def list_sum(l:Sequence[list]) -> list:
+    """ finished, checked,
+
+    Parameters:
+    -----------
+    l: sequence of list,
+        the sequence of lists to obtain the summation
+
+    Returns:
+    --------
+    l_sum: list,
+        sum of `l`,
+        i.e. if l = [list1, list2, ...], then l_sum = list1 + list2 + ...
+    """
+    l_sum = reduce(lambda a,b: a+b, l, [])
+    return l_sum
 
 
 def modulo(val:Real, dividend:Real, val_range_start:Real=0) -> Real:
