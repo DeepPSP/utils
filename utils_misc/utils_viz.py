@@ -7,6 +7,7 @@ from numbers import Real
 from typing import Union, Optional, List, Tuple, Sequence, NoReturn, Any
 
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib import animation, rc
@@ -206,7 +207,8 @@ def plot_confusion_matrix(y_true:ArrayLike, y_pred:ArrayLike, classes:Sequence[s
     return ax
 
 
-class EcgAnimation(object):
+
+class EcgAnimation(animation.FuncAnimation):
     """ NOT finished,
 
     References:
@@ -218,6 +220,7 @@ class EcgAnimation(object):
     """
     __name__ = "EcgAnimation"
     __SIGNAL_FORMATS__ = ["lead_first", "channel_first", "lead_last", "channel_last",]
+    __default_duration_anim__ = 5  # 5 seconds
 
     def __init__(self, signal:ArrayLike, freq:Real, fmt:Optional[str]=None) -> NoReturn:
         """ NOT finished,
@@ -226,6 +229,8 @@ class EcgAnimation(object):
         -----------
         to write
         """
+        rc('animation', html='jshtml')
+
         self.signal = np.array(signal)
         if self._auto_infer_units() == "mV":
             self.signal = 1000 * self.signal
@@ -243,78 +248,74 @@ class EcgAnimation(object):
         elif self.signal.ndim==2 and self.fmt in ["lead_first", "channel_first"]:
             self.siglen = self.signal.shape[1]
             self.duration = self.siglen / self.freq
+        
+        self._n_frames = max(
+            1, math.ceil((self.duration-self.__default_duration_anim__)*self.freq)
+        )
 
-        self._default_duration_anim = 25  # 25 seconds
-        self._frame_freq = max(25, self.freq//5)
-        self._n_frames = max(1, math.ceil((self.duration-self._default_duration_anim)/self._frame_freq))
-
-        self._fig, self._ax, self._line = None, None, None
-        self._show_time_choice()
+        default_fig_sz = 20
+        self._fig, self._ax = plt.subplots(figsize=(default_fig_sz, 4))
+        self._line = None
         self._create_background()
-        self.anim = animation.FuncAnimation(
+        
+        super().__init__(
             fig=self._fig,
             func=self._animate,
             frames=self._n_frames,
             repeat=False,
+            cache_frame_data=False,
             blit=True,
         )
+        self._display()
+        # self.anim = HTML(animation.FuncAnimation(
+        #     fig=self._fig,
+        #     func=self._animate,
+        #     frames=self._n_frames,
+        #     repeat=False,
+        #     blit=True,
+        # ).to_jshtml())
 
-        # self.goto_button = W.Button(description="refresh signal window")
-        # self.Wout = W.Output()
-
-    def _refresh_start_time(self, time) -> NoReturn:
+    def _display(self):
         """
         """
-        self._start_time = int(time * 1000 / self.freq)
-
-    def _show_time_choice(self,) -> NoReturn:
-        """
-        """
-        interact_manual = W.interact.options(manual=True, manual_name="Go to")
-        interact_manual(
-            self._refresh_start_time,
-            time=W.FloatSlider(
-                min=0,
-                max=self.duration,
-                description="s",
-            ),
-        )
+        return HTML(self.to_jshtml())
 
     def _create_background(self,) -> NoReturn:
         """
         """
-        default_fig_sz = 20
-        self._fig, self._ax = plt.subplots(figsize=(default_fig_sz, 6))
-
         self._ax.axhline(y=0, linestyle='-', linewidth='1.0', color='red')
         self._ax.xaxis.set_major_locator(plt.MultipleLocator(0.2))
         self._ax.xaxis.set_minor_locator(plt.MultipleLocator(0.04))
-        self._ax.yaxis.set_major_locator(plt.MultipleLocator(0.5))
-        self._ax.yaxis.set_minor_locator(plt.MultipleLocator(0.1))
+        self._ax.yaxis.set_major_locator(plt.MultipleLocator(500))
+        self._ax.yaxis.set_minor_locator(plt.MultipleLocator(1000))
         self._ax.grid(which='major', linestyle='-', linewidth='0.5', color='red')
         self._ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
-        self._ax.set_xlim(0, self._default_duration_anim)
-        # ax.set_ylim(-np.max(np.abs(self.signal))*1.2, np.max(np.abs(self.signal))*1.2)
+        self._ax.set_xlim(0, self.__default_duration_anim__)
+        self._ax.set_ylim(-np.max(np.abs(self.signal))*1.2, np.max(np.abs(self.signal))*1.2)
+        self._ax.set_xlabel('Time [s]')
+        self._ax.set_ylabel('Voltage [μV]')
         self._line, = self._ax.plot([], [])
 
-    # def _anim_init(self,) -> tuple:
-    #     self._line.set_data([], [])
-    #     return (self._line,)
+    def _animate(self, frame:int) -> Tuple[mpl.artist.Artist]:
+        """
+        The required signature is::
 
-    def _animate(self, frame_idx:int) -> NoReturn:
+            def func(frame, *fargs) -> iterable_of_artists
         """
-        """
-        x_start = self._start_time + frame_idx*self._frame_freq
-        x_end = x_start + self.freq*self._default_duration_anim
+        x_start = frame
+        x_end = int(x_start + self.freq*self.__default_duration_anim__)
         x = np.linspace(
             start=x_start/self.freq,
-            end=x_end/self.freq,
-            num=int(self._default_duration_anim*self.freq),
+            stop=x_end/self.freq,
+            num=int(self.__default_duration_anim__*self.freq),
         )
-        y = np.append(
-            self.signal[x_start: min(self.siglen,x_end)],
-            np.full(shape=(x_end-self.siglen,), fill_value=np.nan)
-        )
+        if x_end <= self.siglen:
+            y = self.signal[x_start: x_end]
+        else:
+            y = np.append(
+                self.signal[x_start: min(self.siglen,x_end)],
+                np.full(shape=(x_end-self.siglen,), fill_value=np.nan)
+            )
         self._line.set_data(x, y)
         return (self._line,)
 
@@ -335,3 +336,172 @@ class EcgAnimation(object):
         else:
             units = 'mV'
         return units
+
+
+
+# class EcgAnimation(W.VBox):
+#     """ NOT finished,
+
+#     References:
+#     -----------
+#     [1] http://louistiao.me/posts/notebooks/embedding-matplotlib-animations-in-jupyter-as-interactive-javascript-widgets/
+#     [2] https://physionet.org/lightwave/
+#     [3] https://ipywidgets.readthedocs.io/en/latest/examples/Using%20Interact.html
+#     [4] https://kapernikov.com/ipywidgets-with-matplotlib/
+#     """
+#     __name__ = "EcgAnimation"
+#     __SIGNAL_FORMATS__ = ["lead_first", "channel_first", "lead_last", "channel_last",]
+#     __default_duration_anim__ = 5  # 5 seconds
+
+#     def __init__(self, signal:ArrayLike, freq:Real, fmt:Optional[str]=None) -> NoReturn:
+#         """ NOT finished,
+
+#         Parameters:
+#         -----------
+#         to write
+#         """
+#         super().__init__()
+#         output = W.Output()
+#         rc('animation', html='jshtml')
+
+#         self.signal = np.array(signal)
+#         if self._auto_infer_units() == "mV":
+#             self.signal = 1000 * self.signal
+#         self.freq = freq
+#         self.fmt = fmt.lower() if isinstance(fmt, str) else fmt
+#         assert (self.signal.ndim == 1 and fmt is None) \
+#             or (self.signal.ndim == 2 and fmt in self.__SIGNAL_FORMATS__)
+
+#         if self.signal.ndim == 2:
+#             raise NotImplementedError("not implemented for multi-lead signals currently")
+
+#         if self.signal.ndim==1 or (self.signal.ndim==2 and self.fmt in ["lead_last", "channel_last"]):
+#             self.siglen = self.signal.shape[0]
+#             self.duration = self.siglen / self.freq
+#         elif self.signal.ndim==2 and self.fmt in ["lead_first", "channel_first"]:
+#             self.siglen = self.signal.shape[1]
+#             self.duration = self.siglen / self.freq
+        
+#         self._frame_freq = max(25, self.freq//5)
+#         self._n_frames = max(
+#             1, math.ceil((self.duration-self.__default_duration_anim__)/self._frame_freq)
+#         )
+
+#         with output:
+#             default_fig_sz = 20
+#             self._fig, self._ax = plt.subplots(figsize=(default_fig_sz, 4))
+#             self._line = None
+#             self._create_background()
+#             self.anim = HTML(animation.FuncAnimation(
+#                 fig=self._fig,
+#                 func=self._animate,
+#                 frames=self._n_frames,
+#                 repeat=False,
+#                 blit=True,
+#             ).to_jshtml())
+
+#         # # define (init) widgets
+#         # color_picker = W.ColorPicker(
+#         #     value="blue", 
+#         #     description="pick a color"
+#         # )
+#         # time_choice = W.FloatSlider(
+#         #     value=0,
+#         #     min=0,
+#         #     max=self.duration,
+#         #     description="s",
+#         # )
+#         # controls = W.VBox([
+#         #     color_picker,
+#         #     time_choice,
+#         # ])
+#         # controls.layout = self._make_box_layout()
+
+#         # out_box = W.Box([output])
+#         # output.layout = self._make_box_layout()
+
+#         # # observe stuff
+#         # time_choice.observe(self._update_start_time, "value")  # "value": param of `W.FloatSlider`
+#         # color_picker.observe(self._update_line_color, "value")  # "value": param of `W.ColorPicker`
+
+#         out_box = W.Box([output])
+#         output.layout = self._make_box_layout()
+#         # add to children
+#         self.children = [output]
+
+
+#     # def _update_start_time(self, change:dict) -> NoReturn:
+#     #     """
+#     #     """
+#     #     self._start_time = change.new
+
+#     # def _update_line_color(self, change:dict) -> NoReturn:
+#     #     """
+#     #     """
+#     #     self._line.set_color(change.new)
+
+#     def _create_background(self,) -> NoReturn:
+#         """
+#         """
+#         self._ax.axhline(y=0, linestyle='-', linewidth='1.0', color='red')
+#         self._ax.xaxis.set_major_locator(plt.MultipleLocator(0.2))
+#         self._ax.xaxis.set_minor_locator(plt.MultipleLocator(0.04))
+#         self._ax.yaxis.set_major_locator(plt.MultipleLocator(0.5))
+#         self._ax.yaxis.set_minor_locator(plt.MultipleLocator(0.1))
+#         self._ax.grid(which='major', linestyle='-', linewidth='0.5', color='red')
+#         self._ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
+#         self._ax.set_xlim(0, self.__default_duration_anim__)
+#         # ax.set_ylim(-np.max(np.abs(self.signal))*1.2, np.max(np.abs(self.signal))*1.2)
+#         self._ax.set_xlabel('Time [s]')
+#         self._ax.set_ylabel('Voltage [μV]')
+#         self._line, = self._ax.plot([], [])
+
+#     def _animate(self, frame_idx:int) -> Tuple[mpl.artist.Artist]:
+#         """
+#         The required signature is::
+
+#             def func(frame, *fargs) -> iterable_of_artists
+#         """
+#         # x_start = int(self._start_time*self.freq + frame_idx*self._frame_freq)
+#         # x_start = int(start_time*self.freq + frame_idx*self._frame_freq)
+#         x_start = int(frame_idx*self._frame_freq)
+#         x_end = int(x_start + self.freq*self.__default_duration_anim__)
+#         x = np.linspace(
+#             start=x_start/self.freq,
+#             end=x_end/self.freq,
+#             num=int(self.__default_duration_anim__*self.freq),
+#         )
+#         y = np.append(
+#             self.signal[x_start: min(self.siglen,x_end)],
+#             np.full(shape=(x_end-self.siglen,), fill_value=np.nan)
+#         )
+#         self._line.set_data(x, y)
+#         return (self._line,)
+
+#     def _make_box_layout(self):
+#         """
+#         """
+#         l = W.Layout(
+#             border='solid 1px black',
+#             margin='0px 10px 10px 0px',
+#             padding='5px 5px 5px 5px'
+#         )
+#         return l
+
+#     def _auto_infer_units(self) -> str:
+#         """ finished, checked,
+
+#         automatically infer the units of `data`,
+
+#         Returns:
+#         --------
+#         units: str,
+#             units of `data`, 'μV' or 'mV'
+#         """
+#         _MAX_mV = 20  # 20mV, seldom an ECG device has range larger than this value
+#         max_val = np.max(self.signal) - np.min(self.signal)
+#         if max_val > _MAX_mV:
+#             units = 'μV'
+#         else:
+#             units = 'mV'
+#         return units
