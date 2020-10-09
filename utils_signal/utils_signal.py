@@ -5,7 +5,7 @@ utilities for signal processing, which numpy, scipy, etc. lack
 from copy import deepcopy
 from collections import namedtuple
 from numbers import Number, Real
-from typing import Union, List, NamedTuple, Optional, Tuple
+from typing import Union, List, NamedTuple, Optional, Tuple, Sequence
 
 import numpy as np
 import pywt
