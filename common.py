@@ -43,7 +43,7 @@ ArrayLike_Int = Union[Sequence[int], np.ndarray]
 DEFAULT_FIG_SIZE_PER_SEC = 4.8
 
 
-def idx2ts(idx:int, start_ts:MilliSecond, fs:int) -> MilliSecond:
+def idx2ts(idx:int, start_ts:int, fs:int) -> int:
     """ finished, checked,
     
     Parameters:
