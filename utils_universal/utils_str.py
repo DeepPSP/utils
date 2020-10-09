@@ -2,6 +2,7 @@
 """
 docstring, to write
 """
+import re
 from typing import Union, Tuple, List, Sequence, NoReturn
 from numbers import Number
 
@@ -16,6 +17,7 @@ __all__ = [
     "str2bool",
     "printmd",
     "local_fuzzy_match_1", "local_fuzzy_match_2", "local_fuzzy_match",
+    "extract_chinese",
 ]
 
 
@@ -383,3 +385,23 @@ def local_fuzzy_match(query_string:str, large_string:str, threshold:float=0.8, v
                 match, start, end = match_2, start_2, end_2
     result = [match, start, end]
     return result
+
+
+def extract_chinese(texts:str) -> str:
+    """ finished, checked,
+
+    extract all Chinese characters (and arabic numbers) in `texts`
+
+    Parameters:
+    -----------
+    texts: str,
+        a string which contains Chinese characters and other characters
+
+    Returns:
+    --------
+    pure_chinese_texts: str,
+        the string which contains all Chinese characters (and arabic numbers) in `texts`,
+        with ordering preserved
+    """
+    pure_chinese_texts = "".join(re.findall("[\u4e00-\u9FFF0-9]", texts))
+    return pure_chinese_texts
