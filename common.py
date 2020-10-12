@@ -7,12 +7,16 @@ import subprocess
 import collections
 import time
 import re
+import math
 from functools import reduce
 from glob import glob
 from copy import deepcopy
 from logging import Logger
 from datetime import datetime, timedelta
-from typing import Union, Optional, Any, Iterable, List, Tuple, Sequence, Dict, Callable, NoReturn
+from typing import (
+    Union, Optional, Any, NoReturn,
+    Iterable, List, Tuple, Sequence, Dict, Callable,
+)
 from numbers import Real, Number
 
 import numpy as np
@@ -26,7 +30,7 @@ __all__ = [
     "idx2ts", "ms2samples", "samples2ms",
     "timestamp_to_local_datetime_string",
     "list_sum",
-    "modulo",
+    "modulo", "gcd",
     "angle_d2r",
     "execute_cmd",
     "get_record_list_recursive",
@@ -203,6 +207,25 @@ def modulo(val:Real, dividend:Real, val_range_start:Real=0) -> Real:
     return mod_val
     # alternatively
     # return (val-val_range_start)%_dividend + val_range_start
+
+
+def gcd(l:Sequence[int]) -> int:
+    """ finished, checked,
+
+    greatest common divisor of a sequence of integers
+
+    Parameters:
+    -----------
+    l: sequence of int,
+        a sequence of integers
+    
+    Returns:
+    --------
+    int, the greatest common divisor of the integers in l;
+    if l is empty, returns 0
+    """
+    assert all([isinstance(i, int) for i in l])
+    return reduce(math.gcd, l, 0)
 
 
 def angle_d2r(angle:Union[Real,np.ndarray]) -> Union[Real,np.ndarray]:
