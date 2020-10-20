@@ -8,6 +8,7 @@ import collections
 import time
 import re
 import math
+import json
 from functools import reduce
 from glob import glob
 from copy import deepcopy
@@ -36,6 +37,7 @@ __all__ = [
     "get_record_list_recursive",
     "get_record_list_recursive2",
     "get_record_list_recursive3",
+    "clear_jupyter_notebook_outputs",
 ]
 
 
@@ -508,3 +510,31 @@ def wfdb_rdheader(header_data:List[str]) -> Union[Record, MultiRecord]:
     record.comments = [line.strip(' \t#') for line in comment_lines]
 
     return record
+
+
+def clear_jupyter_notebook_outputs(fp:str, dst:Optional[str]=None) -> NoReturn:
+    """ finished, checked,
+
+    clear outputs of a jupyter notebook,
+    in cases where it is not able to be opened via jupyter
+
+    Parameters:
+    -----------
+    fp: str,
+        path of the jupyter notebook
+    dst: str, optional,
+        save destination of the contents of `fp` with outputs cleared
+        if is None, `fp` will be used
+    """
+    try:
+        with open(fp, "r") as f:
+            contents = json.load(f)
+    except UnicodeDecodeError:
+        with open(fp, "r", encoding="utf-8") as f:
+            contents = json.load(f)
+    for cell in contents["cells"]:
+        if "outputs" in cell.keys():
+            cell["outputs"] = []
+    new_fp = dst if dst else fp
+    with open(new_fp, "w") as f:
+        json.dump(contents, f)
