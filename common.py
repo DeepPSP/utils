@@ -516,7 +516,7 @@ def clear_jupyter_notebook_outputs(fp:str, dst:Optional[str]=None) -> NoReturn:
     """ finished, checked,
 
     clear outputs of a jupyter notebook,
-    in cases where it is not able to be opened via jupyter
+    in cases when one is not able to open it in the browser
 
     Parameters:
     -----------
