@@ -7,11 +7,12 @@ TODO: implement a torch version
 from typing import Union, Optional, Tuple, List
 from numbers import Real
 
+import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 from keras.layers.core import Layer
 from keras.models import Model
 import keras.backend as K
 import tensorflow as tf
-import numpy as np
 import cv2
 
 from ..common import ArrayLike, modulo

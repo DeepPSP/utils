@@ -8,6 +8,7 @@ from numbers import Real
 from typing import Union, Optional, List, Tuple
 
 import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 import pandas as pd
 from math import sqrt, atan2, factorial
 # from numpy import pi as PI

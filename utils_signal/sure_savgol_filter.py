@@ -8,6 +8,7 @@ from numbers import Number
 from typing import Union, Optional, Any, Dict, List, Tuple
 
 import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 
 from ..common import ArrayLike
 from .utils_signal import noise_std_estimator, uni_polyn_der, eval_uni_polyn

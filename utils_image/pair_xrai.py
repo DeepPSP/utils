@@ -10,6 +10,7 @@ from numbers import Real
 from typing import Optional, List
 
 import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 from skimage import segmentation
 from skimage.morphology import dilation
 from skimage.morphology import disk

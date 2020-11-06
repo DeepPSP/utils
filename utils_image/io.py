@@ -10,6 +10,7 @@ from typing import Tuple, Union, Optional, Tuple, NoReturn
 from random import shuffle
 
 import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 import cv2
 
 from ..common import ArrayLike

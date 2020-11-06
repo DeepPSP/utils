@@ -10,6 +10,7 @@ from typing import Union, Optional, List
 
 import os
 import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 import pandas as pd
 import cv2
 import matplotlib.pyplot as plt

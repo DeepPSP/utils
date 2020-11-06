@@ -48,6 +48,7 @@ try:
 except:
     paa = None
 import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 from parselmouth.praat import call
 from scipy.interpolate import interp1d
 

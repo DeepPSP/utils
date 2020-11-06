@@ -6,6 +6,7 @@ from numbers import Real
 from typing import Union, Optional, List, NoReturn
 
 import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 import parselmouth as pm
 from parselmouth.praat import call
 

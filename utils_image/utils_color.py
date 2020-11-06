@@ -20,6 +20,7 @@ from typing import Union, Optional, NoReturn
 import cv2
 import colour
 import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 from PIL import Image
 
 from .. import common

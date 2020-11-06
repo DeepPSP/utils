@@ -22,6 +22,7 @@ from typing import Union, Optional, Any, Callable, Tuple, Dict, List, NoReturn
 import cv2
 import pandas as pd
 import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 from numpy.random import randint, choice, uniform
 
 from ..common import (

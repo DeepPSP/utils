@@ -17,6 +17,7 @@ from numbers import Real
 from typing import Union, Optional, Any, List, Tuple, Sequence
 
 import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 
 from ..common import ArrayLike
 

@@ -15,6 +15,7 @@ from typing import Tuple, Union, Optional, Dict, List
 
 from PIL import Image
 import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 import pandas as pd
 import tensorflow as tf
 

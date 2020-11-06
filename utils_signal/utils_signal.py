@@ -8,6 +8,7 @@ from numbers import Number, Real
 from typing import Union, List, NamedTuple, Optional, Tuple, Sequence
 
 import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 import pywt
 import scipy
 from math import atan2, factorial
@@ -19,9 +20,6 @@ except:
     from utils.utils_misc import trivial_jit as jit
 
 from ..common import ArrayLike, ArrayLike_Int
-
-
-np.set_printoptions(precision=5, suppress=True)
 
 
 __all__ = [

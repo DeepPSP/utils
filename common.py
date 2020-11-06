@@ -21,6 +21,7 @@ from typing import (
 from numbers import Real, Number
 
 import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 from wfdb.io import _header
 from wfdb import Record, MultiRecord
 

@@ -3,6 +3,7 @@
 2d boxes IoU, for object detection
 '''
 import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 import torch
 from torch import Tensor
 from torch.nn import functional as F

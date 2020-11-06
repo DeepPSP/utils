@@ -12,13 +12,14 @@ implemented geometric objects in sympy:
     Curve,
     Parabola
 """
+import math
 import random
 import warnings
 from typing import Union, Optional, List, NoReturn
 from numbers import Real
 
 import numpy as np
-import math
+np.set_printoptions(precision=5, suppress=True)
 import numpy.linalg as LA
 from numpy import pi as PI
 # import cmath

@@ -7,6 +7,7 @@ from numbers import Real
 from typing import Union, Optional, List, Tuple, Sequence, NoReturn, Any
 
 import numpy as np
+np.set_printoptions(precision=5, suppress=True)
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
