@@ -28,7 +28,7 @@ __all__ = [
 
 
 def plot_single_lead_ecg(s:ArrayLike, freq:Real, use_idx:bool=False, **kwargs) -> NoReturn:
-    """ not finished,
+    """ NOT finished, NOT checked,
 
     single lead ECG plot,
 
@@ -64,7 +64,7 @@ def plot_single_lead_ecg(s:ArrayLike, freq:Real, use_idx:bool=False, **kwargs) -
         mvs = np.array(c) * 0.001
         fig_sz = int(round(default_fig_sz * (idx_end-idx_start)/line_len))
         fig, ax = plt.subplots(figsize=(fig_sz, 6))
-        ax.plot(secs, mvs, c='black')
+        ax.plot(secs, mvs, color="black")
 
         ax.axhline(y=0, linestyle='-', linewidth='1.0', color='red')
         ax.xaxis.set_major_locator(plt.MultipleLocator(0.2))
@@ -89,7 +89,7 @@ def plot_single_lead_ecg(s:ArrayLike, freq:Real, use_idx:bool=False, **kwargs) -
 
 
 def plot_hypnogram(sleep_stage_curve:ArrayLike, style:str='original', **kwargs) -> NoReturn:
-    """
+    """ NOT finished, NOT checked,
 
     plot the hypnogram
 
@@ -134,7 +134,7 @@ def plot_hypnogram(sleep_stage_curve:ArrayLike, style:str='original', **kwargs) 
 
 
 def plot_confusion_matrix(y_true:ArrayLike, y_pred:ArrayLike, classes:Sequence[str], normalize:Optional[str]=None, title:Optional[str]=None, save_path:Optional[str]=None, cmap:Optional[Any]=None) -> Any:
-    """ finished, not checked,
+    """ finished, NOT checked,
 
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
@@ -142,7 +142,27 @@ def plot_confusion_matrix(y_true:ArrayLike, y_pred:ArrayLike, classes:Sequence[s
 
     Parameters:
     -----------
-    to write
+    y_true: array_like,
+        array of ground truths
+    y_pred: array_like,
+        array of predictions
+    classes: sequence of str,
+        sequence of names of the classes
+    normalize: str, optional, case insensitive,
+        can be one of 'true', 'pred', 'all', or None
+        if not None, normalizes confusion matrix over the true (rows),
+        predicted (columns) conditions or all the population
+    title: str, optional,
+        title of the plot of confusion matrix
+    save_path: str, optional,
+        path to save the plot of the confusion matrix
+    cmap: optional,
+        colormap,
+        if not specified, defaults to `plt.cm.Blues`
+
+    Returns:
+    --------
+    ax: `plt.axes.Axes`
     """
     from sklearn.metrics import confusion_matrix
 
