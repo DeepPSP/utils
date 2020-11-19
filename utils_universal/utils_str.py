@@ -7,7 +7,7 @@ from typing import Union, Tuple, List, Sequence, NoReturn
 from numbers import Number
 
 import difflib
-from fuzzysearch import find_near_matches
+from fuzzysearch import find_near_matches, LevenshteinSearchParams
 from fuzzywuzzy import process, fuzz
 
 
