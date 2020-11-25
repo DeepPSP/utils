@@ -396,18 +396,18 @@ def shannon_entropy(s:ArrayLike) -> float:
     """
     # Create a frequency data
     data_set = list(set(s))
-    freq_list = []
+    fs_list = []
     for entry in data_set:
         counter = 0
         for i in s:
             if i == entry:
                 counter += 1
-        freq_list.append(counter / len(s))
+        fs_list.append(counter / len(s))
 
     # Shannon entropy
     ent = 0.0
-    for freq in freq_list:
-        ent += freq * np.log2(freq)
+    for fs in fs_list:
+        ent += fs * np.log2(fs)
     ent = -ent
 
     return ent

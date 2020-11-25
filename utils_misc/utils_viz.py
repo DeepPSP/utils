@@ -27,7 +27,7 @@ __all__ = [
 ]
 
 
-def plot_single_lead_ecg(s:ArrayLike, freq:Real, use_idx:bool=False, **kwargs) -> NoReturn:
+def plot_single_lead_ecg(s:ArrayLike, fs:Real, use_idx:bool=False, **kwargs) -> NoReturn:
     """ NOT finished, NOT checked,
 
     single lead ECG plot,
@@ -36,7 +36,7 @@ def plot_single_lead_ecg(s:ArrayLike, freq:Real, use_idx:bool=False, **kwargs) -
     -----------
     s: array_like,
         the single lead ECG signal
-    freq: real,
+    fs: real,
         sampling frequency of `s`
     use_idx: bool, default False,
         use idx instead of time for the x-axis
@@ -49,7 +49,7 @@ def plot_single_lead_ecg(s:ArrayLike, freq:Real, use_idx:bool=False, **kwargs) -
     contributors: Jeethan, WEN Hao
     """
     default_fig_sz = 120
-    line_len = freq * 25  # 25 seconds
+    line_len = fs * 25  # 25 seconds
     nb_lines, residue = divmod(len(s), line_len)
     waves = ED(kwargs.get("waves", ED()))
     if residue > 0:
@@ -60,7 +60,7 @@ def plot_single_lead_ecg(s:ArrayLike, freq:Real, use_idx:bool=False, **kwargs) -
         c = s[idx_start:idx_end]
         secs = np.arange(idx_start, idx_end)
         if not use_idx:
-            secs = secs / freq
+            secs = secs / fs
         mvs = np.array(c) * 0.001
         fig_sz = int(round(default_fig_sz * (idx_end-idx_start)/line_len))
         fig, ax = plt.subplots(figsize=(fig_sz, 6))
@@ -243,7 +243,7 @@ class EcgAnimation(animation.FuncAnimation):
     __SIGNAL_FORMATS__ = ["lead_first", "channel_first", "lead_last", "channel_last",]
     __default_duration_anim__ = 5  # 5 seconds
 
-    def __init__(self, signal:ArrayLike, freq:Real, fmt:Optional[str]=None) -> NoReturn:
+    def __init__(self, signal:ArrayLike, fs:Real, fmt:Optional[str]=None) -> NoReturn:
         """ NOT finished,
 
         Parameters:
@@ -255,7 +255,7 @@ class EcgAnimation(animation.FuncAnimation):
         self.signal = np.array(signal)
         if self._auto_infer_units() == "mV":
             self.signal = 1000 * self.signal
-        self.freq = freq
+        self.fs = fs
         self.fmt = fmt.lower() if isinstance(fmt, str) else fmt
         assert (self.signal.ndim == 1 and fmt is None) \
             or (self.signal.ndim == 2 and fmt in self.__SIGNAL_FORMATS__)
@@ -265,13 +265,13 @@ class EcgAnimation(animation.FuncAnimation):
 
         if self.signal.ndim==1 or (self.signal.ndim==2 and self.fmt in ["lead_last", "channel_last"]):
             self.siglen = self.signal.shape[0]
-            self.duration = self.siglen / self.freq
+            self.duration = self.siglen / self.fs
         elif self.signal.ndim==2 and self.fmt in ["lead_first", "channel_first"]:
             self.siglen = self.signal.shape[1]
-            self.duration = self.siglen / self.freq
+            self.duration = self.siglen / self.fs
         
         self._n_frames = max(
-            1, math.ceil((self.duration-self.__default_duration_anim__)*self.freq)
+            1, math.ceil((self.duration-self.__default_duration_anim__)*self.fs)
         )
 
         default_fig_sz = 20
@@ -324,11 +324,11 @@ class EcgAnimation(animation.FuncAnimation):
             def func(frame, *fargs) -> iterable_of_artists
         """
         x_start = frame
-        x_end = int(x_start + self.freq*self.__default_duration_anim__)
+        x_end = int(x_start + self.fs*self.__default_duration_anim__)
         x = np.linspace(
-            start=x_start/self.freq,
-            stop=x_end/self.freq,
-            num=int(self.__default_duration_anim__*self.freq),
+            start=x_start/self.fs,
+            stop=x_end/self.fs,
+            num=int(self.__default_duration_anim__*self.fs),
         )
         if x_end <= self.siglen:
             y = self.signal[x_start: x_end]
@@ -374,7 +374,7 @@ class EcgAnimation(animation.FuncAnimation):
 #     __SIGNAL_FORMATS__ = ["lead_first", "channel_first", "lead_last", "channel_last",]
 #     __default_duration_anim__ = 5  # 5 seconds
 
-#     def __init__(self, signal:ArrayLike, freq:Real, fmt:Optional[str]=None) -> NoReturn:
+#     def __init__(self, signal:ArrayLike, fs:Real, fmt:Optional[str]=None) -> NoReturn:
 #         """ NOT finished,
 
 #         Parameters:
@@ -388,7 +388,7 @@ class EcgAnimation(animation.FuncAnimation):
 #         self.signal = np.array(signal)
 #         if self._auto_infer_units() == "mV":
 #             self.signal = 1000 * self.signal
-#         self.freq = freq
+#         self.fs = fs
 #         self.fmt = fmt.lower() if isinstance(fmt, str) else fmt
 #         assert (self.signal.ndim == 1 and fmt is None) \
 #             or (self.signal.ndim == 2 and fmt in self.__SIGNAL_FORMATS__)
@@ -398,14 +398,14 @@ class EcgAnimation(animation.FuncAnimation):
 
 #         if self.signal.ndim==1 or (self.signal.ndim==2 and self.fmt in ["lead_last", "channel_last"]):
 #             self.siglen = self.signal.shape[0]
-#             self.duration = self.siglen / self.freq
+#             self.duration = self.siglen / self.fs
 #         elif self.signal.ndim==2 and self.fmt in ["lead_first", "channel_first"]:
 #             self.siglen = self.signal.shape[1]
-#             self.duration = self.siglen / self.freq
+#             self.duration = self.siglen / self.fs
         
-#         self._frame_freq = max(25, self.freq//5)
+#         self._frame_fs = max(25, self.fs//5)
 #         self._n_frames = max(
-#             1, math.ceil((self.duration-self.__default_duration_anim__)/self._frame_freq)
+#             1, math.ceil((self.duration-self.__default_duration_anim__)/self._frame_fs)
 #         )
 
 #         with output:
@@ -483,14 +483,14 @@ class EcgAnimation(animation.FuncAnimation):
 
 #             def func(frame, *fargs) -> iterable_of_artists
 #         """
-#         # x_start = int(self._start_time*self.freq + frame_idx*self._frame_freq)
-#         # x_start = int(start_time*self.freq + frame_idx*self._frame_freq)
-#         x_start = int(frame_idx*self._frame_freq)
-#         x_end = int(x_start + self.freq*self.__default_duration_anim__)
+#         # x_start = int(self._start_time*self.fs + frame_idx*self._frame_fs)
+#         # x_start = int(start_time*self.fs + frame_idx*self._frame_fs)
+#         x_start = int(frame_idx*self._frame_fs)
+#         x_end = int(x_start + self.fs*self.__default_duration_anim__)
 #         x = np.linspace(
-#             start=x_start/self.freq,
-#             end=x_end/self.freq,
-#             num=int(self.__default_duration_anim__*self.freq),
+#             start=x_start/self.fs,
+#             end=x_end/self.fs,
+#             num=int(self.__default_duration_anim__*self.fs),
 #         )
 #         y = np.append(
 #             self.signal[x_start: min(self.siglen,x_end)],

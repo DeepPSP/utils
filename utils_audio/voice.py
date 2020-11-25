@@ -79,13 +79,13 @@ class Voice(object):
     2. better plot
     3. more voice features
     """
-    def __init__(self, values:Optional[np.ndarray]=None, freq:Optional[Real]=None, start_time:Optional[Real]=None, l_file_path:Optional[List[str]]=None, **kwargs):
+    def __init__(self, values:Optional[np.ndarray]=None, fs:Optional[Real]=None, start_time:Optional[Real]=None, l_file_path:Optional[List[str]]=None, **kwargs):
         """
         Parameter:
         ----------
         values: ndarray, optional,
             values of the audio recording
-        freq: real, optional,
+        fs: real, optional,
             sampling frequency of the audio recording
         start_time: real, optional,
             start time of the audio recording, units in seconds
@@ -95,14 +95,14 @@ class Voice(object):
         """
         self.values = values
         self.filtered_values = None
-        self.freq = freq
-        self.dt = 1/freq if freq is not None else None  # time spacing
-        self.duration = len(self.values)/self.freq if self.freq is not None else None
+        self.fs = fs
+        self.dt = 1/fs if fs is not None else None  # time spacing
+        self.duration = len(self.values)/self.fs if self.fs is not None else None
         self.start_time = start_time
         self.l_file_path = l_file_path
         self.kwargs = kwargs
 
-        if all([self.values is not None, self.freq is not None]):
+        if all([self.values is not None, self.fs is not None]):
             self._loaded = True
         else:
             self._loaded = False
@@ -177,29 +177,29 @@ class Voice(object):
             for file_path in self.l_file_path:
                 be_praat_tmp = PMSound(file_path, **kwargs) # TODO: 多个文件拼接
                 self.values = np.append(self.values, be_praat_tmp.values[0], axis=0)
-                self.freq = be_praat_tmp.sampling_frequency
+                self.fs = be_praat_tmp.sampling_frequency
             self.be_praat = PMSound(
                 values=self.values,
-                sampling_frequency=self.freq,
+                sampling_frequency=self.fs,
             )
             self.dt = self.be_praat.dt
             self.duration = len(self.values) * self.dt
             self._loaded = True
         elif backend.lower() == 'librosa':
             for file_path in self.l_file_path:
-                tmp_values, tmp_freq = librosa.load(path=file_path, **kwargs)
+                tmp_values, tmp_fs = librosa.load(path=file_path, **kwargs)
                 self.values = np.append(self.values, tmp_values, axis=0) if self.values is not None else tmp_values
-                if self.freq is None:
-                    self.freq = tmp_freq
+                if self.fs is None:
+                    self.fs = tmp_fs
                 else:
-                    assert self.freq == tmp_freq
-            self.duration = len(self.values)/self.freq
-            self.dt = 1/self.freq
+                    assert self.fs == tmp_fs
+            self.duration = len(self.values)/self.fs
+            self.dt = 1/self.fs
             self._loaded = True
         elif backend.lower() == 'soundfile':
             self.values = np.array([])
             for f in self.l_file_path:
-                v, self.freq = sf.read(file=f, **kwargs)
+                v, self.fs = sf.read(file=f, **kwargs)
                 self.values = np.append(self.values, v)
             self._loaded = True
         elif backend.lower() == 'wave':
@@ -209,35 +209,35 @@ class Voice(object):
             raise NotImplementedError
 
         if self.verbose >= 1:
-            print(f"len(self.values) = {len(self.values)}, self.freq = {self.freq}")
+            print(f"len(self.values) = {len(self.values)}, self.fs = {self.fs}")
 
 
-    def resample(self, new_freq:Real) -> NoReturn:
+    def resample(self, new_fs:Real) -> NoReturn:
         """
 
         Parameters:
         ----------
-        new_freq: real,
+        new_fs: real,
             the new frequency
         """
         if not self._loaded:
-            self.load(backend='librosa', sr=new_freq)
+            self.load(backend='librosa', sr=new_fs)
             return
         
         # can also use praat override_sampling_frequency
         self.values = librosa.resample(
             self.values,
-            orig_sr=self.freq, target_sr=new_freq,
+            orig_sr=self.fs, target_sr=new_fs,
             res_type='kaiser_best', fix=True, scale=False,
         )
         if self.filtered_values is not None:
             self.bandpass_filter()
-        self.freq = new_freq
-        self.dt = 1/self.freq
+        self.fs = new_fs
+        self.dt = 1/self.fs
         self.reset()
 
 
-    def save(self, filename:str, fmt:Optional[str]='wav', freq:Optional[Real]=None, **kwargs):
+    def save(self, filename:str, fmt:Optional[str]='wav', fs:Optional[Real]=None, **kwargs):
         """
 
         Parameters:
@@ -246,26 +246,26 @@ class Voice(object):
             name of the file to save
         fmt: str, default 'wav', optional,
             format of the file to save
-        freq: real, optional,
+        fs: real, optional,
             sampling frequency of the file to save
         """
         fn, ext = os.path.splitext(filename)
         fmt = ext.replace('.', '') or fmt
         fn = f'{fn}.{fmt}'
         if not self._loaded:
-            self.load(backend='librosa', sr=freq)
-            freq = self.freq
+            self.load(backend='librosa', sr=fs)
+            fs = self.fs
             to_save_values = self.values
-        elif freq is not None:
+        elif fs is not None:
             to_save_values = librosa.resample(
                 self.values,
-                orig_sr=self.freq, target_sr=freq,
+                orig_sr=self.fs, target_sr=fs,
                 res_type='kaiser_best', fix=True, scale=False,
             )
         else:
-            freq = self.freq
+            fs = self.fs
             to_save_values = self.values
-        sf.write(fn, to_save_values, freq, format=fmt, **kwargs)
+        sf.write(fn, to_save_values, fs, format=fmt, **kwargs)
 
 
     def preprocess(self,):
@@ -286,7 +286,7 @@ class Voice(object):
             data=self.values,
             lowcut=kwargs.get('lowcut', 80),
             highcut=kwargs.get('highcut', 8000),
-            fs=self.freq,
+            fs=self.fs,
             order=kwargs.get('order', 3)
         )
 
@@ -325,19 +325,19 @@ class Voice(object):
         if time_range is None:
             st_idx, ed_idx = 0, len(self.values)
         else:
-            st_idx, ed_idx = int(time_range[0] * self.freq), int(time_range[1] * self.freq)
+            st_idx, ed_idx = int(time_range[0] * self.fs), int(time_range[1] * self.fs)
         if backend == 'praat':
             if not is_filtered:
                 snd = PMSound(
                     values=self.values[st_idx:ed_idx],
-                    sampling_frequency=self.freq,
+                    sampling_frequency=self.fs,
                 )
             else:
                 if self.filtered_values is None:
                     self.bandpass_filter()
                 snd = PMSound(
                     values=self.filtered_values[st_idx:ed_idx],
-                    sampling_frequency=self.freq,
+                    sampling_frequency=self.fs,
                 )
             intensity = snd.to_intensity()
             self._intensity = {}
@@ -395,12 +395,12 @@ class Voice(object):
         if time_range is None:
             st_idx, ed_idx = 0, len(self.values)
         else:
-            st_idx, ed_idx = int(time_range[0] * self.freq), int(time_range[1] * self.freq)
+            st_idx, ed_idx = int(time_range[0] * self.fs), int(time_range[1] * self.fs)
         if backend == 'praat':
             assert kwargs.get("method", None) in [None, 'AC', 'CC', 'SHS', 'SPINET']
             snd = PMSound(
                 values=self.values[st_idx:ed_idx],
-                sampling_frequency=self.freq,
+                sampling_frequency=self.fs,
             )
             pitches = snd.to_pitch(**kwargs)
             self._pitches = {}
@@ -430,11 +430,11 @@ class Voice(object):
         if time_range is None:
             st_idx, ed_idx = 0, len(self.values)
         else:
-            st_idx, ed_idx = int(time_range[0] * self.freq), int(time_range[1] * self.freq)
+            st_idx, ed_idx = int(time_range[0] * self.fs), int(time_range[1] * self.fs)
         if backend == 'praat':
             snd = PMSound(
                 values=self.values[st_idx:ed_idx],
-                sampling_frequency=self.freq,
+                sampling_frequency=self.fs,
             )
             formants = snd.to_formant_burg(**kwargs)
             x = formants.xs()
@@ -466,11 +466,11 @@ class Voice(object):
         if time_range is None:
             st_idx, ed_idx = 0, len(self.values)
         else:
-            st_idx, ed_idx = int(time_range[0] * self.freq), int(time_range[1] * self.freq)
+            st_idx, ed_idx = int(time_range[0] * self.fs), int(time_range[1] * self.fs)
         if backend == 'praat':
             snd = PMSound(
                 values=self.values[st_idx:ed_idx],
-                sampling_frequency=self.freq,
+                sampling_frequency=self.fs,
             )
             formants = snd.to_formant_burg(**kw_formants)
             spectrogram = snd.to_spectrogram(**kw_power)
@@ -511,11 +511,11 @@ class Voice(object):
         if time_range is None:
             st_idx, ed_idx = 0, len(self.values)
         else:
-            st_idx, ed_idx = int(time_range[0] * self.freq), int(time_range[1] * self.freq)
+            st_idx, ed_idx = int(time_range[0] * self.fs), int(time_range[1] * self.fs)
         if backend == 'praat':
             snd = PMSound(
                 values=self.values[st_idx:ed_idx],
-                sampling_frequency=self.freq,
+                sampling_frequency=self.fs,
             )
             assert kwargs.get("method", None) in [None, 'AC', 'CC', 'GNE']
             self._harmonicity = snd.to_harmonicity(**kwargs)
@@ -548,11 +548,11 @@ class Voice(object):
         if time_range is None:
             st_idx, ed_idx = 0, len(self.values)
         else:
-            st_idx, ed_idx = int(time_range[0] * self.freq), int(time_range[1] * self.freq)
+            st_idx, ed_idx = int(time_range[0] * self.fs), int(time_range[1] * self.fs)
         if backend == 'praat':
             snd = PMSound(
                 values=self.values[st_idx:ed_idx],
-                sampling_frequency=self.freq,
+                sampling_frequency=self.fs,
             )
             self._spectrogram = snd.to_spectrogram(**kwargs)
         else:
@@ -574,17 +574,17 @@ class Voice(object):
         if time_range is None:
             st_idx, ed_idx = 0, len(self.values)
         else:
-            st_idx, ed_idx = int(time_range[0] * self.freq), int(time_range[1] * self.freq)
+            st_idx, ed_idx = int(time_range[0] * self.fs), int(time_range[1] * self.fs)
         if backend == 'praat':
             snd = PMSound(
                 values=self.values[st_idx:ed_idx],
-                sampling_frequency=self.freq,
+                sampling_frequency=self.fs,
             )
             self._melspectrogram = snd.to_melspectrogram(**kwargs)
         elif backend == 'librosa':
             self._melspectrogram = librosa.feature.melspectrogram(
                 y=self.values[st_idx:ed_idx],
-                sr=self.freq,
+                sr=self.fs,
                 **kwargs
             )
         else:
@@ -607,11 +607,11 @@ class Voice(object):
         if time_range is None:
             st_idx, ed_idx = 0, len(self.values)
         else:
-            st_idx, ed_idx = int(time_range[0] * self.freq), int(time_range[1] * self.freq)
+            st_idx, ed_idx = int(time_range[0] * self.fs), int(time_range[1] * self.fs)
         if backend == 'praat':
             snd = PMSound(
                 values=self.values[st_idx:ed_idx],
-                sampling_frequency=self.freq,
+                sampling_frequency=self.fs,
             )
             self._spectrum = snd.to_spectrum(**kwargs)
         else:
@@ -641,16 +641,16 @@ class Voice(object):
         if time_range is None:
             st_idx, ed_idx = 0, len(self.values)
         else:
-            st_idx, ed_idx = int(time_range[0] * self.freq), int(time_range[1] * self.freq)
+            st_idx, ed_idx = int(time_range[0] * self.fs), int(time_range[1] * self.fs)
         if backend == 'praat':
             snd = PMSound(
                 values=self.values[st_idx:ed_idx],
-                sampling_frequency=self.freq,
+                sampling_frequency=self.fs,
             )
             self._mfcc = snd.to_mfcc(**kwargs)
         elif backend == 'librosa':
             self._mfcc = librosa.feature.mfcc(
-                self.values[st_idx:ed_idx], sr=self.freq, **kwargs
+                self.values[st_idx:ed_idx], sr=self.fs, **kwargs
             )
         else:
             raise NotImplementedError
@@ -675,9 +675,9 @@ class Voice(object):
         if time_range is None:
             st_idx, ed_idx = 0, len(self.values)
         else:
-            st_idx, ed_idx = int(time_range[0] * self.freq), int(time_range[1] * self.freq)
+            st_idx, ed_idx = int(time_range[0] * self.fs), int(time_range[1] * self.fs)
         if backend == 'praat':
-            snd = PMSound(values=self.values[st_idx:ed_idx], sampling_frequency=self.freq)
+            snd = PMSound(values=self.values[st_idx:ed_idx], sampling_frequency=self.fs)
             f0min, f0max = kwargs.get("f0min", 75), kwargs.get("f0max", 500)
             # PointProcess (periodic, cc): minimum pitch (Hz), maximum pitch (Hz)
             pointProcess = call(snd, "To PointProcess (periodic, cc)", f0min, f0max)
@@ -717,12 +717,12 @@ class Voice(object):
             gains = [gains for _ in freqs]
         for idx, (low, high) in enumerate(freqs):
             g = gains[idx]
-            se += butter_bandpass_filter(self.values, low, high, self.freq, order=kwargs.get("order", 3), verbose=self.verbose)*np.power(10, g/20)
+            se += butter_bandpass_filter(self.values, low, high, self.fs, order=kwargs.get("order", 3), verbose=self.verbose)*np.power(10, g/20)
         if inplace:
             self.reset()
             self.values = se
         else:
-            return Voice(values=se, freq=self.freq, start_time=self.start_time, l_file_path=self.l_file_path, **self.kwargs)
+            return Voice(values=se, fs=self.fs, start_time=self.start_time, l_file_path=self.l_file_path, **self.kwargs)
 
 
     def energy_proportion_curve(self, lowcut:Union[Real, List[Real]], highcut:Union[Real, List[Real]], time_range:Optional[ArrayLike]=None, smoothing:float=0.6, **kwargs) -> np.ndarray:
@@ -810,11 +810,11 @@ class Voice(object):
             if time_range is None:
                 st_idx, ed_idx = 0, len(self.values)
             else:
-                st_idx, ed_idx = int(time_range[0] * self.freq), int(time_range[1] * self.freq)
+                st_idx, ed_idx = int(time_range[0] * self.fs), int(time_range[1] * self.fs)
             analysis_start_time = time_range[0] if time_range is not None else self.be_praat.start_time
             snd = PMSound(
                 values=self.values[st_idx:ed_idx],
-                sampling_frequency=self.freq,
+                sampling_frequency=self.fs,
                 start_time=analysis_start_time,
             )
             intensity = snd.to_intensity()
@@ -845,7 +845,7 @@ class Voice(object):
             ori_indices = np.where((start_t<=self.ts())&(end_t>=self.ts()))[0]
             self.syllable_segments.append(
                 SyllableSegment(
-                    values=self.values.flatten()[ori_indices], freq=self.freq, start_time=start_t, end_time=end_t
+                    values=self.values.flatten()[ori_indices], fs=self.fs, start_time=start_t, end_time=end_t
                 )
             )
 
@@ -870,12 +870,12 @@ class Voice(object):
             if time_range is None:
                 st_idx, ed_idx = 0, len(self.values)
             else:
-                st_idx, ed_idx = int(time_range[0] * self.freq), int(time_range[1] * self.freq)
+                st_idx, ed_idx = int(time_range[0] * self.fs), int(time_range[1] * self.fs)
             if st_idx >= ed_idx:
                 if self.verbose >= 1:
                     print("st_idx () is greater than or equal to ed_idx, empty value")
                 return
-            snd = PMSound(values=self.values[st_idx:ed_idx], sampling_frequency=self.freq)
+            snd = PMSound(values=self.values[st_idx:ed_idx], sampling_frequency=self.fs)
             pitches = snd.to_pitch()
             t_arr = pitches.xs()
             pitch_values = pitches.selected_array['frequency']
@@ -975,7 +975,7 @@ class Voice(object):
 
         if 'signal' in items:
             fig, ax = plt.subplots(figsize=(20,4))
-            ax.plot(np.arange(len(self.values))/self.freq, self.values, '-')
+            ax.plot(np.arange(len(self.values))/self.fs, self.values, '-')
             ax.grid()
             ax.set_title('signal')
             ax.set_xlabel("time [s]")
@@ -1017,7 +1017,7 @@ class Voice(object):
             if self.d_vuv == {}:
                 self.obtain_vuv()
             fig, ax = plt.subplots(figsize=(20,4))
-            ax.plot(np.arange(len(self.values))/self.freq, self.values, '-')
+            ax.plot(np.arange(len(self.values))/self.fs, self.values, '-')
             pause_seg = self.d_vuv['pause']
             for r in pause_seg:
                 ax.axvspan(r[0], r[1], color='red', alpha=0.2)
@@ -1080,7 +1080,7 @@ class Voice(object):
         
         snd = PMSound(
                 values=self.values,
-                sampling_frequency=self.freq,
+                sampling_frequency=self.fs,
             )
         
         fig, (ax_t, ax_f) = plt.subplots(2,1,figsize=(max(20,int(8*snd.xmax)),10),sharex=True)
@@ -1171,7 +1171,7 @@ class Voice(object):
     def ts(self) -> np.ndarray:
         """ follow the method ts() of a parselmouth.Sound object
         """
-        return np.arange(0.5, 0.5 + len(self.values), 1) / self.freq
+        return np.arange(0.5, 0.5 + len(self.values), 1) / self.fs
 
     @property
     def intensity(self):
@@ -1256,10 +1256,10 @@ class SyllableSegment(Voice):
     """
     syllable segment
     """
-    def __init__(self, values: np.ndarray, freq:Real, start_time:Real, end_time:Real, vowel:Optional[Real]=None):
+    def __init__(self, values: np.ndarray, fs:Real, start_time:Real, end_time:Real, vowel:Optional[Real]=None):
         """
         """
-        super().__init__(values, freq, start_time)
+        super().__init__(values, fs, start_time)
         self.end_time = end_time
         self.vowel = vowel
 

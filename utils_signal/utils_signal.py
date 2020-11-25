@@ -490,7 +490,7 @@ def lstsq_with_smoothness_prior(data:ArrayLike) -> np.ndarray:
     raise NotImplementedError
 
 
-def generate_rr_interval(nb_beats:int, bpm_mean:Real, bpm_std:Real, lf_hf:float, lf_freq:float=0.1, hf_freq:float=0.25, lf_std:float=0.01, hf_std:float=0.01) -> np.ndarray:
+def generate_rr_interval(nb_beats:int, bpm_mean:Real, bpm_std:Real, lf_hf:float, lf_fs:float=0.1, hf_fs:float=0.25, lf_std:float=0.01, hf_std:float=0.01) -> np.ndarray:
     """ finished, not checked,
 
     Parameters:
@@ -499,9 +499,9 @@ def generate_rr_interval(nb_beats:int, bpm_mean:Real, bpm_std:Real, lf_hf:float,
     bpm_mean: real number,
     bpm_std: real number,
     lf_hf: float,
-    lf_freq: float, default 0.1,
-    hf_freq: float, default 0.25,
-    hf_freq: float, default 0.25,
+    lf_fs: float, default 0.1,
+    hf_fs: float, default 0.25,
+    hf_fs: float, default 0.25,
     lf_std: float, default 0.01,
     ff_std: float, default 0.01,
 
@@ -513,8 +513,8 @@ def generate_rr_interval(nb_beats:int, bpm_mean:Real, bpm_std:Real, lf_hf:float,
     expected_rr_mean = 60 / bpm_mean
     expected_rr_std = 60 * bpm_std / (bpm_mean*bpm_mean)
     
-    lf = lf_hf*np.random.normal(loc=lf_freq, scale=lf_std, size=nb_beats)  # lf power spectum
-    hf = np.random.normal(loc=hf_freq, scale=hf_std, size=nb_beats)  # hf power spectum
+    lf = lf_hf*np.random.normal(loc=lf_fs, scale=lf_std, size=nb_beats)  # lf power spectum
+    hf = np.random.normal(loc=hf_fs, scale=hf_std, size=nb_beats)  # hf power spectum
     rr_power_spectrum = np.sqrt(lf + hf)
     
     # random (uniformly distributed in [0,2pi]) phases
@@ -528,14 +528,14 @@ def generate_rr_interval(nb_beats:int, bpm_mean:Real, bpm_std:Real, lf_hf:float,
     return rr
 
 
-def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) -> bool:
+def is_ecg_signal(s:ArrayLike, fs:int, wavelet_name:str='db6', verbose:int=0) -> bool:
     """ finished, to be improved,
 
     Parameters:
     -----------
     s: array_like,
         the signal to be denoised
-    freq: int,
+    fs: int,
         frequency of the signal `s`
     wavelet_name: str, default 'db6'
         name of the wavelet to use
@@ -548,14 +548,14 @@ def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) 
     """
     nl = '\n'
     sig_len = len(s)
-    spacing = 1000/freq
+    spacing = 1000/fs
 
     # constants for computation
     valid_rr = [200, 3000]  # ms, bpm 300 - 20
     reasonable_rr = [300, 1500]  # ms, bpm 40 - 200
     rr_samp_len = 5
-    step_len = int(0.1*freq)  # 100ms
-    window_radius = int(0.3*freq)  # 300ms
+    step_len = int(0.1*fs)  # 100ms
+    window_radius = int(0.3*fs)  # 300ms
     slice_len = 2*window_radius  # for cutting out head and tails of the reconstructed signals
 
     high_confidence = 1.0
@@ -567,7 +567,7 @@ def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) 
     if verbose >= 2:
         import matplotlib.pyplot as plt
         from utils.common import DEFAULT_FIG_SIZE_PER_SEC
-        # figsize=(int(DEFAULT_FIG_SIZE_PER_SEC*len(s)/freq), 6)
+        # figsize=(int(DEFAULT_FIG_SIZE_PER_SEC*len(s)/fs), 6)
 
         print('(level 3 of) the wavelet in use looks like:')
         _, psi, x = pywt.Wavelet(wavelet_name).wavefun(level=3)
@@ -577,7 +577,7 @@ def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) 
         plt.show()
 
     qrs_freqs = [10, 40]  # Hz
-    qrs_levels = [int(np.ceil(np.log2(freq/qrs_freqs[-1]))), int(np.floor(np.log2(freq/qrs_freqs[0])))]
+    qrs_levels = [int(np.ceil(np.log2(fs/qrs_freqs[-1]))), int(np.floor(np.log2(fs/qrs_freqs[0])))]
     if qrs_levels[0] > qrs_levels[-1]:
         qrs_levels = qrs_levels[::-1]
 
@@ -625,7 +625,7 @@ def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) 
 
         if verbose >= 2:
             default_fig_sz = 120
-            line_len = freq * 25  # 25 seconds
+            line_len = fs * 25  # 25 seconds
             nb_lines = len(qrs_sig) // line_len
             for idx in range(nb_lines):
                 c = qrs_sig[idx*line_len:(idx+1)*line_len]
@@ -669,7 +669,7 @@ def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) 
         s_ = s[slice_len:-slice_len]
         if verbose >= 2:
             default_fig_sz = 120
-            line_len = freq * 25  # 25 seconds
+            line_len = fs * 25  # 25 seconds
             nb_lines = len(qrs_power) // line_len
             for idx in range(nb_lines):
                 c = qrs_power[idx*line_len:(idx+1)*line_len]
@@ -727,7 +727,7 @@ def is_ecg_signal(s:ArrayLike, freq:int, wavelet_name:str='db6', verbose:int=0) 
     return True if is_ecg_confidence >= is_ecg_confidence_threshold else False
 
 
-def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:str='ecg', sides_mode:str='nearest', cval:int=0, verbose:int=0, **kwargs) -> NamedTuple:
+def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:str='ecg', sides_mode:str='nearest', cval:int=0, verbose:int=0, **kwargs) -> NamedTuple:
     """ finished, to be improved,
 
     denoise and amplify (if necessary) signal `s`, using wavelet decomposition
@@ -736,7 +736,7 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
     -----------
     s: array_like,
         the signal to be denoised
-    freq: int,
+    fs: int,
         frequency of the signal `s`
     wavelet_name: str, default 'db6'
         name of the wavelet to use
@@ -767,15 +767,15 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
         "'nearest', 'mirror', 'wrap', 'constant', 'no_slicing', 'interp'.")
 
     sig_len = len(s)
-    spacing = 1000/freq
+    spacing = 1000/fs
 
     # constants for computation
     valid_rr = [200, 3000]  # ms, bpm 300 - 20
     reasonable_rr = [300, 1500]  # ms, bpm 40 - 200
     rr_samp_len = 5
-    step_len = int(0.1*freq)  # 100ms
-    qrs_radius = int(0.1*freq)  # 100ms
-    window_radius = int(0.3*freq)  # 300ms
+    step_len = int(0.1*fs)  # 100ms
+    qrs_radius = int(0.1*fs)  # 100ms
+    window_radius = int(0.3*fs)  # 300ms
     slice_len = 2*window_radius  # for cutting out head and tails of the reconstructed signals
 
     # standard_ecg_amplitude = 1100  # muV
@@ -793,7 +793,7 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
     if verbose >= 2:
         import matplotlib.pyplot as plt
         from utils.common import DEFAULT_FIG_SIZE_PER_SEC
-        # figsize=(int(DEFAULT_FIG_SIZE_PER_SEC*len(s)/freq), 6)
+        # figsize=(int(DEFAULT_FIG_SIZE_PER_SEC*len(s)/fs), 6)
 
         print('(level 3 of) the wavelet used looks like:')
         _, psi, x = pywt.Wavelet(wavelet_name).wavefun(level=3)
@@ -803,12 +803,12 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
         plt.show()
 
     qrs_freqs = [10, 40]  # Hz
-    qrs_levels = [int(np.ceil(np.log2(freq/qrs_freqs[-1]))), int(np.floor(np.log2(freq/qrs_freqs[0])))]
+    qrs_levels = [int(np.ceil(np.log2(fs/qrs_freqs[-1]))), int(np.floor(np.log2(fs/qrs_freqs[0])))]
     if qrs_levels[0] > qrs_levels[-1]:
         qrs_levels = qrs_levels[::-1]
 
     ecg_freqs = [0.5, 45]  # Hz
-    ecg_levels = [int(np.floor(np.log2(freq/ecg_freqs[-1]))), int(np.ceil(np.log2(freq/ecg_freqs[0])))]
+    ecg_levels = [int(np.floor(np.log2(fs/ecg_freqs[-1]))), int(np.ceil(np.log2(fs/ecg_freqs[0])))]
         
     # if qrs_only:
     #     tot_level = qrs_levels[-1]
@@ -859,7 +859,7 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
 
         if verbose >= 2:
             default_fig_sz = 120
-            line_len = freq * 25  # 25 seconds
+            line_len = fs * 25  # 25 seconds
             nb_lines = len(qrs_sig) // line_len
             for idx in range(nb_lines):
                 c = qrs_sig[idx*line_len:(idx+1)*line_len]
@@ -903,7 +903,7 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
         s_ = s[slice_len:-slice_len]
         if verbose >= 2:
             default_fig_sz = 120
-            line_len = freq * 25  # 25 seconds
+            line_len = fs * 25  # 25 seconds
             nb_lines = len(qrs_power) // line_len
             for idx in range(nb_lines):
                 c = qrs_power[idx*line_len:(idx+1)*line_len]
@@ -1018,7 +1018,7 @@ def wavelet_denoise(s:ArrayLike, freq:int, wavelet_name:str='db6', amplify_mode:
             print(f'amplify_ratio = {amplify_ratio}{nl}qrs_amplitudes = {qrs_amplitudes}')
             if verbose >= 2:
                 default_fig_sz = 120
-                line_len = freq * 25  # 25 seconds
+                line_len = fs * 25  # 25 seconds
                 nb_lines = len(s_rec) // line_len
                 for idx in range(nb_lines):
                     c_rec = s_rec[idx*line_len:(idx+1)*line_len]
