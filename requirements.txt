@@ -10,6 +10,8 @@ librosa
 praat-parselmouth
 opencv-contrib-python
 easydict
+requests
+feedparser
 
 # ipympl
 # ipywidgets
