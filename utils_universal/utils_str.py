@@ -3,7 +3,7 @@
 docstring, to write
 """
 import re
-from typing import Union, Tuple, List, Sequence, NoReturn
+from typing import Union, Tuple, List, Sequence, Tuple, NoReturn
 from numbers import Number
 
 import difflib
