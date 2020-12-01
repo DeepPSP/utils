@@ -75,7 +75,7 @@ class BibLookup(object):
         self.__default_err = "Not Found"
 
 
-    def __call__(self, identifier:str, align:str="middle") -> str:
+    def __call__(self, identifier:str, align:Optional[str]=None) -> str:
         """ finished, checked,
 
         Parameters:
@@ -83,7 +83,7 @@ class BibLookup(object):
         identifier: str,
             identifier of a publication,
             can be DOI, PMID (or url), PMCID (or url), arXiv id,
-        align: str, default "middle",
+        align: str, optional,
             alignment of the final output, case insensitive,
             if specified, `self.align` is ignored
         
@@ -103,7 +103,7 @@ class BibLookup(object):
             res = self.__default_err
 
         if res != self.__default_err:
-            res = self._align_result(res, align=align)
+            res = self._align_result(res, align=(align or self.align).lower())
         print(res)
 
         return res
@@ -261,9 +261,18 @@ class BibLookup(object):
         return res
 
 
-    def _align_result(self, res:Union[str,Dict[str,str]], align:str="middle") -> str:
+    def _align_result(self, res:Union[str,Dict[str,str]], align:Optional[str]=None) -> str:
         """ finished, checked,
+
+        Parameters:
+        -----------
+        res: str or dict,
+            result obtained via GET or POST
+        align: str, optional,
+            alignment of the final output, case insensitive,
+            if specified, `self.align` is ignored
         """
+        _align = (align or self.align).lower()
         if isinstance(res, str):
             lines = [l.strip() for l in res.split("\n") if len(l.strip()) > 0]
             d = OrderedDict()
@@ -280,15 +289,15 @@ class BibLookup(object):
                 if idx < len(tmp)-1:
                     d[k] += ","
         max_key_len = max([len(k) for k in d.keys()])
-        if self.align == "middle":
+        if _align == "middle":
             lines = [header] \
                     + [f"{' '*(2+max_key_len-len(k))}{k} = {v}" for k,v in d.items()] \
                     + ["}"]
-        elif self.align == "left":
+        elif _align == "left":
             lines = [header] \
                     + [f"{' '*2}{k} = {v}" for k,v in d.items()] \
                     + ["}"]
-        elif self.align in ["left-middle", "left_middle",]:
+        elif _align in ["left-middle", "left_middle",]:
             lines = [header] \
                     + [f"{' '*2}{k}{' '*(1+max_key_len-len(k))}= {v}" for k,v in d.items()] \
                     + ["}"]
