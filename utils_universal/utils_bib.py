@@ -2,7 +2,7 @@
 """
 import re
 from collections import OrderedDict
-from typing import Union, Tuple, List, Sequence, Tuple, NoReturn
+from typing import Union, Optional, Tuple, List, Sequence, Tuple, Dict, NoReturn
 from numbers import Number
 import warnings
 
@@ -23,6 +23,17 @@ class BibLookup(object):
     [1] https://github.com/davidagraf/doi2bib2
     [2] https://arxiv.org/help/api
     [3] https://github.com/mfcovington/pubmed-lookup/
+
+    Example:
+    --------
+    >>> bl = BibLookup(align="middle")
+    >>> res = bl("1707.07183")
+    @article{liu2017_1707.07183v2
+        title = {Counting Multiplicities in a Hypersurface over a Number Field},
+       author = {Hao, Wen and Chunhui, Liu},
+         year = {2017},
+      journal = {arXiv preprint arXiv:1707.07183v2}
+    }
 
     TODO:
     use eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi for PubMed, as in [3]
