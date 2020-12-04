@@ -28,9 +28,9 @@ class BibLookup(object):
     --------
     >>> bl = BibLookup(align="middle")
     >>> res = bl("1707.07183")
-    @article{liu2017_1707.07183v2
+    @article{wen2017_1707.07183v2,
         title = {Counting Multiplicities in a Hypersurface over a Number Field},
-       author = {Hao, Wen and Chunhui, Liu},
+       author = {Hao Wen and Chunhui Liu},
          year = {2017},
       journal = {arXiv preprint arXiv:1707.07183v2}
     }
@@ -247,16 +247,18 @@ class BibLookup(object):
         arxiv_id = parsed["id"].split("arxiv.org/abs/")[-1]
         year = parsed["published_parsed"].tm_year
         res = {"title": title}
-        authors = []
-        for item in parsed["authors"]:
-            a = item["name"].split(" ")
-            if len(a) > 1:
-                a[-2] = a[-2] + ","
-            authors.append(" ".join(a))
+        # authors = []
+        # for item in parsed["authors"]:
+        #     a = item["name"].split(" ")
+        #     if len(a) > 1:
+        #         a[-2] = a[-2] + ","
+        #     authors.append(" ".join(a))
+        # it seems that surnames are put in the last position of full names by arXiv
+        authors = [item["name"] for item in parsed["authors"]]
         res["author"] = " and ".join(authors)
         res["year"] = year
         res["journal"] = f"arXiv preprint arXiv:{arxiv_id}"
-        res["label"] = f"{parsed['author'].split(' ')[-1].lower()}{year}_{arxiv_id}"
+        res["label"] = f"{parsed['authors'][0]['name'].split(' ')[-1].lower()}{year}_{arxiv_id}"
         res["class"] = "article"
         return res
 
@@ -271,6 +273,11 @@ class BibLookup(object):
         align: str, optional,
             alignment of the final output, case insensitive,
             if specified, `self.align` is ignored
+
+        Returns:
+        --------
+        new_str: str,
+            the aligned bib string
         """
         _align = (align or self.align).lower()
         if isinstance(res, str):
@@ -281,7 +288,7 @@ class BibLookup(object):
                 key, val = l.strip().split("=")
                 d[key.strip()] = self._enclose_braces(val)
         elif isinstance(res, dict):
-            header = f"@{res['class']}{{{res['label']}"
+            header = f"@{res['class']}{{{res['label']},"
             d = OrderedDict()
             tmp = {k:v for k,v in res.items() if k not in ["class", "label"]}
             for idx, (k,v) in enumerate(tmp.items()):
