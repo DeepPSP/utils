@@ -38,7 +38,7 @@ class BibLookup(object):
 
     TODO:
     use eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi for PubMed, as in [3]
-    try using google scholar api described in [4]
+    try using google scholar api described in [4] (unfortunately [4] is charged)
     """
     __name__ = "BibLookup"
 
@@ -242,7 +242,7 @@ class BibLookup(object):
         """
         r = requests.get(**feed_content)
         parsed = feedparser.parse(r.content.decode("utf-8")).entries[0]
-        title = parsed["title"]
+        title = re.sub("[\s]+", " ", parsed["title"])  # sometimes this field has "\n"
         if title == "Error":
             res = self.__default_err
             return res
@@ -259,6 +259,7 @@ class BibLookup(object):
         authors = [item["name"] for item in parsed["authors"]]
         res["author"] = " and ".join(authors)
         res["year"] = year
+        res["month"] = parsed["published_parsed"].tm_mon
         res["journal"] = f"arXiv preprint arXiv:{arxiv_id}"
         res["label"] = f"{parsed['authors'][0]['name'].split(' ')[-1].lower()}{year}_{arxiv_id}"
         res["class"] = "article"
