@@ -24,6 +24,7 @@ class BibLookup(object):
     [2] https://arxiv.org/help/api
     [3] https://github.com/mfcovington/pubmed-lookup/
     [4] https://serpapi.com/google-scholar-cite-api
+    [5] https://www.bibtex.com/
 
     Example:
     --------
@@ -37,7 +38,7 @@ class BibLookup(object):
     }
 
     TODO:
-    use eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi for PubMed, as in [3]
+    use eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi for PubMed, as in [3];
     try using google scholar api described in [4] (unfortunately [4] is charged)
     """
     __name__ = "BibLookup"
