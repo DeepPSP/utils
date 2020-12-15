@@ -39,7 +39,8 @@ class BibLookup(object):
 
     TODO:
     use eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi for PubMed, as in [3];
-    try using google scholar api described in [4] (unfortunately [4] is charged)
+    try using google scholar api described in [4] (unfortunately [4] is charged);
+    use `Flask` to write a simple browser-based UI;
     """
     __name__ = "BibLookup"
 
