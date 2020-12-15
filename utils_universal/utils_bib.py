@@ -16,7 +16,7 @@ __all__ = [
 
 
 class BibLookup(object):
-    """
+    """ finished, continuous improving,
 
     References:
     -----------
