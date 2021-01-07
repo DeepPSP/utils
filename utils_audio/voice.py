@@ -202,8 +202,8 @@ class Voice(object):
         elif backend.lower() == "soundfile":
             self.values = np.array([])
             for file_path in self.l_file_path:
-                v, self.fs = sf.read(file=file_path, **kwargs)
-                self.values = np.append(self.values, v)
+                tmp_values, self.fs = sf.read(file=file_path, **kwargs)
+                self.values = np.append(self.values, tmp_values)
             self._loaded = True
         elif backend.lower() == "wave":
             self.be_wave = wave
@@ -213,7 +213,7 @@ class Voice(object):
             for file_path in self.l_file_path:
                 assert file_path.lower().endswith(".wav"), f"scipy can only read .wav files"
                 self.fs, tmp_values = sio.wavfile.read(file_path)
-                self.values = np.append(self.values, v)
+                self.values = np.append(self.values, tmp_values)
             self._loaded = True
         else:
             raise NotImplementedError
