@@ -9,9 +9,11 @@ wave:
     only has basic audio io operations
 scipy.io:
     https://docs.scipy.org/doc/scipy/reference/io.html#module-scipy.io
+audioread (backend of librosa):
+    https://github.com/beetbox/audioread
 librosa:
     https://github.com/librosa/librosa
-praat(parselmouth):
+praat (parselmouth):
     https://github.com/YannickJadoul/Parselmouth
     http://www.fon.hum.uva.nl/praat/
 pyAudioAnalysis:
@@ -215,6 +217,8 @@ class Voice(object):
                 self.fs, tmp_values = sio.wavfile.read(file_path)
                 self.values = np.append(self.values, tmp_values)
             self._loaded = True
+        elif backend.lower() == "audioread":
+            raise NotImplementedError
         else:
             raise NotImplementedError
 
