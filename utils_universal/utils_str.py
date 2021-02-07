@@ -18,6 +18,7 @@ __all__ = [
     "printmd",
     "local_fuzzy_match_1", "local_fuzzy_match_2", "local_fuzzy_match",
     "extract_chinese",
+    "nildent",
 ]
 
 
@@ -495,3 +496,14 @@ def _choose_search_class(search_params:LevenshteinSearchParams) -> str:
     # if none of the special cases above are met, use the most generic version
     else:
         return "GenericSearch"
+
+
+def nildent(text:str) -> str:
+    """ finished, checked,
+
+    kill all leading white spaces in each line of `text`,
+    while keeping all lines (including empty)
+    """
+    new_text = "\n".join([l.lstrip() for l in text.splitlines()]) \
+        + ("\n" if text.endswith("\n") else "")
+    return new_text
