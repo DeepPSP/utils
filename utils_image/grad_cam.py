@@ -4,7 +4,7 @@ Grad-CAM and Grad-CAM++ for visualization of CNN models
 
 TODO: implement a torch version
 """
-from typing import Union, Optional, Tuple, List
+from typing import Union, Optional, Tuple, List, Any
 from numbers import Real
 
 import numpy as np
@@ -60,7 +60,10 @@ def preprocess_img(img:np.ndarray, rescale:Real=1/255, resize:ArrayLike=(299,299
     return np.array([processed])
 
 
-def grad_cam_naive_keras(input_model:Model, img:np.ndarray, target_layer:Union[str, int, Layer], prediction_layer:Optional[Union[str, int, Layer]]=None, **kwargs) -> Tuple[np.ndarray, np.ndarray, np.ndarray, int, str]:
+def grad_cam_naive_keras(input_model:Model,
+                         img:np.ndarray, target_layer:Union[str, int, Layer],
+                         prediction_layer:Optional[Union[str, int, Layer]]=None,
+                         **kwargs:Any) -> Tuple[np.ndarray, np.ndarray, np.ndarray, int, str]:
     """ finished, fully checked,
 
     Grad-CAM, the naive (local) one
@@ -87,7 +90,7 @@ def grad_cam_naive_keras(input_model:Model, img:np.ndarray, target_layer:Union[s
         "d_class_index_to_name": dict, default {},
             the dict mapping the predicted class index of `img` to class name
         "correct_prediction": int, default None,
-            the user-input 'correct' prediction
+            the user-input "correct" prediction
         "fast": bool, default False,
             if is True, and "correct_prediction" is given,
             then `input_model.predict` will not be called on the processed image
@@ -125,7 +128,7 @@ def grad_cam_naive_keras(input_model:Model, img:np.ndarray, target_layer:Union[s
     img_preprocess_func_kw = kwargs.get("preprocess_func_kw", {})
     cam_color_map = kwargs.get("color_map", cv2.COLORMAP_JET)
     base_model = kwargs.get("base_model", "")
-    base_model = (''.join([c for c in list(base_model) if (c.isdigit() or c.isalpha())])).lower()
+    base_model = ("".join([c for c in list(base_model) if (c.isdigit() or c.isalpha())])).lower()
     d_class_index_to_name = kwargs.get("d_class_index_to_name", {})
     correct_prediction = kwargs.get("correct_prediction", None)
     fast = kwargs.get("fast", False) and (correct_prediction is not None)
@@ -134,17 +137,17 @@ def grad_cam_naive_keras(input_model:Model, img:np.ndarray, target_layer:Union[s
         if verbose == 0:
             _verbose = []
         elif verbose == 1:
-            _verbose = ['brief']
+            _verbose = ["brief"]
         elif verbose == 2:
-            _verbose = ['brief', 'detail']
+            _verbose = ["brief", "detail"]
         elif verbose >= 3:
-            _verbose = ['brief', 'detail', 'plot']
+            _verbose = ["brief", "detail", "plot"]
     else:
         _verbose = verbose
     
     preprocessed_img = img_preprocess_func(img, **img_preprocess_func_kw)
 
-    if 'brief' in _verbose:
+    if "brief" in _verbose:
         print(f"preprocessed_img.shape = {preprocessed_img.shape}")
         print(f"preprocessed_img.dtype = {preprocessed_img.dtype}")
     
@@ -159,7 +162,7 @@ def grad_cam_naive_keras(input_model:Model, img:np.ndarray, target_layer:Union[s
 
     nb_classes = input_model.output_shape[-1]
     
-    if 'brief' in _verbose:
+    if "brief" in _verbose:
         print(f"nb_classes = {nb_classes}")
         if not fast:
             print(f"predictions = {predictions}")
@@ -215,26 +218,26 @@ def grad_cam_naive_keras(input_model:Model, img:np.ndarray, target_layer:Union[s
 
     target_output = tar_layer.output
 
-    if 'brief' in _verbose:
+    if "brief" in _verbose:
         print(f"prediction_layer is {pl_name}, the {pl_idx}-th layer of `input_model`")
         print(f"target_layer is {tl_name}, the {tl_idx}-th layer of `input_model`")
         layers_tot_num = len(input_model.layers)
         print(f"distance of the two layers is {modulo(pl_idx,layers_tot_num) - modulo(tl_idx,layers_tot_num)}")
 
     grads = _normalize(_compute_gradients(pred_output, [target_output])[0])
-    # print(f'grads = {grads}')
+    # print(f"grads = {grads}")
     gradient_function = K.function([input_model.input], [target_output, grads])
 
     output, grads_val = gradient_function([preprocessed_img])
-    # print(f'output.shape = {output.shape}')
-    if 'detail' in _verbose:
-        print('-'*100)
-        print(f'output = {output}')
-        print(f'grads_val = {grads_val}')
-        print('-'*100)
+    # print(f"output.shape = {output.shape}")
+    if "detail" in _verbose:
+        print("-"*100)
+        print(f"output = {output}")
+        print(f"grads_val = {grads_val}")
+        print("-"*100)
     # output, grads_val = output[0, :], grads_val[0, :, :, :]
     output, grads_val = output[0, ...], grads_val[0, ...]  # input is a single image
-    # print(f'output.shape = {output.shape}')
+    # print(f"output.shape = {output.shape}")
 
     cam = np.sum(output * grads_val, axis=-1)
     
@@ -244,19 +247,19 @@ def grad_cam_naive_keras(input_model:Model, img:np.ndarray, target_layer:Union[s
 
     cam = cv2.applyColorMap(np.uint8(255*heatmap), cam_color_map)
     cam = cam[...,::-1]  # from BGR to RGB
-    # print(f'cam.shape = {cam.shape}')
+    # print(f"cam.shape = {cam.shape}")
     img_with_cam = np.float32(cam) + np.float32(img)
     img_with_cam = (255 * img_with_cam / np.max(img_with_cam)).astype(np.uint8)
 
-    if 'plot' in _verbose:
+    if "plot" in _verbose:
         import matplotlib.pyplot as plt
         kw_plot = kwargs.get("kw_plot", {})
-        fig, (ax1,ax2,ax3) = plt.subplots(1,3,figsize=kw_plot.get('figsize', (18,5)))
+        fig, (ax1,ax2,ax3) = plt.subplots(1,3,figsize=kw_plot.get("figsize", (18,5)))
         ax1.imshow(img)
         ax2.imshow(cam)
         ax3.imshow(img_with_cam)
-        if 'title' in kw_plot:
-            fig.suptitle(kw_plot['title'], fontsize=kw_plot.get('fontsize', 16))
+        if "title" in kw_plot:
+            fig.suptitle(kw_plot["title"], fontsize=kw_plot.get("fontsize", 16))
         plt.show()
 
     return cam, img_with_cam, heatmap, pred_class_index, pred_class_name
@@ -271,7 +274,11 @@ _GRAD_CAM_RECOMMENDATIONS = {
     "inceptionresnetv2": {},
 }
 
-def grad_cam_keras(input_model:Model, img:np.ndarray, target_layer:Union[str, int, Layer], prediction_layer:Optional[Union[str, int, Layer]]=None, **kwargs) -> Tuple[np.ndarray, np.ndarray, np.ndarray, int, str]:
+def grad_cam_keras(input_model:Model,
+                   img:np.ndarray,
+                   target_layer:Union[str, int, Layer],
+                   prediction_layer:Optional[Union[str, int, Layer]]=None,
+                   **kwargs:Any) -> Tuple[np.ndarray, np.ndarray, np.ndarray, int, str]:
     """ finished, fully checked,
 
     Grad-CAM
@@ -298,7 +305,7 @@ def grad_cam_keras(input_model:Model, img:np.ndarray, target_layer:Union[str, in
         "d_class_index_to_name": dict, default {},
             the dict mapping the predicted class index of `img` to class name
         "correct_prediction": int, default None,
-            the user-input 'correct' prediction
+            the user-input "correct" prediction
         "fast": bool, default False,
             if is True, and "correct_prediction" is given,
             then `input_model.predict` will not be called on the processed image
@@ -335,7 +342,7 @@ def grad_cam_keras(input_model:Model, img:np.ndarray, target_layer:Union[str, in
     img_preprocess_func_kw = kwargs.get("preprocess_func_kw", {})
     cam_color_map = kwargs.get("color_map", cv2.COLORMAP_JET)
     base_model = kwargs.get("base_model", "")
-    base_model = (''.join([c for c in list(base_model) if (c.isdigit() or c.isalpha())])).lower()
+    base_model = ("".join([c for c in list(base_model) if (c.isdigit() or c.isalpha())])).lower()
     d_class_index_to_name = kwargs.get("d_class_index_to_name", {})
     correct_prediction = kwargs.get("correct_prediction", None)
     fast = kwargs.get("fast", False) and (correct_prediction is not None)
@@ -344,17 +351,17 @@ def grad_cam_keras(input_model:Model, img:np.ndarray, target_layer:Union[str, in
         if verbose == 0:
             _verbose = []
         elif verbose == 1:
-            _verbose = ['brief']
+            _verbose = ["brief"]
         elif verbose == 2:
-            _verbose = ['brief', 'detail']
+            _verbose = ["brief", "detail"]
         elif verbose >= 3:
-            _verbose = ['brief', 'detail', 'plot']
+            _verbose = ["brief", "detail", "plot"]
     else:
         _verbose = verbose
     
     preprocessed_img = img_preprocess_func(img, **img_preprocess_func_kw)
 
-    if 'brief' in _verbose:
+    if "brief" in _verbose:
         print(f"preprocessed_img.shape = {preprocessed_img.shape}")
         print(f"preprocessed_img.dtype = {preprocessed_img.dtype}")
     
@@ -369,7 +376,7 @@ def grad_cam_keras(input_model:Model, img:np.ndarray, target_layer:Union[str, in
 
     nb_classes = input_model.output_shape[-1]
     
-    if 'brief' in _verbose:
+    if "brief" in _verbose:
         print(f"nb_classes = {nb_classes}")
         if not fast:
             print(f"predictions = {predictions}")
@@ -425,26 +432,26 @@ def grad_cam_keras(input_model:Model, img:np.ndarray, target_layer:Union[str, in
 
     target_output = tar_layer.output
 
-    if 'brief' in _verbose:
+    if "brief" in _verbose:
         print(f"prediction_layer is {pl_name}, the {pl_idx}-th layer of `input_model`")
         print(f"target_layer is {tl_name}, the {tl_idx}-th layer of `input_model`")
         layers_tot_num = len(input_model.layers)
         print(f"distance of the two layers is {modulo(pl_idx,layers_tot_num) - modulo(tl_idx,layers_tot_num)}")
 
     grads = _normalize(_compute_gradients(pred_output, [target_output])[0])
-    # print('grads =', grads)
+    # print("grads =", grads)
     gradient_function = K.function([input_model.input], [target_output, grads])
 
     output, grads_val = gradient_function([preprocessed_img])
-    # print(f'output.shape = {output.shape}')
-    if 'detail' in _verbose:
-        print('-'*100)
-        print(f'output = {output}')
-        print(f'grads_val = {grads_val}')
-        print('-'*100)
+    # print(f"output.shape = {output.shape}")
+    if "detail" in _verbose:
+        print("-"*100)
+        print(f"output = {output}")
+        print(f"grads_val = {grads_val}")
+        print("-"*100)
     # output, grads_val = output[0, :], grads_val[0, :, :, :]
     output, grads_val = output[0, ...], grads_val[0, ...]  # input is a single image
-    # print(f'output.shape = {output.shape}')
+    # print(f"output.shape = {output.shape}")
 
     weights = np.mean(grads_val, axis = (0, 1))  # eq (1) in Ref.[1]
 
@@ -459,19 +466,19 @@ def grad_cam_keras(input_model:Model, img:np.ndarray, target_layer:Union[str, in
 
     cam = cv2.applyColorMap(np.uint8(255*heatmap), cam_color_map)
     cam = cam[...,::-1]  # from BGR to RGB
-    # print(f'cam.shape = {cam.shape}')
+    # print(f"cam.shape = {cam.shape}")
     img_with_cam = np.float32(cam) + np.float32(img)
     img_with_cam = (255 * img_with_cam / np.max(img_with_cam)).astype(np.uint8)
 
-    if 'plot' in _verbose:
+    if "plot" in _verbose:
         import matplotlib.pyplot as plt
         kw_plot = kwargs.get("kw_plot", {})
-        fig, (ax1,ax2,ax3) = plt.subplots(1,3,figsize=kw_plot.get('figsize', (18,5)))
+        fig, (ax1,ax2,ax3) = plt.subplots(1,3,figsize=kw_plot.get("figsize", (18,5)))
         ax1.imshow(img)
         ax2.imshow(cam)
         ax3.imshow(img_with_cam)
-        if 'title' in kw_plot:
-            fig.suptitle(kw_plot['title'], fontsize=kw_plot.get('fontsize', 16))
+        if "title" in kw_plot:
+            fig.suptitle(kw_plot["title"], fontsize=kw_plot.get("fontsize", 16))
         plt.show()
 
     return cam, img_with_cam, heatmap, pred_class_index, pred_class_name
@@ -487,7 +494,12 @@ _GRAD_CAM_PLUSPLUS_RECOMMENDATIONS = {
 }
 
 
-def grad_cam_plusplus_keras(input_model:Model, img:np.ndarray, target_layer:Union[str, int, Layer], prediction_layer:Optional[Union[str, int, Layer]]=None, prediction_activation:str="linear", **kwargs) -> Tuple[np.ndarray, np.ndarray, np.ndarray, int, str]:
+def grad_cam_plusplus_keras(input_model:Model,
+                            img:np.ndarray,
+                            target_layer:Union[str, int, Layer],
+                            prediction_layer:Optional[Union[str, int, Layer]]=None,
+                            prediction_activation:str="linear",
+                            **kwargs:Any) -> Tuple[np.ndarray, np.ndarray, np.ndarray, int, str]:
     """ finished, not checked, has error,
 
     Grad-CAM++
@@ -516,7 +528,7 @@ def grad_cam_plusplus_keras(input_model:Model, img:np.ndarray, target_layer:Unio
         "d_class_index_to_name": dict, default {},
             the dict mapping the predicted class index of `img` to class name
         "correct_prediction": int, default None,
-            the user-input 'correct' prediction
+            the user-input "correct" prediction
         "fast": bool, default False,
             if is True, and "correct_prediction" is given,
             then `input_model.predict` will not be called on the processed image
@@ -570,7 +582,11 @@ def grad_cam_plusplus_keras(input_model:Model, img:np.ndarray, target_layer:Unio
         raise NotImplementedError(f"the case where the prediction layer has {prediction_activation} activation has not yet been implemented!")
 
 
-def _grad_cam_plusplus_keras_linear(input_model:Model, img:np.ndarray, target_layer:Union[str, int, Layer], prediction_layer:Optional[Union[str, int, Layer]]=None, **kwargs) -> Tuple[np.ndarray, np.ndarray, np.ndarray, int, str]:
+def _grad_cam_plusplus_keras_linear(input_model:Model,
+                                    img:np.ndarray,
+                                    target_layer:Union[str, int, Layer],
+                                    prediction_layer:Optional[Union[str, int, Layer]]=None,
+                                    **kwargs:Any) -> Tuple[np.ndarray, np.ndarray, np.ndarray, int, str]:
     """
     Grad-CAM++, when the prediction layer has "linear" activation
 
@@ -596,7 +612,7 @@ def _grad_cam_plusplus_keras_linear(input_model:Model, img:np.ndarray, target_la
     img_preprocess_func_kw = kwargs.get("preprocess_func_kw", {})
     cam_color_map = kwargs.get("color_map", cv2.COLORMAP_JET)
     base_model = kwargs.get("base_model", "")
-    base_model = (''.join([c for c in list(base_model) if (c.isdigit() or c.isalpha())])).lower()
+    base_model = ("".join([c for c in list(base_model) if (c.isdigit() or c.isalpha())])).lower()
     d_class_index_to_name = kwargs.get("d_class_index_to_name", {})
     correct_prediction = kwargs.get("correct_prediction", None)
     fast = kwargs.get("fast", False) and (correct_prediction is not None)
@@ -605,16 +621,16 @@ def _grad_cam_plusplus_keras_linear(input_model:Model, img:np.ndarray, target_la
         if verbose == 0:
             _verbose = []
         elif verbose == 1:
-            _verbose = ['brief']
+            _verbose = ["brief"]
         elif verbose == 2:
-            _verbose = ['brief', 'detail']
+            _verbose = ["brief", "detail"]
         elif verbose >= 3:
-            _verbose = ['brief', 'detail', 'plot']
+            _verbose = ["brief", "detail", "plot"]
     else:
         _verbose = verbose
     
     preprocessed_img = img_preprocess_func(img, **img_preprocess_func_kw)
-    if 'brief' in _verbose:
+    if "brief" in _verbose:
         print(f"preprocessed_img.shape = {preprocessed_img.shape}")
         print(f"preprocessed_img.dtype = {preprocessed_img.dtype}")
     
@@ -629,7 +645,7 @@ def _grad_cam_plusplus_keras_linear(input_model:Model, img:np.ndarray, target_la
 
     nb_classes = input_model.output_shape[-1]
     
-    if 'brief' in _verbose:
+    if "brief" in _verbose:
         print(f"nb_classes = {nb_classes}")
         if not fast:
             print(f"predictions = {predictions}")
@@ -678,7 +694,7 @@ def _grad_cam_plusplus_keras_linear(input_model:Model, img:np.ndarray, target_la
         tl_name = tar_layer.name
         tl_idx = input_model.layers.index(tar_layer) - len(input_model.layers)
 
-    if 'brief' in _verbose:
+    if "brief" in _verbose:
         print(f"prediction_layer is {pl_name}, the {pl_idx}-th layer of `input_model`")
         print(f"target_layer is {tl_name}, the {tl_idx}-th layer of `input_model`")
         layers_tot_num = len(input_model.layers)
@@ -698,14 +714,14 @@ def _grad_cam_plusplus_keras_linear(input_model:Model, img:np.ndarray, target_la
     gradient_function = K.function([input_model.input], [target_output, first_derivative, second_derivative, third_derivative])
     output, first_grad, second_grad, third_grad = gradient_function([preprocessed_img])
 
-    if 'detail' in _verbose:
-        print(f'output.shape = {output.shape}')
-        print('-'*100)
-        print(f'output = {output}')
-        print(f'first_grad = {first_grad}')
-        print(f'second_grad = {second_grad}')
-        print(f'third_grad = {third_grad}')
-        print('-'*100)
+    if "detail" in _verbose:
+        print(f"output.shape = {output.shape}")
+        print("-"*100)
+        print(f"output = {output}")
+        print(f"first_grad = {first_grad}")
+        print(f"second_grad = {second_grad}")
+        print(f"third_grad = {third_grad}")
+        print("-"*100)
     output, first_grad, second_grad, third_grad = output[0], first_grad[0], second_grad[0], third_grad[0]
 
     global_sum = np.sum(output.reshape((-1, first_grad.shape[2])), axis=0)
@@ -736,21 +752,25 @@ def _grad_cam_plusplus_keras_linear(input_model:Model, img:np.ndarray, target_la
     img_with_cam = np.float32(cam) + np.float32(img)
     img_with_cam = (255 * img_with_cam / np.max(img_with_cam)).astype(np.uint8)
 
-    if 'plot' in _verbose:
+    if "plot" in _verbose:
         import matplotlib.pyplot as plt
         kw_plot = kwargs.get("kw_plot", {})
-        fig, (ax1,ax2,ax3) = plt.subplots(1,3,figsize=kw_plot.get('figsize', (18,5)))
+        fig, (ax1,ax2,ax3) = plt.subplots(1,3,figsize=kw_plot.get("figsize", (18,5)))
         ax1.imshow(img)
         ax2.imshow(cam)
         ax3.imshow(img_with_cam)
-        if 'title' in kw_plot:
-            fig.suptitle(kw_plot['title'], fontsize=kw_plot.get('fontsize', 16))
+        if "title" in kw_plot:
+            fig.suptitle(kw_plot["title"], fontsize=kw_plot.get("fontsize", 16))
         plt.show()
 
     return cam, img_with_cam, heatmap, pred_class_index, pred_class_name
 
 
-def _grad_cam_plusplus_keras_softmax(input_model:Model, img:np.ndarray, target_layer:Union[str, int, Layer], prediction_layer:Optional[Union[str, int, Layer]]=None, **kwargs) -> Tuple[np.ndarray, np.ndarray, np.ndarray, int, str]:
+def _grad_cam_plusplus_keras_softmax(input_model:Model,
+                                     img:np.ndarray,
+                                     target_layer:Union[str, int, Layer],
+                                     prediction_layer:Optional[Union[str, int, Layer]]=None,
+                                     **kwargs:Any) -> Tuple[np.ndarray, np.ndarray, np.ndarray, int, str]:
     """ not finished,
 
     Grad-CAM++, when the prediction layer has "softmax" activation
@@ -776,7 +796,7 @@ def _grad_cam_plusplus_keras_softmax(input_model:Model, img:np.ndarray, target_l
     img_preprocess_func_kw = kwargs.get("preprocess_func_kw", {})
     cam_color_map = kwargs.get("color_map", cv2.COLORMAP_JET)
     base_model = kwargs.get("base_model", "")
-    base_model = (''.join([c for c in list(base_model) if (c.isdigit() or c.isalpha())])).lower()
+    base_model = ("".join([c for c in list(base_model) if (c.isdigit() or c.isalpha())])).lower()
     d_class_index_to_name = kwargs.get("d_class_index_to_name", {})
     correct_prediction = kwargs.get("correct_prediction", None)
     fast = kwargs.get("fast", False) and (correct_prediction is not None)
@@ -785,16 +805,16 @@ def _grad_cam_plusplus_keras_softmax(input_model:Model, img:np.ndarray, target_l
         if verbose == 0:
             _verbose = []
         elif verbose == 1:
-            _verbose = ['brief']
+            _verbose = ["brief"]
         elif verbose == 2:
-            _verbose = ['brief', 'detail']
+            _verbose = ["brief", "detail"]
         elif verbose >= 3:
-            _verbose = ['brief', 'detail', 'plot']
+            _verbose = ["brief", "detail", "plot"]
     else:
         _verbose = verbose
     
     preprocessed_img = img_preprocess_func(img, **img_preprocess_func_kw)
-    if 'brief' in _verbose:
+    if "brief" in _verbose:
         print(f"preprocessed_img.shape = {preprocessed_img.shape}")
         print(f"preprocessed_img.dtype = {preprocessed_img.dtype}")
     
@@ -809,7 +829,7 @@ def _grad_cam_plusplus_keras_softmax(input_model:Model, img:np.ndarray, target_l
 
     nb_classes = input_model.output_shape[-1]
     
-    if 'brief' in _verbose:
+    if "brief" in _verbose:
         print(f"nb_classes = {nb_classes}")
         if not fast:
             print(f"predictions = {predictions}")
@@ -858,7 +878,7 @@ def _grad_cam_plusplus_keras_softmax(input_model:Model, img:np.ndarray, target_l
         tl_name = tar_layer.name
         tl_idx = input_model.layers.index(tar_layer) - len(input_model.layers)
 
-    if 'brief' in _verbose:
+    if "brief" in _verbose:
         print(f"prediction_layer is {pl_name}, the {pl_idx}-th layer of `input_model`")
         print(f"target_layer is {tl_name}, the {tl_idx}-th layer of `input_model`")
         layers_tot_num = len(input_model.layers)

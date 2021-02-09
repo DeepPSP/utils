@@ -6,7 +6,7 @@ Author: wenhao
 remarks: utilities for image and annotation checking
 """
 from random import shuffle
-from typing import Union, Optional, List
+from typing import Union, Optional, List, Any, NoReturn
 
 import os
 import numpy as np
@@ -21,7 +21,13 @@ class ObjectDetectionCheck(object):
 
     check and label validity of images and bounding box annotations for object detection datasets
     """
-    def __init__(self, checker:str, ann_path:str, save_path:str, check_col:str="class", check_cls:Optional[Union[str,List[str]]]=None, **kwargs):
+    def __init__(self,
+                 checker:str,
+                 ann_path:str,
+                 save_path:str,
+                 check_col:str="class",
+                 check_cls:Optional[Union[str,List[str]]]=None,
+                 **kwargs:Any) -> NoReturn:
         """
 
         Parameters:
@@ -54,22 +60,22 @@ class ObjectDetectionCheck(object):
         self.check_cls = self.check_cls or self.df_ann[self.df_ann[self.check_col]].unique().tolist()
         self.save_path = save_path
         
-        self.df_check_images = self.df_ann[self.df_ann['filename'].str.contains('|'.join(self.check_cls), case=False)==True].reset_index(drop=True)
-        self.check_image_paths = self.df_check_images['filename'].unique().tolist()
+        self.df_check_images = self.df_ann[self.df_ann["filename"].str.contains("|".join(self.check_cls), case=False)==True].reset_index(drop=True)
+        self.check_image_paths = self.df_check_images["filename"].unique().tolist()
         shuffle(self.check_image_paths)
         
         if os.path.isfile(self.save_path):
             self.df_saved = pd.read_csv(self.save_path)
         else:
-            self.df_saved = pd.DataFrame(columns=['filename', 'valid', 'checker'])
+            self.df_saved = pd.DataFrame(columns=["filename", "valid", "checker"])
             self.df_saved.to_csv(self.save_path, index=False)
-        self.pending_image_paths = list(set(self.check_image_paths).difference(set(self.df_saved['filename'])))
+        self.pending_image_paths = list(set(self.check_image_paths).difference(set(self.df_saved["filename"])))
         
         self.batch_len = kwargs.get("batch_len", 20)
-        self.df_saving = pd.DataFrame(columns=['filename', 'valid', 'checker'])
-        self.df_saving['filename'] = self.pending_image_paths[:self.batch_len]
-        self.df_saving['valid'] = np.nan
-        self.df_saving['checker'] = self.checker
+        self.df_saving = pd.DataFrame(columns=["filename", "valid", "checker"])
+        self.df_saving["filename"] = self.pending_image_paths[:self.batch_len]
+        self.df_saving["valid"] = np.nan
+        self.df_saving["checker"] = self.checker
         
         self.counter = 0
         self.current_image = None
@@ -80,22 +86,22 @@ class ObjectDetectionCheck(object):
         """
         """
         self.df_saved = pd.read_csv(self.save_path).dropna().reset_index(drop=True)
-        self.pending_image_paths = list(set(self.check_image_paths).difference(set(self.df_saved['filename'])))
+        self.pending_image_paths = list(set(self.check_image_paths).difference(set(self.df_saved["filename"])))
         print(f"pending images updated, current total number is {len(self.pending_image_paths)}")
-        self.df_saving = pd.DataFrame(columns=['filename', 'valid', 'checker'])
-        self.df_saving['filename'] = self.pending_image_paths[:self.batch_len]
-        self.df_saving['valid'] = np.nan
-        self.df_saving['checker'] = self.checker
+        self.df_saving = pd.DataFrame(columns=["filename", "valid", "checker"])
+        self.df_saving["filename"] = self.pending_image_paths[:self.batch_len]
+        self.df_saving["valid"] = np.nan
+        self.df_saving["checker"] = self.checker
         self.counter = 0
         
     def save_to_file(self):
         """
         """
         self.df_saved = pd.read_csv(self.save_path).dropna().reset_index(drop=True)
-        self.pending_image_paths = set(self.check_image_paths).difference(set(self.df_saved['filename']))
+        self.pending_image_paths = set(self.check_image_paths).difference(set(self.df_saved["filename"]))
         print(f"pending images updated, current total number is {len(self.pending_image_paths)}")
-        self.df_saving = self.df_saving[self.df_saving['filename'].isin(self.pending_image_paths)].dropna()
-        self.df_saving.to_csv(self.save_path, index=False, header=False, mode='a')
+        self.df_saving = self.df_saving[self.df_saving["filename"].isin(self.pending_image_paths)].dropna()
+        self.df_saving.to_csv(self.save_path, index=False, header=False, mode="a")
         
     def __iter__(self):
         """
@@ -109,10 +115,10 @@ class ObjectDetectionCheck(object):
         """
         if self.counter < len(self.df_saving):
             print(f"{len(self.df_saving)} / {self.counter+1} ...")
-            self.current_image = self.df_saving.loc[self.counter, 'filename']
+            self.current_image = self.df_saving.loc[self.counter, "filename"]
             img = cv2.imread(self.current_image)[...,::-1]
             linewidth = max(1, int(round(max(img.shape[:2])/200)))
-            df_img = self.df_check_images[self.df_check_images['filename']==self.current_image]
+            df_img = self.df_check_images[self.df_check_images["filename"]==self.current_image]
             try:
                 from IPython.display import display
                 display(df_img)
@@ -120,7 +126,7 @@ class ObjectDetectionCheck(object):
                 print(df_img)
             img_with_boxes = img.copy()
             for _, row in df_img.iterrows():
-                cv2.rectangle(img_with_boxes, (row['xmin'], row['ymin']), (row['xmax'], row['ymax']), (0, 255, 0), linewidth)
+                cv2.rectangle(img_with_boxes, (row["xmin"], row["ymin"]), (row["xmax"], row["ymax"]), (0, 255, 0), linewidth)
             plt.figure(figsize=(12,12))
             plt.imshow(img_with_boxes)
             plt.show()
@@ -135,23 +141,23 @@ class ObjectDetectionCheck(object):
     def keep(self):
         """
         """
-        current_valid = self.df_saving[self.df_saving['filename']==self.current_image]['valid'].values[0]
+        current_valid = self.df_saving[self.df_saving["filename"]==self.current_image]["valid"].values[0]
         if np.isnan(current_valid):
-            self.df_saving.loc[self.counter, 'valid'] = 1
+            self.df_saving.loc[self.counter, "valid"] = 1
             self.counter += 1
             print("labelled successfully")
         else:
-            self.df_saving.loc[self.counter-1, 'valid'] = 1
+            self.df_saving.loc[self.counter-1, "valid"] = 1
             print("re-labelled successfully")
     
     def dismiss(self):
         """
         """
-        current_valid = self.df_saving[self.df_saving['filename']==self.current_image]['valid'].values[0]
+        current_valid = self.df_saving[self.df_saving["filename"]==self.current_image]["valid"].values[0]
         if np.isnan(current_valid):
-            self.df_saving.loc[self.counter, 'valid'] = 0
+            self.df_saving.loc[self.counter, "valid"] = 0
             self.counter += 1
             print("labelled successfully")
         else:
-            self.df_saving.loc[self.counter-1, 'valid'] = 0
+            self.df_saving.loc[self.counter-1, "valid"] = 0
             print("re-labelled successfully")

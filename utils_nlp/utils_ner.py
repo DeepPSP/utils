@@ -20,7 +20,7 @@ def bio_to_bioes(input_fp:str, output_fp:str, sep:str) -> NoReturn:
     sep: str,
         separator of the word and the label of each line in the input file
     """
-    with codecs.open(input_fp, 'r', encoding='utf-8') as in_f, codecs.open(output_fp, 'w', encoding='utf-8') as out_f:
+    with codecs.open(input_fp, "r", encoding="utf-8") as in_f, codecs.open(output_fp, "w", encoding="utf-8") as out_f:
         words = []
         labels = []
         for line in in_f:
@@ -46,6 +46,6 @@ def bio_to_bioes(input_fp:str, output_fp:str, sep:str) -> NoReturn:
                     labels = []
                     continue
             if contends.startswith("-DOCSTART-"):
-                words.append('')
+                words.append("")
                 continue
     

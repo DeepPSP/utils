@@ -15,7 +15,7 @@ implemented geometric objects in sympy:
 import math
 import random
 import warnings
-from typing import Union, Optional, List, NoReturn
+from typing import Union, Optional, List, NoReturn, Any
 from numbers import Real
 
 import numpy as np
@@ -63,7 +63,7 @@ __all__ = [
 class GeometricObject(object):
     """
     """
-    def __init__(self, name:str, **kwargs):
+    def __init__(self, name:str, **kwargs:Any) -> NoReturn:
         """
         """
         self._name = name
@@ -104,7 +104,7 @@ class LineSegment2D(GeometricObject):
     """
     class of line segment in 2D (real) space
     """
-    def __init__(self, *points, **kwargs):
+    def __init__(self, *points:Any, **kwargs:Any) -> NoReturn:
         """
 
         Parameters:
@@ -112,7 +112,7 @@ class LineSegment2D(GeometricObject):
         points: array like, of shape (2,2)
             the 2 end points of the line segment
         """
-        super().__init__(name='Line Segment in 2D Space')
+        super().__init__(name="Line Segment in 2D Space")
         self.ends = np.array(points)
         if self.ends.shape != (2,2):
             raise ValueError("incorrect number or dimensions of input points")
@@ -165,7 +165,7 @@ class Triangle2D(GeometricObject):
     """
     class of triangle in 2D (real) space
     """
-    def __init__(self, *points, **kwargs):
+    def __init__(self, *points:Any, **kwargs:Any) -> NoReturn:
         """
 
         Parameters:
@@ -173,7 +173,7 @@ class Triangle2D(GeometricObject):
         points: array like, of shape (3,2)
             the 3 apexes of the triangle
         """
-        super().__init__(name='Triangle in 2D Space')
+        super().__init__(name="Triangle in 2D Space")
         self.apexes = rearrange_convex_contour_points_2d(np.array(points))
         if self.apexes.shape != (3,2):
             raise ValueError("incorrect number or dimensions of input points")
@@ -214,30 +214,30 @@ class Triangle2D(GeometricObject):
         """
         _max_angle = np.max(self._angles)
         if _max_angle > 90:
-            self._shape = 'obtuse'
+            self._shape = "obtuse"
         elif _max_angle < 90:
-            self._shape = 'acute'
+            self._shape = "acute"
         else:
-            self._shape = 'rectangle'
+            self._shape = "rectangle"
         return self._shape
 
 
     def is_obtuse(self) -> bool:
         """
         """
-        return self.shape == 'obtuse'
+        return self.shape == "obtuse"
 
 
     def is_rectangle(self) -> bool:
         """
         """
-        return self.shape == 'rectangle'
+        return self.shape == "rectangle"
 
     
     def is_acute(self) -> bool:
         """
         """
-        return self.shape == 'acute'
+        return self.shape == "acute"
 
     
     def intersect_with(self, other):
@@ -264,10 +264,12 @@ class ConvexCone2D(GeometricObject):
     class of convex cone in 2D (real) space
     """
     def __init__(self,
-            apex:Optional[ArrayLike]=None,
-            axis_vec:Optional[ArrayLike]=None, angle:Optional[Real]=None,
-            left_vec:Optional[ArrayLike]=None, right_vec:Optional[ArrayLike]=None,
-            **kwargs):
+                 apex:Optional[ArrayLike]=None,
+                 axis_vec:Optional[ArrayLike]=None,
+                 angle:Optional[Real]=None,
+                 left_vec:Optional[ArrayLike]=None,
+                 right_vec:Optional[ArrayLike]=None,
+                 **kwargs:Any) -> NoReturn:
         """ finished, checked,
 
         Parameters:
@@ -293,7 +295,7 @@ class ConvexCone2D(GeometricObject):
         1. add more functions
         2. when degenerates to a ray, should raise error or just warning?
         """
-        super().__init__(name='Convex Cone in 2D Space')
+        super().__init__(name="Convex Cone in 2D Space")
         self.verbose = kwargs.get("verbose", 0)
         if not self._check_dimensions([apex, axis_vec, left_vec, right_vec]):
             raise ValueError("all points and vectors should be of dimension 2")
@@ -368,7 +370,11 @@ class ConvexCone2D(GeometricObject):
         pass
 
 
-    def plot_cone(self, show:bool=False, kw_ray:Optional[dict]=None, kw_fill:Optional[dict]=None, **kwargs) -> Union[tuple, NoReturn]:
+    def plot_cone(self,
+                  show:bool=False,
+                  kw_ray:Optional[dict]=None,
+                  kw_fill:Optional[dict]=None,
+                  **kwargs:Any) -> Union[tuple, NoReturn]:
         """ finished, checked, still has some errors
 
         TODO: 
@@ -457,7 +463,9 @@ class ConvexCone2D(GeometricObject):
             return fig, ax
 
     @classmethod
-    def _check_dimensions(cls, points_and_vectors:List[ArrayLike], in_details:bool=False) -> Union[bool, np.ndarray]:
+    def _check_dimensions(cls,
+                          points_and_vectors:List[ArrayLike],
+                          in_details:bool=False) -> Union[bool, np.ndarray]:
         """
         check the dimension of the ambient space of the passed points or vectors is 2 or not
 
@@ -470,7 +478,9 @@ class ConvexCone2D(GeometricObject):
         
         Returns: bool, or ndarray
         """
-        is_valid = np.array([np.array(item).flatten().shape[0]==2 for item in points_and_vectors if item is not None])
+        is_valid = np.array([
+            np.array(item).flatten().shape[0]==2 for item in points_and_vectors if item is not None
+        ])
         if in_details:
             return is_valid
         else:
@@ -494,7 +504,14 @@ class Fan2D(ConvexCone2D):
 
     class of fan in 2D (real) space
     """
-    def __init__(self, radius:Real, apex:ArrayLike, axis_vec:Optional[ArrayLike]=None, angle:Optional[Real]=None, left_vec:Optional[ArrayLike]=None, right_vec:Optional[ArrayLike]=None, **kwargs):
+    def __init__(self,
+                 radius:Real,
+                 apex:ArrayLike,
+                 axis_vec:Optional[ArrayLike]=None,
+                 angle:Optional[Real]=None,
+                 left_vec:Optional[ArrayLike]=None,
+                 right_vec:Optional[ArrayLike]=None,
+                 **kwargs:Any) -> NoReturn:
         """
 
         Parameters:
@@ -563,7 +580,7 @@ class Ellipse(GeometricObject):
 
     seems `sympy` has implemented a class named `Ellipse`
     """
-    def __init__(self, center:ArrayLike, axis_vecs:ArrayLike):
+    def __init__(self, center:ArrayLike, axis_vecs:ArrayLike) -> NoReturn:
         """ not finished,
 
         Parameters:
@@ -600,7 +617,7 @@ class Circle(Ellipse):
     """
     class of circle in 2D (real) space
     """
-    def __init__(self, center:ArrayLike, radius:Real):
+    def __init__(self, center:ArrayLike, radius:Real) -> NoReturn:
         """
         Parameters:
         -----------
@@ -633,7 +650,7 @@ class BoundingBox(ss.Rectangle):
 
     Bounding boxes in the 2D real space
     """
-    def __init__(self, xmin:Real, ymin:Real, xmax:Real, ymax:Real, verbose:int=0):
+    def __init__(self, xmin:Real, ymin:Real, xmax:Real, ymax:Real, verbose:int=0) -> NoReturn:
         """
 
         Parameters:
@@ -699,7 +716,7 @@ class BoundingBox(ss.Rectangle):
             return BoundingBox(xmin=x_itv[0], xmax=x_itv[1], ymin=y_itv[0], ymax=y_itv[1])
 
 
-    def union_with(self, other, force:bool=True, inplace:bool=False):
+    def union_with(self, other, force:bool=True, inplace:bool=False) -> Any:
         """ finished, checked,
 
         compute the union with another BoundingBox,
@@ -729,7 +746,7 @@ class BoundingBox(ss.Rectangle):
         self.xmin, self.xmax, self.ymin, self.ymax = new_xmin, new_xmax, new_ymin, new_ymax
 
 
-    def resize(self, ratio:float, x_thre:list, y_thre:list, inplace:bool=False):
+    def resize(self, ratio:float, x_thre:list, y_thre:list, inplace:bool=False) -> Any:
         """ finished, checked,
         
         resize the BoundingBox by `ratio`
@@ -763,7 +780,7 @@ class BoundingBox(ss.Rectangle):
         self.xmin, self.xmax, self.ymin, self.ymax = new_xmin, new_xmax, new_ymin, new_ymax
 
 
-    def enlarge(self, ratio:float, x_thre:list, y_thre:list, inplace:bool=False):
+    def enlarge(self, ratio:float, x_thre:list, y_thre:list, inplace:bool=False) -> Any:
         """
         ref. func self.resize
         """
@@ -771,7 +788,7 @@ class BoundingBox(ss.Rectangle):
         return self.resize(ratio, x_thre, y_thre, inplace)
 
 
-    def shrink(self, ratio:float, x_thre:list, y_thre:list, inplace:bool=False):
+    def shrink(self, ratio:float, x_thre:list, y_thre:list, inplace:bool=False) -> Any:
         """
         ref. func self.resize
 
@@ -798,7 +815,7 @@ class Rectangle2D(ss.Rectangle):
 
     arbitrary rectangle in the 2D real space
     """
-    def __init__(self, ymin:Real, xmin:Real, ymax:Real, xmax:Real):
+    def __init__(self, ymin:Real, xmin:Real, ymax:Real, xmax:Real) -> NoReturn:
         """
 
         Parameters:
@@ -865,10 +882,12 @@ def is_in_hull(points:ArrayLike, hull:Union[ss.Delaunay,ss.ConvexHull,ArrayLike]
     return _h.find_simplex(points) >= 0
 
 
-def convex_hull_inflation(ch:ss.ConvexHull, inflation_ratio:float=0.2, vertices_only:bool=True) -> ss.ConvexHull:
+def convex_hull_inflation(ch:ss.ConvexHull,
+                          inflation_ratio:float=0.2,
+                          vertices_only:bool=True) -> ss.ConvexHull:
     """
 
-    TODO: consider the choice of 'center_of_mass'
+    TODO: consider the choice of "center_of_mass"
 
     Parameters:
     -----------
@@ -892,7 +911,9 @@ def convex_hull_inflation(ch:ss.ConvexHull, inflation_ratio:float=0.2, vertices_
     return inflated_ch
 
 
-def split_2d_plane_into_convex_cones(center:ArrayLike, split_vecs:ArrayLike, **kwargs) -> List[ConvexCone2D]:
+def split_2d_plane_into_convex_cones(center:ArrayLike,
+                                     split_vecs:ArrayLike,
+                                     **kwargs:Any) -> List[ConvexCone2D]:
     """ finished, checked,
 
     split the 2d real cartesian space into convex cones
@@ -1177,7 +1198,7 @@ def rearrange_convex_contour_points_2d(points:ArrayLike) -> np.ndarray:
     return np.array(points)[np.argsort(vec_radians)]
 
 
-def smallest_circle(points:ArrayLike, method:str='msw') -> dict:
+def smallest_circle(points:ArrayLike, method:str="msw") -> dict:
     """
     one can use `cv2.minEnclosingCircle` instead
 
@@ -1189,9 +1210,9 @@ def smallest_circle(points:ArrayLike, method:str='msw') -> dict:
     --------
     to write
     """
-    if method.lower() == 'msw':
+    if method.lower() == "msw":
         return _smallest_circle_msw(points, [])
-    elif method.lower() == 'welzl':
+    elif method.lower() == "welzl":
         return _smallest_circle_welzl(points, [])
 
 
@@ -1230,7 +1251,7 @@ def _smallest_circle_welzl(points:ArrayLike, base:ArrayLike) -> dict:
     _p = shuffled[0]
     _points = shuffled[1:]
     _c = _smallest_circle_welzl(_points, base)
-    if LA.norm(_c['center']-np.array(_p)) <= _c['radius']:
+    if LA.norm(_c["center"]-np.array(_p)) <= _c["radius"]:
         return _c
 
     _base = np.array(base).tolist() + [_p]
@@ -1253,13 +1274,13 @@ def _smallest_circle_trivial(points:Optional[ArrayLike]=None) -> Union[dict, Non
     elif len(points) == 1:
         center = np.array(points[0])
         radius = 0
-        circle = {'center':center, 'radius': radius}
+        circle = {"center":center, "radius": radius}
         return circle
     elif len(points) == 2:
         _p1, _p2 = np.array(points)
         center = (_p1+_p2)/2
         radius = LA.norm(center-_p1)
-        circle = {'center':center, 'radius': radius}
+        circle = {"center":center, "radius": radius}
         return circle
     elif len(points) == 3:
         _p1, _p2, _p3 = np.array(points)
@@ -1301,14 +1322,14 @@ def get_circle_passing_through(p1:ArrayLike, p2:ArrayLike, p3:ArrayLike) -> dict
     radius = LA.norm(center-_p1)
 
     circle = {
-        'center': center,
-        'radius': radius,
+        "center": center,
+        "radius": radius,
     }
 
     return circle
 
 
-def merge_boxes(box1:ArrayLike, box2:ArrayLike, **kwargs) -> Union[np.ndarray, NoReturn]:
+def merge_boxes(box1:ArrayLike, box2:ArrayLike, **kwargs:Any) -> Union[np.ndarray, NoReturn]:
     """
 
     Parameters:
@@ -1325,7 +1346,7 @@ def merge_boxes(box1:ArrayLike, box2:ArrayLike, **kwargs) -> Union[np.ndarray, N
     xmin = max(xmin1, xmin2)
     ymax = min(ymax1, ymax2)
     xmax = min(xmax1, xmax2)
-    overlap_threshold = kwargs('overlap_threshold', 0.7)
+    overlap_threshold = kwargs("overlap_threshold", 0.7)
     overlap_area = max(0,xmax-xmin) * max(0,ymax-ymin)
     if (overlap_area/(xmax1-xmin1)/(ymax1-ymin1) > overlap_threshold) or (overlap_area/(xmax2-xmin2)/(ymax2-ymin2) > overlap_threshold):
         return np.array([min(ymin1, ymin2)])

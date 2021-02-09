@@ -2,16 +2,16 @@
 """
 utilities for operations on color spaces for image processing
 
-NOTE that there is an abuse of 'format' and 'color space'
+NOTE that there is an abuse of "format" and "color space"
 
 TODO:
-    implement the usage of other backends, epecially 'cv2', and 'pil' for acceleration;
+    implement the usage of other backends, epecially "cv2", and "pil" for acceleration;
     use color-math, colour-science(the most powerful one), skimage;
     use cython (or C/C++ lib) for acceleration?
 
     consistency of different backends!
 
-experiment result: backend 'cv2' is 10-100 times faster than backend 'naive'
+experiment result: backend "cv2" is 10-100 times faster than backend "naive"
 """
 from copy import deepcopy
 from numbers import Real
@@ -36,9 +36,9 @@ __all__ = [
 ]
 
 
-_CVT_COLOR_BACKEND = 'cv2'
+_CVT_COLOR_BACKEND = "cv2"
 _AVAILABLE_CVT_COLOR_BACKENDS = [
-    'cv2', 'pil', 'colour-science', 'naive',
+    "cv2", "pil", "colour-science", "naive",
 ]
 
 
@@ -72,12 +72,12 @@ def generate_pure_color_image(height:int, width:int, rgb_color:ArrayLike_Int, sh
         raise ValueError("Invalid RGB color")
     pure_color_image = np.array([c for _ in range(height*width)],dtype=np.uint8).reshape((height,width,3))
     if show:
-        figsize = kwargs.get('figsize', None)
-        axis_off = kwargs.get('axis_off', True)
+        figsize = kwargs.get("figsize", None)
+        axis_off = kwargs.get("axis_off", True)
         plt.figure(figsize=figsize)
         plt.imshow(pure_color_image)
         if axis_off:
-            plt.axis('off')
+            plt.axis("off")
     return pure_color_image
 
 
@@ -107,24 +107,24 @@ def compatible_imshow(img_path:str, return_fmt:Optional[str]=None, **kwargs) -> 
     import matplotlib.pyplot as plt
     bgr_img = cv2.imread(img_path)
     rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
-    figsize = kwargs.get('figsize', None)
-    axis_off = kwargs.get('axis_off', True)
+    figsize = kwargs.get("figsize", None)
+    axis_off = kwargs.get("axis_off", True)
     plt.figure(figsize=figsize)
     plt.imshow(rgb_img)
     if axis_off:
-        plt.axis('off')
+        plt.axis("off")
     if return_fmt is None:
         return
     fmt = return_fmt.lower()
-    if fmt == 'rgb':
+    if fmt == "rgb":
         rt_img = rgb_img
-    elif fmt == 'bgr':
+    elif fmt == "bgr":
         rt_img = bgr_img
-    elif 'xyz' in fmt:
+    elif "xyz" in fmt:
         rt_img = _rgb_to_ciexyz(rgb_img, **kwargs)
-    elif 'lab' in fmt:
+    elif "lab" in fmt:
         rt_img = _rgb_to_cielab(rgb_img, **kwargs)
-    elif 'gray' in fmt or 'grey' in fmt:
+    elif "gray" in fmt or "grey" in fmt:
         rt_img = _rgb_to_grey(rgb_img, **kwargs)
     else:
         raise ValueError(f"format {return_fmt} not implemented yet!")
@@ -154,9 +154,9 @@ def compatible_imread_cv2(img_path:str, return_fmt:str) -> np.ndarray:
         "rgb": cv2.COLOR_BGR2RGB,
         "gray": cv2.COLOR_BGR2GRAY,
         "grey": cv2.COLOR_BGR2GRAY,
-        'hsv': cv2.COLOR_BGR2HSV,
-        'lab': cv2.COLOR_BGR2LAB,
-        'xyz': cv2.COLOR_BGR2LUV,
+        "hsv": cv2.COLOR_BGR2HSV,
+        "lab": cv2.COLOR_BGR2LAB,
+        "xyz": cv2.COLOR_BGR2LUV,
     }
     rt_img = cv2.cvtColor(bgr_img,cvt_operation[return_fmt.lower()])
 
@@ -182,7 +182,7 @@ def convert_color(img:np.ndarray, src_fmt:str, dst_fmt:str, backend:Optional[str
     dst_fmt: str,
         the color space to be converted to,
         can be one of GRAY(GREY), RGB, BGR, CIELAB, CIEXYZ, CIELUV, YCbCr, HSV, YIQ, CMYK,
-    backend: str, default `_CVT_COLOR_BACKEND`, currently can be 'cv2', 'PIL', or 'JD',
+    backend: str, default `_CVT_COLOR_BACKEND`, currently can be "cv2", "PIL", or "naive",
         the backend to perform the color space conversion
     kwargs: dict,
         additional parameters
@@ -201,53 +201,53 @@ def convert_color(img:np.ndarray, src_fmt:str, dst_fmt:str, backend:Optional[str
     err = ValueError(f"Color space conversion from {src_fmt} to {dst_fmt} is not implemented yet")
     if src == dst:
         dst_img = img.copy()
-    elif src == 'rgb':
-        if 'gray' in dst or 'grey' in dst:
+    elif src == "rgb":
+        if "gray" in dst or "grey" in dst:
             dst_img = _rgb_to_grey(img, backend=backend, **kwargs)
-        if dst == 'bgr':
+        if dst == "bgr":
             dst_img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        elif 'xyz' in dst:
+        elif "xyz" in dst:
             dst_img = _rgb_to_ciexyz(img, backend=backend, **kwargs)
-        elif 'xyy' in dst:
+        elif "xyy" in dst:
             dst_img = _rgb_to_ciexyy(img, backend=backend, **kwargs)
-        elif 'xy' in dst:  # 'xyz' not in dst
+        elif "xy" in dst:  # "xyz" not in dst
             dst_img = _rgb_to_ciexy(img, backend=backend, **kwargs)
-        elif 'lab' in dst:
+        elif "lab" in dst:
             dst_img = _rgb_to_cielab(img, backend=backend, **kwargs)
-        elif 'luv' in dst:
+        elif "luv" in dst:
             # dst_img = cv2.cvtColor(_rescale_rgb(img), cv2.COLOR_RGB2LUV)
             dst_img = _rgb_to_cieluv(img, backend=backend, **kwargs)
-        elif 'ycbcr' in dst or 'ycrcb' in dst:
+        elif "ycbcr" in dst or "ycrcb" in dst:
             # dst_img = cv2.cvtColor(_rescale_rgb(img), cv2.COLOR_RGB2YCrCb)
             dst_img = _rgb_to_ycbcr(img, backend=backend, **kwargs)
-        elif 'hsv' in dst:
+        elif "hsv" in dst:
             dst_img = _rgb_to_hsv(img, backend=backend, **kwargs)
-        elif 'yiq' in dst:
+        elif "yiq" in dst:
             dst_img = _rgb_to_yiq(img, backend=backend, **kwargs)
-        elif 'cmyk' in dst:
+        elif "cmyk" in dst:
             dst_img = _rgb_to_cmyk(img, backend=backend, **kwargs)
         else:
             raise err
-    elif src == 'bgr':
+    elif src == "bgr":
         rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        if dst == 'rgb':
+        if dst == "rgb":
             dst_img = rgb_img
         else:
-            dst_img = convert_color(rgb_img, src_fmt='rgb', dst_fmt=dst_fmt, backend=backend, **kwargs)
-    elif src in ['gray', 'grey']:
+            dst_img = convert_color(rgb_img, src_fmt="rgb", dst_fmt=dst_fmt, backend=backend, **kwargs)
+    elif src in ["gray", "grey"]:
         rgb_img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-        dst_img = convert_color(rgb_img, src_fmt='rgb', dst_fmt=dst_fmt, backend=backend, **kwargs)
-    elif 'xyz' in src:
-        if 'rgb' in dst:
+        dst_img = convert_color(rgb_img, src_fmt="rgb", dst_fmt=dst_fmt, backend=backend, **kwargs)
+    elif "xyz" in src:
+        if "rgb" in dst:
             dst_img = _ciexyz_to_rgb(img, backend=backend, **kwargs)
-        elif 'lab' in dst:
+        elif "lab" in dst:
             dst_img = _ciexyz_to_cielab(img, backend=backend, **kwargs)
         else:
             raise err
-    elif 'xyy' in src:
-        if dst == 'rgb':
+    elif "xyy" in src:
+        if dst == "rgb":
             pass
-    elif 'xy' in src:
+    elif "xy" in src:
         pass
     else:
         raise err
@@ -279,13 +279,13 @@ def _rgb_to_grey(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.nda
     """
     if backend is None:
         backend = _CVT_COLOR_BACKEND
-    if backend.lower() == 'cv2':
+    if backend.lower() == "cv2":
         grey = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    elif backend.lower() == 'colour-science':
+    elif backend.lower() == "colour-science":
         pass
-    elif backend.lower() == 'pil':
+    elif backend.lower() == "pil":
         pass
-    elif backend.lower() == 'naive':
+    elif backend.lower() == "naive":
         pass
     else:
         raise ValueError(f"no backend named {backend} for converting color space from `RGB` to `GREY`")
@@ -319,14 +319,14 @@ def _rgb_to_ciexyz(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.n
     """
     if backend is None:
         backend = _CVT_COLOR_BACKEND
-    if backend.lower() == 'cv2':
+    if backend.lower() == "cv2":
         cie_xyz = cv2.cvtColor(_rescale_rgb(img), cv2.COLOR_RGB2XYZ)
-    elif backend.lower() == 'colour-science':
-        colourspace = colour.utilities.first_item(colour.plotting.filter_RGB_colourspaces('sRGB').values())
+    elif backend.lower() == "colour-science":
+        colourspace = colour.utilities.first_item(colour.plotting.filter_RGB_colourspaces("sRGB").values())
         cie_xyz = colour.RGB_to_XYZ(img, colourspace.whitepoint, colourspace.whitepoint, colourspace.RGB_to_XYZ_matrix)
-    elif backend.lower() == 'pil':
+    elif backend.lower() == "pil":
         pass
-    elif backend.lower() == 'naive':
+    elif backend.lower() == "naive":
         gamma_correction = lambda e: np.power((e+0.055)/1.055, 2.4) if e>0.04045 else e/12.92
         var_rgb = 100 * np.vectorize(gamma_correction)(_rescale_rgb(img))
         M = common.MAT_RGB_TO_CIEXYZ
@@ -358,14 +358,14 @@ def _rgb_to_ciexyy(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.n
     """
     if backend is None:
         # backend = _CVT_COLOR_BACKEND  # no such method in cv2
-        backend = 'colour-science'
-    if backend.lower() == 'cv2':
+        backend = "colour-science"
+    if backend.lower() == "cv2":
         pass
-    elif backend.lower() == 'colour-science':
-        cie_xyy = colour.XYZ_to_xyY(_rgb_to_ciexyz(img,backend='colour-science',**kwargs))
-    elif backend.lower() == 'pil':
+    elif backend.lower() == "colour-science":
+        cie_xyy = colour.XYZ_to_xyY(_rgb_to_ciexyz(img,backend="colour-science",**kwargs))
+    elif backend.lower() == "pil":
         pass
-    elif backend.lower() == 'naive':
+    elif backend.lower() == "naive":
         # default_white_point = np.array([0.3127, 0.3290, 0.0])
         # img_xyz = _rgb_to_ciexyz(img=img, backend=backend, **kwargs)
         pass
@@ -393,21 +393,21 @@ def _rgb_to_ciexy(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.nd
     """
     if backend is None:
         # backend = _CVT_COLOR_BACKEND  # no such method in cv2
-        backend = 'colour-science'
-    if backend.lower() == 'cv2':
+        backend = "colour-science"
+    if backend.lower() == "cv2":
         pass
-    elif backend.lower() == 'colour-science':
-        cie_xy = colour.XYZ_to_xy(_rgb_to_ciexyz(img,backend='colour-science',**kwargs))
-    elif backend.lower() == 'pil':
+    elif backend.lower() == "colour-science":
+        cie_xy = colour.XYZ_to_xy(_rgb_to_ciexyz(img,backend="colour-science",**kwargs))
+    elif backend.lower() == "pil":
         pass
-    elif backend.lower() == 'naive':
+    elif backend.lower() == "naive":
         # default_white_point = np.array([0.3127, 0.3290, 0.0])
         # img_xyz = _rgb_to_ciexyz(img=img, backend=backend, **kwargs)
         pass
     return cie_xy
 
 
-def _ciexyz_to_cielab(img:np.ndarray, illuminant:str='D65', observer:int=2, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def _ciexyz_to_cielab(img:np.ndarray, illuminant:str="D65", observer:int=2, backend:Optional[str]=None, **kwargs) -> np.ndarray:
     """ not finished, finished part checked,
 
     convert `img` from the color space of CIEXYZ to the color space of CIELAB
@@ -416,7 +416,7 @@ def _ciexyz_to_cielab(img:np.ndarray, illuminant:str='D65', observer:int=2, back
     -----------
     img: ndarray,
         the image whose color space is to be converted from CIEXYZ to CIELAB
-    illuminant: str, default 'D65',
+    illuminant: str, default "D65",
         ref. [2]
     observer: int, default 2,
         ref. [2]
@@ -435,14 +435,14 @@ def _ciexyz_to_cielab(img:np.ndarray, illuminant:str='D65', observer:int=2, back
     """
     if backend is None:
         # backend = _CVT_COLOR_BACKEND  # no such method in cv2
-        backend = 'naive'
-    if backend.lower() == 'cv2':
+        backend = "naive"
+    if backend.lower() == "cv2":
         pass
-    elif backend.lower() == 'colour-science':
+    elif backend.lower() == "colour-science":
         pass
-    elif backend.lower() == 'pil':
+    elif backend.lower() == "pil":
         pass
-    elif backend.lower() == 'naive':
+    elif backend.lower() == "naive":
         delta = 6/29
         delta_cubic = delta**3
         a = 1/3/delta**2
@@ -458,7 +458,7 @@ def _ciexyz_to_cielab(img:np.ndarray, illuminant:str='D65', observer:int=2, back
     return cie_lab
 
 
-def _rgb_to_cielab(img:np.ndarray, illuminant:str='D65', observer:int=2, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def _rgb_to_cielab(img:np.ndarray, illuminant:str="D65", observer:int=2, backend:Optional[str]=None, **kwargs) -> np.ndarray:
     """ not finished, finished part checked,
 
     convert `img` from the color space of RGB to the color space of CIELAB
@@ -467,7 +467,7 @@ def _rgb_to_cielab(img:np.ndarray, illuminant:str='D65', observer:int=2, backend
     -----------
     img: ndarray,
         the image, in the format (color space) RGB8, to be converted to CIELAB
-    illuminant: str, default 'D65',
+    illuminant: str, default "D65",
         ref. the function `_ciexyz_to_cielab`
     observer: int, default 2,
         ref. the function `_ciexyz_to_cielab`
@@ -481,14 +481,14 @@ def _rgb_to_cielab(img:np.ndarray, illuminant:str='D65', observer:int=2, backend
     """
     if backend is None:
         backend = _CVT_COLOR_BACKEND
-    if backend.lower() == 'cv2':
+    if backend.lower() == "cv2":
         cie_lab = cv2.cvtColor(_rescale_rgb(img), cv2.COLOR_RGB2LAB)
-    elif backend.lower() == 'colour-science':
+    elif backend.lower() == "colour-science":
         pass
-    elif backend.lower() == 'pil':
+    elif backend.lower() == "pil":
         pass
-    elif backend.lower() == 'naive':
-        img = _validate_img_fmt(img, fmt='RGB')
+    elif backend.lower() == "naive":
+        img = _validate_img_fmt(img, fmt="RGB")
         cie_xyz = _rgb_to_ciexyz(img)
         cie_lab = _ciexyz_to_cielab(cie_xyz, illuminant=illuminant, observer=observer, backend=backend)
     else:
@@ -496,7 +496,7 @@ def _rgb_to_cielab(img:np.ndarray, illuminant:str='D65', observer:int=2, backend
     return cie_lab
 
 
-def _rgb_to_cieluv(img:np.ndarray, illuminant:str='D65', observer:int=2, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def _rgb_to_cieluv(img:np.ndarray, illuminant:str="D65", observer:int=2, backend:Optional[str]=None, **kwargs) -> np.ndarray:
     """ not finished, finished part checked,
 
     convert `img` from the color space of RGB to the color space of CIELUV
@@ -505,11 +505,11 @@ def _rgb_to_cieluv(img:np.ndarray, illuminant:str='D65', observer:int=2, backend
     -----------
     img: ndarray,
         the image, in the format (color space) RGB8, to be converted to CIELUV
-    illuminant: str, default 'D65',
+    illuminant: str, default "D65",
         ref. the function `_ciexyz_to_cielab`
     observer: int, default 2,
         ref. the function `_ciexyz_to_cielab`
-    backend: str, default `_CVT_COLOR_BACKEND`, currently can be 'cv2', 'PIL', or 'JD',
+    backend: str, default `_CVT_COLOR_BACKEND`, currently can be "cv2", "PIL", or "naive",
         the backend to perform the color space conversion
 
     Returns:
@@ -519,13 +519,13 @@ def _rgb_to_cieluv(img:np.ndarray, illuminant:str='D65', observer:int=2, backend
     """
     if backend is None:
         backend = _CVT_COLOR_BACKEND
-    if backend.lower() == 'cv2':
+    if backend.lower() == "cv2":
         cieluv = cv2.cvtColor(_rescale_rgb(img), cv2.COLOR_RGB2LUV)
-    elif backend.lower() == 'colour-science':
+    elif backend.lower() == "colour-science":
         pass
-    elif backend.lower() == 'pil':
+    elif backend.lower() == "pil":
         pass
-    elif backend.lower() == 'naive':
+    elif backend.lower() == "naive":
         pass
     else:
         raise ValueError(f"no backend named {backend} for converting color space from `RGB` to `CIELUV`")
@@ -551,13 +551,13 @@ def _rgb_to_ycbcr(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.nd
     """
     if backend is None:
         backend = _CVT_COLOR_BACKEND
-    if backend.lower() == 'cv2':
+    if backend.lower() == "cv2":
         ycbcr = cv2.cvtColor(_rescale_rgb(img), cv2.COLOR_RGB2YCrCb)
-    elif backend.lower() == 'colour-science':
+    elif backend.lower() == "colour-science":
         pass
-    elif backend.lower() == 'pil':
+    elif backend.lower() == "pil":
         pass
-    elif backend.lower() == 'naive':
+    elif backend.lower() == "naive":
         pass
     else:
         raise ValueError(f"no backend named {backend} for converting color space from `RGB` to `YCbCr`")
@@ -587,14 +587,14 @@ def _rgb_to_yiq(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.ndar
     """
     if backend is None:
         # backend = _CVT_COLOR_BACKEND  # no such method in cv2
-        backend = 'naive'
-    if backend.lower() == 'cv2':
+        backend = "naive"
+    if backend.lower() == "cv2":
         pass
-    elif backend.lower() == 'colour-science':
+    elif backend.lower() == "colour-science":
         pass
-    elif backend.lower() == 'pil':
+    elif backend.lower() == "pil":
         pass
-    elif backend.lower() == 'naive':
+    elif backend.lower() == "naive":
         M = common.MAT_RGB_TO_YIQ
         yiq = np.apply_along_axis(lambda v:np.dot(M,v), -1, _rescale_rgb(img))
     else:
@@ -629,13 +629,13 @@ def _rgb_to_hsv(img:np.ndarray, scale:Real=1, backend:Optional[str]=None, **kwar
         backend = _CVT_COLOR_BACKEND
     if scale not in [360, 1, 360.0, 1.0]:
         raise ValueError("Invalid scale")
-    if backend.lower() == 'cv2':
+    if backend.lower() == "cv2":
         hsv = cv2.cvtColor(_rescale_rgb(img), cv2.COLOR_RGB2HSV)
-    elif backend.lower() == 'colour-science':
+    elif backend.lower() == "colour-science":
         pass
-    elif backend.lower() == 'pil':
+    elif backend.lower() == "pil":
         pass
-    elif backend.lower() == 'naive':
+    elif backend.lower() == "naive":
         pass
     if scale in [1.0, 1]:
         hsv[:,:,0] =  hsv[:,:,0]/360.0
@@ -667,16 +667,16 @@ def _rgb_to_cmyk(img:np.ndarray, scale:Real=1, backend:Optional[str]=None, **kwa
     """
     if backend is None:
         # backend = _CVT_COLOR_BACKEND  # no such method in cv2
-        backend = 'naive'
+        backend = "naive"
     if scale not in [100, 1, 100.0, 1.0]:
         raise ValueError("Invalid scale")
-    if backend.lower() == 'cv2':
+    if backend.lower() == "cv2":
         pass
-    elif backend.lower() == 'colour-science':
+    elif backend.lower() == "colour-science":
         pass
-    elif backend.lower() == 'pil':
+    elif backend.lower() == "pil":
         pass
-    elif backend.lower() == 'naive':
+    elif backend.lower() == "naive":
         nrows,ncols,_ = img.shape
         cmyk = np.zeros(shape=(nrows,ncols,4),dtype=np.float32)
         cmyk[:,:,:3] = 1.0 - _rescale_rgb(img)
@@ -711,7 +711,7 @@ def _rgb_to_hex(img:np.ndarray, **kwargs) -> np.ndarray:
     img_hex: ndarray,
         `img` in the format of hex
     """
-    to_hex = lambda v: '#%02x%02x%02x' % tuple(v)
+    to_hex = lambda v: "#%02x%02x%02x" % tuple(v)
     img_hex = np.apply_along_axis(to_hex, axis=-1, arr=img,)
     return img_hex
 
@@ -737,15 +737,15 @@ def _ciexyz_to_rgb(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.n
     """
     if backend is None:
         # backend = _CVT_COLOR_BACKEND  # no such method in cv2
-        backend = 'colour-science'
-    if backend.lower() == 'cv2':
+        backend = "colour-science"
+    if backend.lower() == "cv2":
         pass
-    elif backend.lower() == 'colour-science':
+    elif backend.lower() == "colour-science":
         rgb = colour.XYZ_to_sRGB(img)
         # srgb to 8bit RGB
-    elif backend.lower() == 'pil':
+    elif backend.lower() == "pil":
         pass
-    elif backend.lower() == 'naive':
+    elif backend.lower() == "naive":
         # default_white_point = np.array([0.3127, 0.3290, 0.0])
         # img_xyz = _rgb_to_ciexyz(img=img, backend=backend, **kwargs)
         pass
@@ -769,7 +769,7 @@ def _validate_img_fmt(img:np.ndarray, fmt:str, **kwargs) -> Union[np.ndarray, No
     valid_img: ndarray,
         the validated image
     """
-    if fmt.lower() == 'rgb':
+    if fmt.lower() == "rgb":
         try:
             valid_img = _validate_rgb(img)
         except Exception as e:
@@ -840,7 +840,7 @@ def get_color_type(roi_pixels:ArrayLike, color_space:str, rule_func:callable, kw
     roi_pixels: array_like,
         pixels of region of interest, in RGB
     color_space: str,
-        the color space to make observation, can be 'CIEXYZ', 'CIExy', etc.
+        the color space to make observation, can be "CIEXYZ", "CIExy", etc.
     rule_func: callable,
         the function to map the observation in `color_space` to names of color types
     kw_rf: dict, optional,
@@ -853,12 +853,12 @@ def get_color_type(roi_pixels:ArrayLike, color_space:str, rule_func:callable, kw
     ret, dict, with items `centroid`, `color_type`
     """
     cs = color_space.lower()
-    backend = kwargs.get('backend', None)
-    verbose = kwargs.get('verbose', 0)
-    if 'rgb' in cs.lower():  # no need to do color space conversion
+    backend = kwargs.get("backend", None)
+    verbose = kwargs.get("verbose", 0)
+    if "rgb" in cs.lower():  # no need to do color space conversion
         observation = deepcopy(roi_pixels)
     else:
-        observation = convert_color(roi_pixels, src_fmt='rgb', dst_fmt=cs, backend=backend)
+        observation = convert_color(roi_pixels, src_fmt="rgb", dst_fmt=cs, backend=backend)
     _q = kwargs.get("q", 60)
     _observation = filter_by_percentile(observation, q=_q)
     if len(_observation) > 0:
@@ -875,8 +875,8 @@ def get_color_type(roi_pixels:ArrayLike, color_space:str, rule_func:callable, kw
     }
 
     if verbose >= 2:
-        plot_func = kwargs.get('plot_func', None)
-        plot_params = kwargs.get('plot_params', {})
+        plot_func = kwargs.get("plot_func", None)
+        plot_params = kwargs.get("plot_params", {})
         if plot_func is not None and callable(plot_func):
             plot_func(observation, **plot_params)
 
@@ -946,21 +946,21 @@ def exif_color_space(img: Image.Image, verbose:int=0) -> str:
     check the color profile (space) of an Image object read from file
     """
     exif = img._getexif() or {}
-    if exif.get(0xA001) == 1 or exif.get(0x0001) == 'R98':
-        img_cs = 'srgb'
+    if exif.get(0xA001) == 1 or exif.get(0x0001) == "R98":
+        img_cs = "srgb"
         if verbose >= 1:
-            print ('This image uses sRGB color space')
-    elif exif.get(0xA001) == 2 or exif.get(0x0001) == 'R03':
-        img_cs = 'adobe_rgb'
+            print ("This image uses sRGB color space")
+    elif exif.get(0xA001) == 2 or exif.get(0x0001) == "R03":
+        img_cs = "adobe_rgb"
         if verbose >= 1:
-            print ('This image uses Adobe RGB color space')
+            print ("This image uses Adobe RGB color space")
     elif exif.get(0xA001) is None and exif.get(0x0001) is None:
-        img_cs = 'unspecified'
+        img_cs = "unspecified"
         if verbose >= 1:
-            print ('Empty EXIF tags ColorSpace and InteropIndex')
+            print ("Empty EXIF tags ColorSpace and InteropIndex")
     else:
-        img_cs = 'unknown'
+        img_cs = "unknown"
         if verbose >= 1:
-            print (f'This image uses UNKNOWN color space ({exif.get(0xA001)}, {exif.get(0x0001)})')
+            print (f"This image uses UNKNOWN color space ({exif.get(0xA001)}, {exif.get(0x0001)})")
     return img_cs
     

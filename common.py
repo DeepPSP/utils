@@ -138,7 +138,7 @@ def timestamp_to_local_datetime_string(ts:int, ts_in_second:bool=False, fmt:str=
     to_zone = tz.tzlocal()
 
     # Tell the datetime object that it's in UTC time zone since 
-    # datetime objects are 'naive' by default
+    # datetime objects are "naive" by default
     utc = utc.replace(tzinfo=from_zone)
 
     # Convert time zone
@@ -318,9 +318,9 @@ def get_record_list_recursive(db_dir:str, rec_ext:str) -> List[str]:
     """ finished, checked,
 
     get the list of records in `db_dir` recursively,
-    for example, there are two folders 'patient1', 'patient2' in `db_dir`,
-    and there are records 'A0001', 'A0002', ... in 'patient1'; 'B0001', 'B0002', ... in 'patient2',
-    then the output would be 'patient1{sep}A0001', ..., 'patient2{sep}B0001', ...,
+    for example, there are two folders "patient1", "patient2" in `db_dir`,
+    and there are records "A0001", "A0002", ... in "patient1"; "B0001", "B0002", ... in "patient2",
+    then the output would be "patient1{sep}A0001", ..., "patient2{sep}B0001", ...,
     sep is determined by the system
 
     Parameters:
@@ -355,9 +355,9 @@ def get_record_list_recursive2(db_dir:str, rec_pattern:str) -> List[str]:
     """ finished, checked,
 
     get the list of records in `db_dir` recursively,
-    for example, there are two folders 'patient1', 'patient2' in `db_dir`,
-    and there are records 'A0001', 'A0002', ... in 'patient1'; 'B0001', 'B0002', ... in 'patient2',
-    then the output would be 'patient1{sep}A0001', ..., 'patient2{sep}B0001', ...,
+    for example, there are two folders "patient1", "patient2" in `db_dir`,
+    and there are records "A0001", "A0002", ... in "patient1"; "B0001", "B0002", ... in "patient2",
+    then the output would be "patient1{sep}A0001", ..., "patient2{sep}B0001", ...,
     sep is determined by the system
 
     Parameters:
@@ -365,7 +365,7 @@ def get_record_list_recursive2(db_dir:str, rec_pattern:str) -> List[str]:
     db_dir: str,
         the parent (root) path of the whole database
     rec_pattern: str,
-        pattern of the record filenames, e.g. 'A*.mat'
+        pattern of the record filenames, e.g. "A*.mat"
 
     Returns:
     --------
@@ -393,9 +393,9 @@ def get_record_list_recursive3(db_dir:str, rec_patterns:Union[str,Dict[str,str]]
     """ finished, checked,
 
     get the list of records in `db_dir` recursively,
-    for example, there are two folders 'patient1', 'patient2' in `db_dir`,
-    and there are records 'A0001', 'A0002', ... in 'patient1'; 'B0001', 'B0002', ... in 'patient2',
-    then the output would be 'patient1{sep}A0001', ..., 'patient2{sep}B0001', ...,
+    for example, there are two folders "patient1", "patient2" in `db_dir`,
+    and there are records "A0001", "A0002", ... in "patient1"; "B0001", "B0002", ... in "patient2",
+    then the output would be "patient1{sep}A0001", ..., "patient2{sep}B0001", ...,
     sep is determined by the system
 
     Parameters:
@@ -454,12 +454,12 @@ def wfdb_rdheader(header_data:List[str]) -> Union[Record, MultiRecord]:
     for line in header_data:
         striped_line = line.strip()
         # Comment line
-        if striped_line.startswith('#'):
+        if striped_line.startswith("#"):
             comment_lines.append(striped_line)
         # Non-empty non-comment line = header line.
         elif striped_line:
             # Look for a comment in the line
-            ci = striped_line.find('#')
+            ci = striped_line.find("#")
             if ci > 0:
                 header_lines.append(striped_line[:ci])
                 # comment on same line as header line
@@ -471,7 +471,7 @@ def wfdb_rdheader(header_data:List[str]) -> Union[Record, MultiRecord]:
     record_fields = _header._parse_record_line(header_lines[0])
 
     # Single segment header - Process signal specification lines
-    if record_fields['n_seg'] is None:
+    if record_fields["n_seg"] is None:
         # Create a single-segment WFDB record object
         record = Record()
 
@@ -485,7 +485,7 @@ def wfdb_rdheader(header_data:List[str]) -> Union[Record, MultiRecord]:
 
         # Set the object's record line fields
         for field in record_fields:
-            if field == 'n_seg':
+            if field == "n_seg":
                 continue
             setattr(record, field, record_fields[field])
     # Multi segment header - Process segment specification lines
@@ -503,12 +503,12 @@ def wfdb_rdheader(header_data:List[str]) -> Union[Record, MultiRecord]:
 
         # Determine whether the record is fixed or variable
         if record.seg_len[0] == 0:
-            record.layout = 'variable'
+            record.layout = "variable"
         else:
-            record.layout = 'fixed'
+            record.layout = "fixed"
 
     # Set the comments field
-    record.comments = [line.strip(' \t#') for line in comment_lines]
+    record.comments = [line.strip(" \t#") for line in comment_lines]
 
     return record
 

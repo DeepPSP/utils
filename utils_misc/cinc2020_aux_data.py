@@ -32,6 +32,8 @@ __all__ = [
 ]
 
 
+# constants
+
 df_weights = pd.read_csv(StringIO(""",270492004,164889003,164890007,426627000,713427006,713426002,445118002,39732003,164909002,251146004,698252002,10370003,284470004,427172004,164947007,111975006,164917005,47665007,59118001,427393009,426177001,426783006,427084000,63593006,164934002,59931005,17338001
 270492004,1.0,0.3,0.3,0.5,0.4,0.5,0.45,0.45,0.325,0.375,0.45,0.425,0.4625,0.425,0.5,0.35,0.2,0.45,0.4,0.5,0.5,0.45,0.425,0.4625,0.3,0.3,0.425
 164889003,0.3,1.0,0.5,0.3,0.4,0.3,0.35,0.35,0.475,0.425,0.35,0.375,0.3375,0.375,0.3,0.45,0.4,0.35,0.4,0.3,0.3,0.25,0.375,0.3375,0.5,0.5,0.375
@@ -184,18 +186,18 @@ dx_mapping_unscored["SNOMED CT Code"] = dx_mapping_unscored["SNOMED CT Code"].ap
 
 
 dms = dx_mapping_scored.copy()
-dms['scored'] = True
+dms["scored"] = True
 dmn = dx_mapping_unscored.copy()
-dmn['Notes'] = ''
-dmn['scored'] = False
-dx_mapping_all = pd.concat([dms, dmn], ignore_index=True).fillna('')
+dmn["Notes"] = ""
+dmn["scored"] = False
+dx_mapping_all = pd.concat([dms, dmn], ignore_index=True).fillna("")
 
 
 df_weights_snomed = df_weights  # alias
 
 
 snomed_ct_code_to_abbr = \
-    ED({row['SNOMED CT Code']:row['Abbreviation'] for _,row in dx_mapping_all.iterrows()})
+    ED({row["SNOMED CT Code"]:row["Abbreviation"] for _,row in dx_mapping_all.iterrows()})
 abbr_to_snomed_ct_code = ED({v:k for k,v in snomed_ct_code_to_abbr.items()})
 
 df_weights_abbr = df_weights.copy()
@@ -208,7 +210,7 @@ df_weights_abbr.index = \
 
 
 snomed_ct_code_to_fullname = \
-    ED({row['SNOMED CT Code']:row['Dx'] for _,row in dx_mapping_all.iterrows()})
+    ED({row["SNOMED CT Code"]:row["Dx"] for _,row in dx_mapping_all.iterrows()})
 fullname_to_snomed_ct_code = ED({v:k for k,v in snomed_ct_code_to_fullname.items()})
 
 df_weights_fullname = df_weights.copy()
@@ -221,25 +223,27 @@ df_weights_fullname.index = \
 
 
 abbr_to_fullname = \
-    ED({row['Abbreviation']:row['Dx'] for _,row in dx_mapping_all.iterrows()})
+    ED({row["Abbreviation"]:row["Dx"] for _,row in dx_mapping_all.iterrows()})
 fullname_to_abbr = ED({v:k for k,v in abbr_to_fullname.items()})
 
 
 equiv_class_dict = ED({
-    'CRBBB': 'RBBB',
-    'SVPB': 'PAC',
-    'VPB': 'PVC',
-    '713427006': '59118001',
-    '63593006': '284470004',
-    '17338001': '427172004',
-    'complete right bundle branch block': 'right bundle branch block',
-    'supraventricular premature beats': 'premature atrial contraction',
-    'ventricular premature beats': 'premature ventricular contractions',
+    "CRBBB": "RBBB",
+    "SVPB": "PAC",
+    "VPB": "PVC",
+    "713427006": "59118001",
+    "63593006": "284470004",
+    "17338001": "427172004",
+    "complete right bundle branch block": "right bundle branch block",
+    "supraventricular premature beats": "premature atrial contraction",
+    "ventricular premature beats": "premature ventricular contractions",
 })
 
 
+# functions
 
-def load_weights(classes:Sequence[Union[int,str]]=None, return_fmt:str='np') -> Union[np.ndarray, pd.DataFrame]:
+def load_weights(classes:Sequence[Union[int,str]]=None,
+                 return_fmt:str="np") -> Union[np.ndarray, pd.DataFrame]:
     """ finished, checked,
 
     load the weight matrix of the `classes`
@@ -249,8 +253,8 @@ def load_weights(classes:Sequence[Union[int,str]]=None, return_fmt:str='np') -> 
     classes: sequence of str or int, optional,
         the classes (abbr. or SNOMED CT Code) to load their weights,
         if not given, weights of all classes in `dx_mapping_scored` will be loaded
-    return_fmt: str, default 'np',
-        'np' or 'pd', the values in the form of a 2d array or a DataFrame
+    return_fmt: str, default "np",
+        "np" or "pd", the values in the form of a 2d array or a DataFrame
 
     Returns:
     --------
@@ -264,9 +268,9 @@ def load_weights(classes:Sequence[Union[int,str]]=None, return_fmt:str='np') -> 
     else:
         mat = df_weights_abbr.copy()
     
-    if return_fmt.lower() == 'np':
+    if return_fmt.lower() == "np":
         mat = mat.values
-    elif return_fmt.lower() == 'pd':
+    elif return_fmt.lower() == "pd":
         # columns and indices back to the original input format
         mat.columns = list(map(str, classes))
         mat.index = list(map(str, classes))
@@ -324,7 +328,12 @@ def get_class(snomed_ct_code:Union[str,int]) -> Dict[str,str]:
     return arrhythmia_class
 
 
-def get_class_count(tranches:Union[str, Sequence[str]], exclude_classes:Optional[Sequence[str]]=None, scored_only:bool=False, normalize:bool=True, threshold:Optional[Real]=0, fmt:str='a') ->Dict[str, int]:
+def get_class_count(tranches:Union[str, Sequence[str]],
+                    exclude_classes:Optional[Sequence[str]]=None,
+                    scored_only:bool=False,
+                    normalize:bool=True,
+                    threshold:Optional[Real]=0,
+                    fmt:str="a") ->Dict[str, int]:
     """ finished, checked,
 
     Parameters:
@@ -340,12 +349,12 @@ def get_class_count(tranches:Union[str, Sequence[str]], exclude_classes:Optional
         used only when `scored_only` = True
     threshold: real number,
         minimum ratio (0-1) or absolute number (>1) of a class to be counted
-    fmt: str, default 'a',
+    fmt: str, default "a",
         the format of the names of the classes in the returned dict,
         can be one of the following (case insensitive):
-        - 'a', abbreviations
-        - 'f', full names
-        - 's', SNOMED CT Code
+        - "a", abbreviations
+        - "f", full names
+        - "s", SNOMED CT Code
 
     Returns:
     --------
@@ -384,13 +393,13 @@ def get_class_count(tranches:Union[str, Sequence[str]], exclude_classes:Optional
     tmp = ED()
     tot_count = sum(class_count.values())
     _threshold = threshold if threshold >= 1 else threshold * tot_count
-    if fmt.lower() == 's':
+    if fmt.lower() == "s":
         for key, val in class_count.items():
             if val < _threshold:
                 continue
             tmp[abbr_to_snomed_ct_code[key]] = val
         class_count = tmp.copy()
-    elif fmt.lower() == 'f':
+    elif fmt.lower() == "f":
         for key, val in class_count.items():
             if val < _threshold:
                 continue
@@ -402,7 +411,13 @@ def get_class_count(tranches:Union[str, Sequence[str]], exclude_classes:Optional
     return class_count
 
 
-def get_class_weight(tranches:Union[str, Sequence[str]], exclude_classes:Optional[Sequence[str]]=None, scored_only:bool=False, normalize:bool=True, threshold:Optional[Real]=0, fmt:str='a', min_weight:Real=0.5) ->Dict[str, int]:
+def get_class_weight(tranches:Union[str, Sequence[str]],
+                     exclude_classes:Optional[Sequence[str]]=None,
+                     scored_only:bool=False,
+                     normalize:bool=True,
+                     threshold:Optional[Real]=0,
+                     fmt:str="a",
+                     min_weight:Real=0.5) ->Dict[str, int]:
     """ finished, checked,
 
     Parameters:
@@ -418,12 +433,12 @@ def get_class_weight(tranches:Union[str, Sequence[str]], exclude_classes:Optiona
         used only when `scored_only` = True
     threshold: real number,
         minimum ratio (0-1) or absolute number (>1) of a class to be counted
-    fmt: str, default 'a',
+    fmt: str, default "a",
         the format of the names of the classes in the returned dict,
         can be one of the following (case insensitive):
-        - 'a', abbreviations
-        - 'f', full names
-        - 's', SNOMED CT Code
+        - "a", abbreviations
+        - "f", full names
+        - "s", SNOMED CT Code
     min_weight: real number, default 0.5,
         minimum value of the weight of all classes,
         or equivalently the weight of the largest class
@@ -450,6 +465,8 @@ def get_class_weight(tranches:Union[str, Sequence[str]], exclude_classes:Optiona
     })
     return class_weight
 
+
+# extra statistics
 
 dx_cooccurrence_all = pd.read_csv(StringIO(""",IAVB,AF,AFL,Brady,CRBBB,IRBBB,LAnFB,LAD,LBBB,LQRSV,NSIVCB,PR,PAC,PVC,LPR,LQT,QAb,RAD,RBBB,SA,SB,NSR,STach,SVPB,TAb,TInv,VPB,IIAVB,abQRS,AJR,AMI,AMIs,AnMIs,AnMI,AB,AFAFL,AH,AP,ATach,AVJR,AVB,BPAC,BTS,BBB,CD,CAF,CMI,CHB,CIAHB,CHD,SQT,DIB,ERe,FB,HF,HVD,HTV,IR,ILBBB,ICA,IIs,ISTD,JE,JPC,JTach,LIs,LAA,LAE,LAH,LPFB,LVH,LVS,MoI,MI,MIs,NSSTTA,OldMI,VPVC,PAF,PSVT,PVT,RAb,RAF,RAAb,RAH,RVH,STC,SPRI,SAB,SND,STD,STE,STIAb,SVB,SVT,ALR,TIA,UAb,VBig,VEB,VEsB,VEsR,VF,VFL,VH,VPP,VPEx,VTach,VTrig,WAP,WPW
 IAVB,2394,24,7,16,85,77,148,469,158,15,92,0,77,8,125,119,61,32,84,58,251,614,89,17,223,67,43,3,177,0,0,0,22,23,0,0,3,0,4,0,0,2,1,19,0,0,6,0,0,0,0,0,7,0,0,0,0,0,30,5,29,0,0,0,0,87,6,179,2,24,202,0,0,391,121,166,25,0,0,0,0,0,0,0,7,15,18,0,0,0,38,17,88,0,2,3,0,0,4,93,0,1,0,0,13,2,0,0,1,1,0
@@ -601,7 +618,7 @@ dx_cooccurrence_all is obtained via the following code
 >>> for tranche, l_rec in dr.all_records.items():
 ...     for rec in l_rec:
 ...         ann = dr.load_ann(rec)
-...         d = ann['diagnosis']['diagnosis_abbr']
+...         d = ann["diagnosis"]["diagnosis_abbr"]
 ...         for item in d:
 ...             mat_cooccurance.loc[item,item] += 1
 ...         for i in range(len(d)-1):

@@ -5,7 +5,7 @@ utilities for signal processing, which numpy, scipy, etc. lack
 from copy import deepcopy
 from collections import namedtuple
 from numbers import Number, Real
-from typing import Union, List, NamedTuple, Optional, Tuple, Sequence
+from typing import Union, List, NamedTuple, Optional, Tuple, Sequence, Any, NoReturn
 
 import numpy as np
 np.set_printoptions(precision=5, suppress=True)
@@ -47,8 +47,8 @@ __all__ = [
 
 
 WaveletDenoiseResult = namedtuple(
-    typename='WaveletDenoiseResult',
-    field_names=['is_ecg', 'amplified_ratio', 'amplified_signal', 'raw_r_peaks', 'side_len', 'wavelet_name', 'wavelet_coeffs']
+    typename="WaveletDenoiseResult",
+    field_names=["is_ecg", "amplified_ratio", "amplified_signal", "raw_r_peaks", "side_len", "wavelet_name", "wavelet_coeffs"]
 )
 
 
@@ -56,7 +56,7 @@ def detect_peaks(x:ArrayLike,
                  mph:Optional[Real]=None, mpd:int=1,
                  threshold:Real=0, left_threshold:Real=0, right_threshold:Real=0,
                  prominence:Optional[Real]=None, prominence_wlen:Optional[int]=None,
-                 edge:Union[str,type(None)]='rising', kpsh:bool=False, valley:bool=False,
+                 edge:Union[str,type(None)]="rising", kpsh:bool=False, valley:bool=False,
                  show:bool=False, ax=None,
                  verbose:int=0) -> np.ndarray:
     """
@@ -84,10 +84,10 @@ def detect_peaks(x:ArrayLike,
         threshold of prominence of the detected peaks (valleys)
     prominence_wlen: positive int, optional,
         the `wlen` parameter of the function `scipy.signal.peak_prominences`
-    edge: str or None, default 'rising',
-        can also be 'falling', 'both',
-        for a flat peak, keep only the rising edge ('rising'), only the falling edge ('falling'),
-        both edges ('both'), or don't detect a flat peak (None)
+    edge: str or None, default "rising",
+        can also be "falling", "both",
+        for a flat peak, keep only the rising edge ("rising"), only the falling edge ("falling"),
+        both edges ("both"), or don't detect a flat peak (None)
     kpsh: bool, default False,
         keep peaks with same height even if they are closer than `mpd`
     valley: bool, default False,
@@ -137,7 +137,7 @@ def detect_peaks(x:ArrayLike,
 
     >>> x = [0, 1, 1, 0, 1, 1, 0]
     >>> # detect both edges
-    >>> detect_peaks(x, edge='both', show=True)
+    >>> detect_peaks(x, edge="both", show=True)
 
     >>> x = [-2, 1, -2, 2, 1, 1, 3, 0]
     >>> # set threshold = 2
@@ -145,11 +145,11 @@ def detect_peaks(x:ArrayLike,
 
     Version history
     ---------------
-    '1.0.5':
+    "1.0.5":
         The sign of `mph` is inverted if parameter `valley` is True
     """
     data = deepcopy(x)
-    data = np.atleast_1d(data).astype('float64')
+    data = np.atleast_1d(data).astype("float64")
     if data.size < 3:
         return np.array([], dtype=int)
     
@@ -171,15 +171,15 @@ def detect_peaks(x:ArrayLike,
     if not edge:
         ine = np.where((np.hstack((dx, 0)) < 0) & (np.hstack((0, dx)) > 0))[0]
     else:
-        if edge.lower() in ['rising', 'both']:
+        if edge.lower() in ["rising", "both"]:
             ire = np.where((np.hstack((dx, 0)) <= 0) & (np.hstack((0, dx)) > 0))[0]
-        if edge.lower() in ['falling', 'both']:
+        if edge.lower() in ["falling", "both"]:
             ife = np.where((np.hstack((dx, 0)) < 0) & (np.hstack((0, dx)) >= 0))[0]
     ind = np.unique(np.hstack((ine, ire, ife)))
 
     if verbose >= 1:
-        print(f'before filtering by mpd = {mpd}, and threshold = {threshold}, ind = {ind.tolist()}')
-        print(f'additionally, left_threshold = {left_threshold}, right_threshold = {right_threshold}, length of data = {len(data)}')
+        print(f"before filtering by mpd = {mpd}, and threshold = {threshold}, ind = {ind.tolist()}")
+        print(f"additionally, left_threshold = {left_threshold}, right_threshold = {right_threshold}, length of data = {len(data)}")
     
     # handle NaN's
     if ind.size and indnan.size:
@@ -187,13 +187,13 @@ def detect_peaks(x:ArrayLike,
         ind = ind[np.in1d(ind, np.unique(np.hstack((indnan, indnan-1, indnan+1))), invert=True)]
 
     if verbose >= 1:
-        print(f'after handling nan values, ind = {ind.tolist()}')
+        print(f"after handling nan values, ind = {ind.tolist()}")
     
     # peaks are only valid within [mpb, len(data)-mpb[
     ind = np.array([pos for pos in ind if mpd<=pos<len(data)-mpd])
     
     if verbose >= 1:
-        print(f'after fitering out elements too close to border by mpd = {mpd}, ind = {ind.tolist()}')
+        print(f"after fitering out elements too close to border by mpd = {mpd}, ind = {ind.tolist()}")
 
     # first and last values of data cannot be peaks
     # if ind.size and ind[0] == 0:
@@ -205,7 +205,7 @@ def detect_peaks(x:ArrayLike,
         ind = ind[data[ind] >= mph]
     
     if verbose >= 1:
-        print(f'after filtering by mph = {mph}, ind = {ind.tolist()}')
+        print(f"after filtering by mph = {mph}, ind = {ind.tolist()}")
     
     # remove peaks - neighbors < threshold
     _left_threshold = left_threshold if left_threshold > 0 else threshold
@@ -215,15 +215,15 @@ def detect_peaks(x:ArrayLike,
         dx = np.max(np.vstack([data[ind]-data[ind+idx] for idx in range(-mpd, 0)]), axis=0)
         ind = np.delete(ind, np.where(dx < _left_threshold)[0])
         if verbose >= 2:
-            print(f'from left, dx = {dx.tolist()}')
-            print(f'after deleting those dx < _left_threshold = {_left_threshold}, ind = {ind.tolist()}')
+            print(f"from left, dx = {dx.tolist()}")
+            print(f"after deleting those dx < _left_threshold = {_left_threshold}, ind = {ind.tolist()}")
         dx = np.max(np.vstack([data[ind]-data[ind+idx] for idx in range(1, mpd+1)]), axis=0)
         ind = np.delete(ind, np.where(dx < _right_threshold)[0])
         if verbose >= 2:
-            print(f'from right, dx = {dx.tolist()}')
-            print(f'after deleting those dx < _right_threshold = {_right_threshold}, ind = {ind.tolist()}')
+            print(f"from right, dx = {dx.tolist()}")
+            print(f"after deleting those dx < _right_threshold = {_right_threshold}, ind = {ind.tolist()}")
     if verbose >= 1:
-        print(f'after filtering by threshold, ind = {ind.tolist()}')
+        print(f"after filtering by threshold, ind = {ind.tolist()}")
     # detect small peaks closer than minimum peak distance
     if ind.size and mpd > 1:
         ind = ind[np.argsort(data[ind])][::-1]  # sort ind by peak height
@@ -240,15 +240,15 @@ def detect_peaks(x:ArrayLike,
     ind = np.array([item for item in ind if data[item]==np.max(data[item-mpd:item+mpd+1])])
 
     if verbose >= 1:
-        print(f'after filtering by mpd, ind = {ind.tolist()}')
+        print(f"after filtering by mpd, ind = {ind.tolist()}")
 
     if prominence:
         _p = peak_prominences(data, ind, prominence_wlen)[0]
         ind = ind[np.where(_p >= prominence)[0]]
         if verbose >= 1:
-            print(f'after filtering by prominence, ind = {ind.tolist()}')
+            print(f"after filtering by prominence, ind = {ind.tolist()}")
             if verbose >= 2:
-                print(f'with detailed prominence = {_p.tolist()}')
+                print(f"with detailed prominence = {_p.tolist()}")
 
     if show:
         if indnan.size:
@@ -268,26 +268,26 @@ def _plot(x, mph, mpd, threshold, edge, valley, ax, ind):
 
     Parameters: ref. the function `detect_peaks`
     """
-    if 'plt' not in dir():
+    if "plt" not in dir():
         import matplotlib.pyplot as plt
     
     if ax is None:
         _, ax = plt.subplots(1, 1, figsize=(8, 4))
 
-    ax.plot(x, 'b', lw=1)
+    ax.plot(x, "b", lw=1)
     if ind.size:
-        label = 'valley' if valley else 'peak'
-        label = label + 's' if ind.size > 1 else label
-        ax.plot(ind, x[ind], '+', mfc=None, mec='r', mew=2, ms=8,
-                label='%d %s' % (ind.size, label))
-        ax.legend(loc='best', framealpha=.5, numpoints=1)
+        label = "valley" if valley else "peak"
+        label = label + "s" if ind.size > 1 else label
+        ax.plot(ind, x[ind], "+", mfc=None, mec="r", mew=2, ms=8,
+                label="%d %s" % (ind.size, label))
+        ax.legend(loc="best", framealpha=.5, numpoints=1)
     ax.set_xlim(-.02*x.size, x.size*1.02-1)
     ymin, ymax = x[np.isfinite(x)].min(), x[np.isfinite(x)].max()
     yrange = ymax - ymin if ymax > ymin else 1
     ax.set_ylim(ymin - 0.1*yrange, ymax + 0.1*yrange)
-    ax.set_xlabel('Data #', fontsize=14)
-    ax.set_ylabel('Amplitude', fontsize=14)
-    mode = 'Valley detection' if valley else 'Peak detection'
+    ax.set_xlabel("Data #", fontsize=14)
+    ax.set_ylabel("Amplitude", fontsize=14)
+    mode = "Valley detection" if valley else "Peak detection"
     ax.set_title("%s (mph=%s, mpd=%d, threshold=%s, edge='%s')"
                     % (mode, str(mph), mpd, str(threshold), edge))
     # plt.grid()
@@ -378,7 +378,7 @@ def uni_polyn_der(coeff:ArrayLike, order:int=1, coeff_asc:bool=True) -> np.ndarr
     polyn_deg = len(_coeff) - 1
 
     if order < 0 or not isinstance(order, int):
-        raise ValueError('order must be a non negative integer')
+        raise ValueError("order must be a non negative integer")
     elif order == 0:
         return _coeff
     elif order > polyn_deg:
@@ -392,7 +392,9 @@ def uni_polyn_der(coeff:ArrayLike, order:int=1, coeff_asc:bool=True) -> np.ndarr
     return der
 
 
-def eval_uni_polyn(x:Union[Real,list,tuple,np.ndarray], coeff:ArrayLike, coeff_asc:bool=True) -> Union[int,float,np.ndarray]:
+def eval_uni_polyn(x:Union[Real,list,tuple,np.ndarray],
+                   coeff:ArrayLike,
+                   coeff_asc:bool=True) -> Union[int,float,np.ndarray]:
     """ finished, checked,
 
     evaluate `x` at the univariate polynomial defined by `coeff`
@@ -414,7 +416,7 @@ def eval_uni_polyn(x:Union[Real,list,tuple,np.ndarray], coeff:ArrayLike, coeff_a
     """
     polyn_order = len(coeff)-1
     if len(coeff) == 0:
-        raise ValueError('please specify a univariate polynomial!')
+        raise ValueError("please specify a univariate polynomial!")
     
     if coeff_asc:
         if isinstance(x, (int,float)):
@@ -490,7 +492,14 @@ def lstsq_with_smoothness_prior(data:ArrayLike) -> np.ndarray:
     raise NotImplementedError
 
 
-def generate_rr_interval(nb_beats:int, bpm_mean:Real, bpm_std:Real, lf_hf:float, lf_fs:float=0.1, hf_fs:float=0.25, lf_std:float=0.01, hf_std:float=0.01) -> np.ndarray:
+def generate_rr_interval(nb_beats:int,
+                         bpm_mean:Real,
+                         bpm_std:Real,
+                         lf_hf:float,
+                         lf_fs:float=0.1,
+                         hf_fs:float=0.25,
+                         lf_std:float=0.01,
+                         hf_std:float=0.01) -> np.ndarray:
     """ finished, not checked,
 
     Parameters:
@@ -528,7 +537,7 @@ def generate_rr_interval(nb_beats:int, bpm_mean:Real, bpm_std:Real, lf_hf:float,
     return rr
 
 
-def is_ecg_signal(s:ArrayLike, fs:int, wavelet_name:str='db6', verbose:int=0) -> bool:
+def is_ecg_signal(s:ArrayLike, fs:int, wavelet_name:str="db6", verbose:int=0) -> bool:
     """ finished, to be improved,
 
     Parameters:
@@ -537,7 +546,7 @@ def is_ecg_signal(s:ArrayLike, fs:int, wavelet_name:str='db6', verbose:int=0) ->
         the signal to be denoised
     fs: int,
         frequency of the signal `s`
-    wavelet_name: str, default 'db6'
+    wavelet_name: str, default "db6"
         name of the wavelet to use
     verbose: int, default 0,
         for detailedness of printing
@@ -546,7 +555,7 @@ def is_ecg_signal(s:ArrayLike, fs:int, wavelet_name:str='db6', verbose:int=0) ->
     --------
     True if the signal `s` is valid ecg signal, else return False
     """
-    nl = '\n'
+    nl = "\n"
     sig_len = len(s)
     spacing = 1000/fs
 
@@ -569,11 +578,11 @@ def is_ecg_signal(s:ArrayLike, fs:int, wavelet_name:str='db6', verbose:int=0) ->
         from utils.common import DEFAULT_FIG_SIZE_PER_SEC
         # figsize=(int(DEFAULT_FIG_SIZE_PER_SEC*len(s)/fs), 6)
 
-        print('(level 3 of) the wavelet in use looks like:')
+        print("(level 3 of) the wavelet in use looks like:")
         _, psi, x = pywt.Wavelet(wavelet_name).wavefun(level=3)
         _,ax = plt.subplots()
         ax.plot(x, psi)
-        ax.set_title(wavelet_name+' level 3')
+        ax.set_title(wavelet_name+" level 3")
         plt.show()
 
     qrs_freqs = [10, 40]  # Hz
@@ -584,8 +593,8 @@ def is_ecg_signal(s:ArrayLike, fs:int, wavelet_name:str='db6', verbose:int=0) ->
     tot_level = qrs_levels[-1]
 
     if pow(2,tot_level) > sig_len:
-        # raise ValueError('length of signal is too short')
-        print(f'length ({sig_len}) of signal is too short (should be at least {pow(2,tot_level)}) to perform wavelet denoising')
+        # raise ValueError("length of signal is too short")
+        print(f"length ({sig_len}) of signal is too short (should be at least {pow(2,tot_level)}) to perform wavelet denoising")
         return False
     
     base_len = pow(2,tot_level)
@@ -596,9 +605,9 @@ def is_ecg_signal(s:ArrayLike, fs:int, wavelet_name:str='db6', verbose:int=0) ->
         s_padded = np.array(s)
 
     if verbose >= 1:
-        print(f'tot_level = {tot_level}, qrs_levels = {qrs_levels}')
-        print(f'sig_len = {sig_len}, padded length = {len(s_padded)-sig_len}')
-        print(f'shape of s_padded is {s_padded.shape}')
+        print(f"tot_level = {tot_level}, qrs_levels = {qrs_levels}")
+        print(f"sig_len = {sig_len}, padded length = {len(s_padded)-sig_len}")
+        print(f"shape of s_padded is {s_padded.shape}")
     
     # perform swt
     coeffs = pywt.swt(
@@ -630,17 +639,17 @@ def is_ecg_signal(s:ArrayLike, fs:int, wavelet_name:str='db6', verbose:int=0) ->
             for idx in range(nb_lines):
                 c = qrs_sig[idx*line_len:(idx+1)*line_len]
                 _, ax = plt.subplots(figsize=(default_fig_sz,6))
-                ax.plot(c, label=f'level {lv}')
-                ax.legend(loc='best')
-                ax.set_title(f'level {lv}', fontsize=24)
+                ax.plot(c, label=f"level {lv}")
+                ax.legend(loc="best")
+                ax.set_title(f"level {lv}", fontsize=24)
                 plt.show()
             c = qrs_sig[nb_lines*line_len:]  # tail left
             if len(c) > 0:
                 fig_sz = int(default_fig_sz*(len(s)-nb_lines*line_len)/line_len)
                 _, ax = plt.subplots(figsize=(fig_sz,6))
-                ax.plot(c, label=f'level {lv}')
-                ax.legend(loc='best')
-                ax.set_title(f'level {lv}', fontsize=24)
+                ax.plot(c, label=f"level {lv}")
+                ax.legend(loc="best")
+                ax.set_title(f"level {lv}", fontsize=24)
                 plt.show()
 
     qrs_power = np.power(np.sum(np.array(qrs_signals)[:,slice_len:-slice_len], axis=0), 2)
@@ -653,7 +662,7 @@ def is_ecg_signal(s:ArrayLike, fs:int, wavelet_name:str='db6', verbose:int=0) ->
     qrs_amp = np.percentile(qrs_amplitudes, 50) * 0.5
 
     if verbose >= 1:
-        print(f'qrs_amplitudes = {qrs_amplitudes}{nl}qrs_amp = {qrs_amp}')
+        print(f"qrs_amplitudes = {qrs_amplitudes}{nl}qrs_amp = {qrs_amp}")
 
     raw_r_peaks = detect_peaks(
         x=qrs_power,
@@ -665,7 +674,7 @@ def is_ecg_signal(s:ArrayLike, fs:int, wavelet_name:str='db6', verbose:int=0) ->
     raw_rr_intervals = np.diff(raw_r_peaks)*spacing
 
     if verbose >= 1:
-        print(f'raw_r_peaks = {raw_r_peaks.tolist()}{nl}raw_rr_intervals = {raw_rr_intervals.tolist()}')
+        print(f"raw_r_peaks = {raw_r_peaks.tolist()}{nl}raw_rr_intervals = {raw_rr_intervals.tolist()}")
         s_ = s[slice_len:-slice_len]
         if verbose >= 2:
             default_fig_sz = 120
@@ -675,34 +684,34 @@ def is_ecg_signal(s:ArrayLike, fs:int, wavelet_name:str='db6', verbose:int=0) ->
                 c = qrs_power[idx*line_len:(idx+1)*line_len]
                 c_s_ = s_[idx*line_len:(idx+1)*line_len]
                 _, ax = plt.subplots(figsize=(default_fig_sz,6))
-                ax.plot(c, color='blue')
+                ax.plot(c, color="blue")
                 c_r = [r for r in raw_r_peaks if idx*line_len<=r<(idx+1)*line_len]
                 for r in c_r:
-                    ax.axvline(r-idx*line_len, color='red', linestyle='dashed', linewidth=0.5)
-                ax.set_title('QRS power', fontsize=24)
+                    ax.axvline(r-idx*line_len, color="red", linestyle="dashed", linewidth=0.5)
+                ax.set_title("QRS power", fontsize=24)
                 ax2 = ax.twinx()
-                ax2.plot(c_s_, color='green')
+                ax2.plot(c_s_, color="green")
                 plt.show()
             c = qrs_power[nb_lines*line_len:]  # tail left
             c_s_ = s_[nb_lines*line_len:]
             if len(c) > 0:
                 fig_sz = int(default_fig_sz*(len(s)-nb_lines*line_len)/line_len)
                 _, ax = plt.subplots(figsize=(fig_sz,6))
-                ax.plot(c, color='blue')
+                ax.plot(c, color="blue")
                 c_r = [r for r in raw_r_peaks if nb_lines*line_len<=r]
                 for r in c_r:
-                    ax.axvline(r-nb_lines*line_len, color='red', linestyle='dashed', linewidth=0.5)
-                ax.set_title('QRS power', fontsize=24)
+                    ax.axvline(r-nb_lines*line_len, color="red", linestyle="dashed", linewidth=0.5)
+                ax.set_title("QRS power", fontsize=24)
                 ax2 = ax.twinx()
-                ax2.plot(c_s_, color='green')
+                ax2.plot(c_s_, color="green")
                 plt.show()
             # _, ax = plt.subplots(figsize=figsize)
-            # ax.plot(qrs_power, color='blue')
+            # ax.plot(qrs_power, color="blue")
             # for r in raw_r_peaks:
-            #     ax.axvline(r, color='red', linestyle='dashed', linewidth=0.5)
-            # ax.set_title('QRS power', fontsize=20)
+            #     ax.axvline(r, color="red", linestyle="dashed", linewidth=0.5)
+            # ax.set_title("QRS power", fontsize=20)
             # ax2 = ax.twinx()
-            # ax2.plot(s[slice_len:-slice_len], color='green', linestyle='dashed')
+            # ax2.plot(s[slice_len:-slice_len], color="green", linestyle="dashed")
             # plt.show()
 
     # TODO: compute entropy, std., etc. of raw_r_peaks
@@ -722,12 +731,19 @@ def is_ecg_signal(s:ArrayLike, fs:int, wavelet_name:str='db6', verbose:int=0) ->
     # TODO: compute confidence level via sample entropy
 
     if verbose >= 1:
-        print(f'overall is_ecg_confidence = {is_ecg_confidence}')
+        print(f"overall is_ecg_confidence = {is_ecg_confidence}")
     
     return True if is_ecg_confidence >= is_ecg_confidence_threshold else False
 
 
-def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:str='ecg', sides_mode:str='nearest', cval:int=0, verbose:int=0, **kwargs) -> NamedTuple:
+def wavelet_denoise(s:ArrayLike,
+                    fs:int,
+                    wavelet_name:str="db6",
+                    amplify_mode:str="ecg",
+                    sides_mode:str="nearest",
+                    cval:int=0,
+                    verbose:int=0,
+                    **kwargs:Any) -> NamedTuple:
     """ finished, to be improved,
 
     denoise and amplify (if necessary) signal `s`, using wavelet decomposition
@@ -738,31 +754,31 @@ def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:st
         the signal to be denoised
     fs: int,
         frequency of the signal `s`
-    wavelet_name: str, default 'db6'
+    wavelet_name: str, default "db6"
         name of the wavelet to use
-    amplify_mode: str, default 'ecg',
-        amplification mode, can be one of 'ecg', 'qrs', 'all', 'none'
-    sides_mode: str, default 'nearest',
+    amplify_mode: str, default "ecg",
+        amplification mode, can be one of "ecg", "qrs", "all", "none"
+    sides_mode: str, default "nearest",
         the way to treat the head and tail of the reconstructed (only if amplification is performed) signal,
-        implemented modes: 'nearest', 'mirror', 'wrap', 'constant', 'no_slicing'
-        not yet implemented mode(s): 'interp'
+        implemented modes: "nearest", "mirror", "wrap", "constant", "no_slicing"
+        not yet implemented mode(s): "interp"
     cval: int, default 0,
-        used only when `side_mode` is set 'constant'
+        used only when `side_mode` is set "constant"
     verbose: int, default 0,
         for detailedness of printing
 
     Returns:
     --------
-    WaveletDenoiseResult, with field_names: 'is_ecg', 'amplified_ratio', 'amplified_signal', 'raw_r_peaks'
+    WaveletDenoiseResult, with field_names: "is_ecg", "amplified_ratio", "amplified_signal", "raw_r_peaks"
     
     TODO:
     -----
     """
-    nl = '\n'
-    if amplify_mode not in ['ecg', 'qrs', 'all', 'none']:
+    nl = "\n"
+    if amplify_mode not in ["ecg", "qrs", "all", "none"]:
         raise ValueError("Invalid amplify_mode! amplify_mode must be one of "
         "'ecg', 'qrs', 'all', 'none'.")
-    if sides_mode not in ['nearest', 'mirror', 'wrap', 'constant', 'no_slicing', 'interp']:
+    if sides_mode not in ["nearest", "mirror", "wrap", "constant", "no_slicing", "interp"]:
         raise ValueError("Invalid sides_mode! sides_mode must be one of "
         "'nearest', 'mirror', 'wrap', 'constant', 'no_slicing', 'interp'.")
 
@@ -781,8 +797,8 @@ def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:st
     # standard_ecg_amplitude = 1100  # muV
     # need_amplification_threshold = 500  # muV
     # now can be set de hors
-    standard_ecg_amplitude = kwargs.get('standard_ecg_amplitude', 1100)
-    need_amplification_threshold = kwargs.get('need_amplification_threshold', 500)
+    standard_ecg_amplitude = kwargs.get("standard_ecg_amplitude", 1100)
+    need_amplification_threshold = kwargs.get("need_amplification_threshold", 500)
 
     high_confidence = 1.0
     low_confidence = 0.4
@@ -795,11 +811,11 @@ def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:st
         from utils.common import DEFAULT_FIG_SIZE_PER_SEC
         # figsize=(int(DEFAULT_FIG_SIZE_PER_SEC*len(s)/fs), 6)
 
-        print('(level 3 of) the wavelet used looks like:')
+        print("(level 3 of) the wavelet used looks like:")
         _, psi, x = pywt.Wavelet(wavelet_name).wavefun(level=3)
         _,ax = plt.subplots()
         ax.plot(x, psi)
-        ax.set_title(wavelet_name+' level 3')
+        ax.set_title(wavelet_name+" level 3")
         plt.show()
 
     qrs_freqs = [10, 40]  # Hz
@@ -817,8 +833,8 @@ def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:st
     tot_level = ecg_levels[-1]+1
 
     if pow(2,tot_level) > sig_len:
-        # raise ValueError('length of signal is too short')
-        print(f'length ({sig_len}) of signal is too short (should be at least {pow(2,tot_level)}) to perform wavelet denoising')
+        # raise ValueError("length of signal is too short")
+        print(f"length ({sig_len}) of signal is too short (should be at least {pow(2,tot_level)}) to perform wavelet denoising")
         ret = WaveletDenoiseResult(is_ecg=False, amplified_ratio=1.0, amplified_signal=deepcopy(s), raw_r_peaks=np.array([]), side_len=slice_len, wavelet_name=wavelet_name, wavelet_coeffs=[])
         return ret
     
@@ -830,9 +846,9 @@ def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:st
         s_padded = np.array(s)
 
     if verbose >= 1:
-        print(f'tot_level = {tot_level}, qrs_levels = {qrs_levels}, ecg_levels = {ecg_levels}')
-        print(f'sig_len = {sig_len}, padded length = {len(s_padded)-sig_len}')
-        print(f'shape of s_padded is {s_padded.shape}')
+        print(f"tot_level = {tot_level}, qrs_levels = {qrs_levels}, ecg_levels = {ecg_levels}")
+        print(f"sig_len = {sig_len}, padded length = {len(s_padded)-sig_len}")
+        print(f"shape of s_padded is {s_padded.shape}")
     
     # perform swt
     raw_coeffs = pywt.swt(
@@ -864,17 +880,17 @@ def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:st
             for idx in range(nb_lines):
                 c = qrs_sig[idx*line_len:(idx+1)*line_len]
                 _, ax = plt.subplots(figsize=(default_fig_sz,6))
-                ax.plot(c, label=f'level {lv}')
-                ax.legend(loc='best')
-                ax.set_title(f'level {lv}', fontsize=24)
+                ax.plot(c, label=f"level {lv}")
+                ax.legend(loc="best")
+                ax.set_title(f"level {lv}", fontsize=24)
                 plt.show()
             c = qrs_sig[nb_lines*line_len:]  # tail left
             if len(c) > 0:
                 fig_sz = int(default_fig_sz*(len(s)-nb_lines*line_len)/line_len)
                 _, ax = plt.subplots(figsize=(fig_sz,6))
-                ax.plot(c, label=f'level {lv}')
-                ax.legend(loc='best')
-                ax.set_title(f'level {lv}', fontsize=24)
+                ax.plot(c, label=f"level {lv}")
+                ax.legend(loc="best")
+                ax.set_title(f"level {lv}", fontsize=24)
                 plt.show()
 
     qrs_power = np.power(np.sum(np.array(qrs_signals)[:,slice_len:-slice_len], axis=0), 2)
@@ -887,7 +903,7 @@ def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:st
     qrs_amp = np.percentile(qrs_amplitudes, 50) * 0.5
 
     if verbose >= 1:
-        print(f'qrs_amplitudes = {qrs_amplitudes}{nl}qrs_amp = {qrs_amp}')
+        print(f"qrs_amplitudes = {qrs_amplitudes}{nl}qrs_amp = {qrs_amp}")
 
     raw_r_peaks = detect_peaks(
         x=qrs_power,
@@ -899,7 +915,7 @@ def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:st
     raw_rr_intervals = np.diff(raw_r_peaks)*spacing
 
     if verbose >= 1:
-        print(f'raw_r_peaks = {raw_r_peaks.tolist()}{nl}raw_rr_intervals = {raw_rr_intervals.tolist()}')
+        print(f"raw_r_peaks = {raw_r_peaks.tolist()}{nl}raw_rr_intervals = {raw_rr_intervals.tolist()}")
         s_ = s[slice_len:-slice_len]
         if verbose >= 2:
             default_fig_sz = 120
@@ -909,34 +925,34 @@ def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:st
                 c = qrs_power[idx*line_len:(idx+1)*line_len]
                 c_s_ = s_[idx*line_len:(idx+1)*line_len]
                 _, ax = plt.subplots(figsize=(default_fig_sz,6))
-                ax.plot(c, color='blue')
+                ax.plot(c, color="blue")
                 c_r = [r for r in raw_r_peaks if idx*line_len<=r<(idx+1)*line_len]
                 for r in c_r:
-                    ax.axvline(r-idx*line_len, color='red', linestyle='dashed', linewidth=0.5)
-                ax.set_title('QRS power', fontsize=24)
+                    ax.axvline(r-idx*line_len, color="red", linestyle="dashed", linewidth=0.5)
+                ax.set_title("QRS power", fontsize=24)
                 ax2 = ax.twinx()
-                ax2.plot(c_s_, color='green')
+                ax2.plot(c_s_, color="green")
                 plt.show()
             c = qrs_power[nb_lines*line_len:]  # tail left
             c_s_ = s_[nb_lines*line_len:]
             if len(c) > 0:
                 fig_sz = int(default_fig_sz*(len(s)-nb_lines*line_len)/line_len)
                 _, ax = plt.subplots(figsize=(fig_sz,6))
-                ax.plot(c, color='blue')
+                ax.plot(c, color="blue")
                 c_r = [r for r in raw_r_peaks if nb_lines*line_len<=r]
                 for r in c_r:
-                    ax.axvline(r-nb_lines*line_len, color='red', linestyle='dashed', linewidth=0.5)
-                ax.set_title('QRS power', fontsize=24)
+                    ax.axvline(r-nb_lines*line_len, color="red", linestyle="dashed", linewidth=0.5)
+                ax.set_title("QRS power", fontsize=24)
                 ax2 = ax.twinx()
-                ax2.plot(c_s_, color='green')
+                ax2.plot(c_s_, color="green")
                 plt.show()
             # _, ax = plt.subplots(figsize=figsize)
-            # ax.plot(qrs_power, color='blue')
+            # ax.plot(qrs_power, color="blue")
             # for r in raw_r_peaks:
-            #     ax.axvline(r, color='red', linestyle='dashed', linewidth=0.5)
-            # ax.set_title('QRS power', fontsize=20)
+            #     ax.axvline(r, color="red", linestyle="dashed", linewidth=0.5)
+            # ax.set_title("QRS power", fontsize=20)
             # ax2 = ax.twinx()
-            # ax2.plot(s[slice_len:-slice_len], color='green', linestyle='dashed')
+            # ax2.plot(s[slice_len:-slice_len], color="green", linestyle="dashed")
             # plt.show()
 
     # TODO: compute entropy, std., etc. of raw_r_peaks
@@ -956,7 +972,7 @@ def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:st
     # TODO: compute confidence level via sample entropy
 
     if verbose >= 1:
-        print(f'overall is_ecg_confidence = {is_ecg_confidence}')
+        print(f"overall is_ecg_confidence = {is_ecg_confidence}")
     
     if is_ecg_confidence >= is_ecg_confidence_threshold:
         qrs_amplitudes = []
@@ -972,15 +988,15 @@ def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:st
         else:
             amplify_ratio = 1.0
 
-        if amplify_mode != 'none' and amplify_ratio > 1.0:
+        if amplify_mode != "none" and amplify_ratio > 1.0:
             c_ = deepcopy(coeffs)  # or deepcopy(zero_coeffs)?
             # c_ = deepcopy(zero_coeffs)
 
-            if amplify_mode == 'ecg':
+            if amplify_mode == "ecg":
                 levels_in_use = [ecg_levels[0], ecg_levels[-1]-2]
-            elif amplify_mode == 'qrs':
+            elif amplify_mode == "qrs":
                 levels_in_use = [qrs_levels[0]-1, qrs_levels[-1]+1]
-            elif amplify_mode == 'all':
+            elif amplify_mode == "all":
                 levels_in_use = [1, ecg_levels[-1]+1]
             # for lv in range(qrs_levels[0]-1, qrs_levels[-1]+2):
             # for lv in range(qrs_levels[0]-1, qrs_levels[-1]+1):
@@ -993,29 +1009,29 @@ def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:st
             s_rec = np.vectorize(lambda n: int(round(n)))(s_rec)
 
             # add head and tail
-            if sides_mode == 'nearest':
+            if sides_mode == "nearest":
                 s_rec[:slice_len] = s_rec[slice_len]
                 s_rec[-slice_len:] = s_rec[-slice_len-1]
-            elif sides_mode == 'mirror':
+            elif sides_mode == "mirror":
                 s_rec[:slice_len] = s_rec[2*slice_len-1:slice_len-1:-1]
                 s_rec[-slice_len:] = s_rec[-slice_len-1:-2*slice_len-1:-1]
-            elif sides_mode == 'wrap':
+            elif sides_mode == "wrap":
                 s_rec[:slice_len] = s_rec[-2*slice_len:-slice_len] + (s_rec[slice_len]-s_rec[slice_len-1])
                 s_rec[-slice_len:] = s_rec[slice_len:2*slice_len] + (s_rec[-slice_len]-s_rec[-slice_len-1])
-            elif sides_mode == 'constant':
+            elif sides_mode == "constant":
                 s_rec[:slice_len] = cval
                 s_rec[-slice_len:] = cval
-            elif sides_mode == 'no_slicing':
+            elif sides_mode == "no_slicing":
                 pass  # do nothing to head and tail of s_rec
-            elif sides_mode == 'interp':
+            elif sides_mode == "interp":
                 raise ValueError("Invalid sides_mode! sides_mode 'interp' not implemented yet!")
         else: # set no amplification, or need no amplification
             levels_in_use = [np.nan, np.nan]
             s_rec = deepcopy(s)
         
         if verbose >= 1:
-            print(f'levels used for the purpose of amplification are {levels_in_use[0]} to {levels_in_use[1]-1} (inclusive)')
-            print(f'amplify_ratio = {amplify_ratio}{nl}qrs_amplitudes = {qrs_amplitudes}')
+            print(f"levels used for the purpose of amplification are {levels_in_use[0]} to {levels_in_use[1]-1} (inclusive)")
+            print(f"amplify_ratio = {amplify_ratio}{nl}qrs_amplitudes = {qrs_amplitudes}")
             if verbose >= 2:
                 default_fig_sz = 120
                 line_len = fs * 25  # 25 seconds
@@ -1024,24 +1040,24 @@ def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:st
                     c_rec = s_rec[idx*line_len:(idx+1)*line_len]
                     c = s[idx*line_len:(idx+1)*line_len]
                     _, ax = plt.subplots(figsize=(default_fig_sz,6))
-                    ax.plot(c_rec,color='red')
+                    ax.plot(c_rec,color="red")
                     ax.plot(c,alpha=0.6)
-                    ax.set_title('signal amplified', fontsize=24)
+                    ax.set_title("signal amplified", fontsize=24)
                     c_r = [r for r in raw_r_peaks if idx*line_len<=r<(idx+1)*line_len]
                     for r in c_r:
-                        ax.axvline(r-idx*line_len, color='red', linestyle='dashed', linewidth=0.5)
+                        ax.axvline(r-idx*line_len, color="red", linestyle="dashed", linewidth=0.5)
                     plt.show()
                 c_rec = s_rec[nb_lines*line_len:]  # tail left
                 c = s[nb_lines*line_len:]
                 if len(c) > 0:
                     fig_sz = int(default_fig_sz*(len(s)-nb_lines*line_len)/line_len)
                     _, ax = plt.subplots(figsize=(fig_sz,6))
-                    ax.plot(c_rec,color='red')
+                    ax.plot(c_rec,color="red")
                     ax.plot(c,alpha=0.6)
-                    ax.set_title('signal amplified', fontsize=24)
+                    ax.set_title("signal amplified", fontsize=24)
                     c_r = [r for r in raw_r_peaks if nb_lines*line_len<=r]
                     for r in c_r:
-                        ax.axvline(r-nb_lines*line_len, color='red', linestyle='dashed', linewidth=0.5)
+                        ax.axvline(r-nb_lines*line_len, color="red", linestyle="dashed", linewidth=0.5)
                     plt.show()
         
         ret = WaveletDenoiseResult(is_ecg=True, amplified_ratio=amplify_ratio, amplified_signal=s_rec, raw_r_peaks=raw_r_peaks, side_len=slice_len, wavelet_name=wavelet_name, wavelet_coeffs=raw_coeffs)
@@ -1052,7 +1068,10 @@ def wavelet_denoise(s:ArrayLike, fs:int, wavelet_name:str='db6', amplify_mode:st
     return ret
 
 
-def wavelet_rec_iswt(coeffs:List[List[np.ndarray]], levels:ArrayLike_Int, wavelet_name:str, verbose:int=0) -> np.ndarray:
+def wavelet_rec_iswt(coeffs:List[List[np.ndarray]],
+                     levels:ArrayLike_Int,
+                     wavelet_name:str,
+                     verbose:int=0) -> np.ndarray:
     """ finished, checked,
 
     reconstruct signal, using pywt.iswt, using coefficients obtained by pywt.swt of level in `levels`
@@ -1079,10 +1098,10 @@ def wavelet_rec_iswt(coeffs:List[List[np.ndarray]], levels:ArrayLike_Int, wavele
     nb_levels = len(coeffs)
 
     if verbose >= 1:
-        print(f'sig_shape = {sig_shape}, nb_levels = {nb_levels}')
+        print(f"sig_shape = {sig_shape}, nb_levels = {nb_levels}")
     
     if (nb_levels < np.array(levels)).any():
-        raise ValueError('Invalid levels')
+        raise ValueError("Invalid levels")
     
     c_ = [[np.zeros(sig_shape),np.zeros(sig_shape)] for _ in range(nb_levels)]
     for lv in levels:
@@ -1097,7 +1116,13 @@ def wavelet_rec_iswt(coeffs:List[List[np.ndarray]], levels:ArrayLike_Int, wavele
     return sig_rec
 
 
-def resample_irregular_timeseries(s:ArrayLike, output_fs:Real=2, method:str="spline", return_with_time:bool=False, tnew:Optional[ArrayLike]=None, interp_kw:dict={}, verbose:int=0) -> np.ndarray:
+def resample_irregular_timeseries(s:ArrayLike,
+                                  output_fs:Real=2,
+                                  method:str="spline",
+                                  return_with_time:bool=False,
+                                  tnew:Optional[ArrayLike]=None,
+                                  interp_kw:dict={},
+                                  verbose:int=0) -> np.ndarray:
     """ finished, checked,
 
     resample the 2d irregular timeseries `s` into a 1d or 2d regular time series with frequency `output_fs`,
@@ -1110,7 +1135,7 @@ def resample_irregular_timeseries(s:ArrayLike, output_fs:Real=2, method:str="spl
     output_fs: Real, default 2,
         the frequency of the output 1d regular timeseries
     method: str, default "spline"
-        interpolation method, can be 'spline' or 'interp1d'
+        interpolation method, can be "spline" or "interp1d"
     return_with_time: bool, default False,
         return a 2d array, with the 0-th coordinate being time
     tnew: array_like, optional,
@@ -1120,7 +1145,7 @@ def resample_irregular_timeseries(s:ArrayLike, output_fs:Real=2, method:str="spl
 
     Returns:
     --------
-    np.ndarray, a 1d or 2d regular time series with frequency `output_freq`
+    np.ndarray, a 1d or 2d regular time series with frequency `output_fs`
 
     NOTE:
     pandas also has the function to regularly resample irregular timeseries
@@ -1143,9 +1168,9 @@ def resample_irregular_timeseries(s:ArrayLike, output_fs:Real=2, method:str="spl
         xnew = np.array(tnew)
 
     if verbose >= 1:
-        print(f'time_series start ts = {time_series[0][0]}, end ts = {time_series[-1][0]}')
-        print(f'tot_len = {tot_len}')
-        print(f'xnew start = {xnew[0]}, end = {xnew[-1]}')
+        print(f"time_series start ts = {time_series[0][0]}, end ts = {time_series[-1][0]}")
+        print(f"tot_len = {tot_len}")
+        print(f"xnew start = {xnew[0]}, end = {xnew[-1]}")
 
     if method == "spline":
         m = len(time_series)
@@ -1168,7 +1193,14 @@ def resample_irregular_timeseries(s:ArrayLike, output_fs:Real=2, method:str="spl
         return regular_timeseries
 
 
-def resample_discontinuous_irregular_timeseries(s:ArrayLike, allowd_gap:Optional[Real]=None,output_fs:Real=2, method:str="spline", return_with_time:bool=True, tnew:Optional[ArrayLike]=None, options:dict={}, verbose:int=0) -> List[np.ndarray]:
+def resample_discontinuous_irregular_timeseries(s:ArrayLike,
+                                                allowd_gap:Optional[Real]=None,
+                                                output_fs:Real=2,
+                                                method:str="spline",
+                                                return_with_time:bool=True,
+                                                tnew:Optional[ArrayLike]=None,
+                                                options:dict={},
+                                                verbose:int=0) -> List[np.ndarray]:
     """ finished, checked,
 
     resample the 2d discontinuous irregular timeseries `s` into a list of 1d or 2d regular time series with frequency `output_fs`,
@@ -1182,7 +1214,7 @@ def resample_discontinuous_irregular_timeseries(s:ArrayLike, allowd_gap:Optional
     output_fs: Real, default 2,
         the frequency of the output 1d regular timeseries
     method: str, default "spline"
-        interpolation method, can be 'spline' or 'interp1d'
+        interpolation method, can be "spline" or "interp1d"
     return_with_time: bool, default False,
         return a 2d array, with the 0-th coordinate being time
     tnew: array_like, optional,
@@ -1230,7 +1262,11 @@ def sft(s:ArrayLike) -> np.ndarray:
     return np.array([(_s*np.exp(-2*np.pi*1j*n*tmp/N)).sum() for n in range(N)])
 
 
-def butter_bandpass(lowcut:Real, highcut:Real, fs:Real, order:int, verbose:int=0) -> Tuple[np.ndarray, np.ndarray]:
+def butter_bandpass(lowcut:Real,
+                    highcut:Real,
+                    fs:Real,
+                    order:int,
+                    verbose:int=0) -> Tuple[np.ndarray, np.ndarray]:
     """ finished, checked,
 
     Butterworth Bandpass Filter Design
@@ -1273,25 +1309,30 @@ def butter_bandpass(lowcut:Real, highcut:Real, fs:Real, order:int, verbose:int=0
     
     if low <= 0:
         Wn = high
-        btype = 'low'
+        btype = "low"
     elif high >= 1:
         Wn = low
-        btype = 'high'
+        btype = "high"
     elif lowcut==highcut:
         Wn = high
-        btype = 'low'
+        btype = "low"
     else:
         Wn = [low, high]
-        btype = 'band'
+        btype = "band"
     
     if verbose >= 1:
-        print(f'by the setup of lowcut and highcut, the filter type falls to {btype}, with Wn = {Wn}')
+        print(f"by the setup of lowcut and highcut, the filter type falls to {btype}, with Wn = {Wn}")
     
     b, a = butter(order, Wn, btype=btype)
     return b, a
 
 
-def butter_bandpass_filter(data:ArrayLike, lowcut:Real, highcut:Real, fs:Real, order:int, verbose:int=0) -> np.ndarray:
+def butter_bandpass_filter(data:ArrayLike,
+                           lowcut:Real,
+                           highcut:Real,
+                           fs:Real,
+                           order:int,
+                           verbose:int=0) -> np.ndarray:
     """ finished, checked,
 
     Butterworth Bandpass
@@ -1325,7 +1366,11 @@ def butter_bandpass_filter(data:ArrayLike, lowcut:Real, highcut:Real, fs:Real, o
     return y
 
 
-def hampel(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_outlier:bool=True, use_jit:bool=False) -> Union[np.ndarray, Tuple[np.ndarray, List[int]]]:
+def hampel(input_series:ArrayLike,
+           window_size:int,
+           n_sigmas:int=3,
+           return_outlier:bool=True,
+           use_jit:bool=False) -> Union[np.ndarray, Tuple[np.ndarray, List[int]]]:
     """ finished, not checked, (potentially with bugs)
 
     Hampel filter
@@ -1368,7 +1413,10 @@ def hampel(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_outli
     return new_series, outlier_indices
 
 @jit(nopython=True)
-def _hampel_jit(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_outlier:bool=True) -> Union[np.ndarray, Tuple[np.ndarray, List[int]]]:
+def _hampel_jit(input_series:ArrayLike,
+                window_size:int,
+                n_sigmas:int=3,
+                return_outlier:bool=True) -> Union[np.ndarray, Tuple[np.ndarray, List[int]]]:
     """
     ref. hampel
     """
@@ -1388,7 +1436,10 @@ def _hampel_jit(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_
     else:
         return new_series
 
-def _hampel(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_outlier:bool=True) -> Union[np.ndarray, Tuple[np.ndarray, List[int]]]:
+def _hampel(input_series:ArrayLike,
+            window_size:int,
+            n_sigmas:int=3,
+            return_outlier:bool=True) -> Union[np.ndarray, Tuple[np.ndarray, List[int]]]:
     """
     ref. hampel
     """
@@ -1409,7 +1460,11 @@ def _hampel(input_series:ArrayLike, window_size:int, n_sigmas:int=3, return_outl
         return new_series
 
 
-def detect_flat_lines(s:np.ndarray, window:int, tolerance:Real=0, verbose:int=0, **kwargs) -> Tuple[np.ndarray, float]:
+def detect_flat_lines(s:np.ndarray,
+                      window:int,
+                      tolerance:Real=0,
+                      verbose:int=0,
+                      **kwargs:Any) -> Tuple[np.ndarray, float]:
     """ finished, checked,
 
     detect flat (with tolerance) lines of length >= `window`
@@ -1421,7 +1476,7 @@ def detect_flat_lines(s:np.ndarray, window:int, tolerance:Real=0, verbose:int=0,
     window: int,
         size (length) of the detection window
     tolerance: real, default 0,
-        difference within `tolerance` will be considered 'flat'
+        difference within `tolerance` will be considered "flat"
     verbose: int, default 0,
 
     Returns:
@@ -1445,12 +1500,12 @@ def detect_flat_lines(s:np.ndarray, window:int, tolerance:Real=0, verbose:int=0,
     for i in range(1, window):
         flat_locs[i:] = np.bitwise_or(flat_locs[i:], tmp[:-i])
     if verbose >= 2:
-        if 'plt' not in dir():
+        if "plt" not in dir():
             import matplotlib.pyplot as plt
         fig, ax = plt.subplots(figsize=(n/125*4,6))
         x = np.arange(n)
         ax.plot(x, s)
-        ax.scatter(x[flat_locs==1], s[flat_locs==1], color='red')
+        ax.scatter(x[flat_locs==1], s[flat_locs==1], color="red")
     flat_prop = np.sum(flat_locs)/n
     return flat_locs, flat_prop
 
@@ -1464,7 +1519,7 @@ class MovingAverage(object):
     -----------
     [1] https://en.wikipedia.org/wiki/Moving_average
     """
-    def __init__(self, data:ArrayLike, **kwargs):
+    def __init__(self, data:ArrayLike, **kwargs:Any) -> NoReturn:
         """
         Parameters:
         -----------
@@ -1474,31 +1529,31 @@ class MovingAverage(object):
         self.data = np.array(data)
         self.verbose = kwargs.get("verbose", 0)
 
-    def cal(self, method:str, **kwargs) -> np.ndarray:
+    def cal(self, method:str, **kwargs:Any) -> np.ndarray:
         """
         Parameters:
         -----------
         method: str,
             method for computing moving average, can be one of
-            - 'sma', 'simple', 'simple moving average'
-            - 'ema', 'ewma', 'exponential', 'exponential weighted', 'exponential moving average', 'exponential weighted moving average'
-            - 'cma', 'cumulative', 'cumulative moving average'
-            - 'wma', 'weighted', 'weighted moving average'
+            - "sma", "simple", "simple moving average"
+            - "ema", "ewma", "exponential", "exponential weighted", "exponential moving average", "exponential weighted moving average"
+            - "cma", "cumulative", "cumulative moving average"
+            - "wma", "weighted", "weighted moving average"
         """
-        m = method.lower().replace('_', ' ')
-        if m in ['sma', 'simple', 'simple moving average']:
+        m = method.lower().replace("_", " ")
+        if m in ["sma", "simple", "simple moving average"]:
             func = self._sma
-        elif m in ['ema', 'ewma', 'exponential', 'exponential weighted', 'exponential moving average', 'exponential weighted moving average']:
+        elif m in ["ema", "ewma", "exponential", "exponential weighted", "exponential moving average", "exponential weighted moving average"]:
             func = self._ema
-        elif m in ['cma', 'cumulative', 'cumulative moving average']:
+        elif m in ["cma", "cumulative", "cumulative moving average"]:
             func = self._cma
-        elif m in ['wma', 'weighted', 'weighted moving average']:
+        elif m in ["wma", "weighted", "weighted moving average"]:
             func = self._wma
         else:
             raise NotImplementedError
         return func(**kwargs)
 
-    def _sma(self, window:int=5, center:bool=False, **kwargs) -> np.ndarray:
+    def _sma(self, window:int=5, center:bool=False, **kwargs:Any) -> np.ndarray:
         """
         simple moving average
 
@@ -1529,7 +1584,7 @@ class MovingAverage(object):
                 smoothed[-n-1] = np.mean(self.data[-n-hw-1:])
         return smoothed
 
-    def _ema(self, weight:float=0.6, **kwargs) -> np.ndarray:
+    def _ema(self, weight:float=0.6, **kwargs:Any) -> np.ndarray:
         """
         exponential moving average,
         which is also the function used in Tensorboard Scalar panel,
@@ -1562,7 +1617,7 @@ class MovingAverage(object):
         smoothed = np.array(smoothed)
         return smoothed
 
-    def _wma(self, window:int=5, **kwargs) -> np.ndarray:
+    def _wma(self, window:int=5, **kwargs:Any) -> np.ndarray:
         """
         weighted moving average
 
@@ -1576,11 +1631,15 @@ class MovingAverage(object):
         # numerator = []
         conv = np.arange(1, window+1)[::-1]
         deno = np.sum(conv)
-        smoothed = np.convolve(conv, self.data, mode='same') / deno
+        smoothed = np.convolve(conv, self.data, mode="same") / deno
         return smoothed
 
 
-def smooth(x:np.ndarray, window_len:int=11, window:str='hanning', mode:str='valid', keep_dtype:bool=True) -> np.ndarray:
+def smooth(x:np.ndarray,
+           window_len:int=11,
+           window:str="hanning",
+           mode:str="valid",
+           keep_dtype:bool=True) -> np.ndarray:
     """ finished, checked,
     
     smooth the 1d data using a window with requested size.
@@ -1597,10 +1656,10 @@ def smooth(x:np.ndarray, window_len:int=11, window:str='hanning', mode:str='vali
     window_len: int, default 11,
         the length of the smoothing window,
         (previously should be an odd integer, currently can be any (positive) integer)
-    window: str, default 'hanning',
-        the type of window from 'flat', 'hanning', 'hamming', 'bartlett', 'blackman',
+    window: str, default "hanning",
+        the type of window from "flat", "hanning", "hamming", "bartlett", "blackman",
         flat window will produce a moving average smoothing
-    mode: str, default 'valid',
+    mode: str, default "valid",
         ref. `np.convolve`
     keep_dtype: bool, default True,
         dtype of the returned value keeps the same with that of `x` or not
@@ -1642,15 +1701,15 @@ def smooth(x:np.ndarray, window_len:int=11, window:str='hanning', mode:str='vali
     if radius < 3:
         return x
     
-    if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
+    if not window in ["flat", "hanning", "hamming", "bartlett", "blackman"]:
         raise ValueError("Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'")
 
     s = np.r_[x[radius-1:0:-1], x, x[-2:-radius-1:-1]]
     #print(len(s))
-    if window == 'flat': #moving average
-        w = np.ones(radius,'d')
+    if window == "flat": #moving average
+        w = np.ones(radius,"d")
     else:
-        w = eval(f'np.{window}({radius})')
+        w = eval(f"np.{window}({radius})")
 
     y = np.convolve(w/w.sum(), s, mode=mode)
     y = y[(radius//2-1):-(radius//2)-1]
@@ -1662,7 +1721,9 @@ def smooth(x:np.ndarray, window_len:int=11, window:str='hanning', mode:str='vali
     return y
 
 
-def ensure_lead_fmt(values:Sequence[Real], n_leads:int=12, fmt:str="lead_first") -> np.ndarray:
+def ensure_lead_fmt(values:Sequence[Real],
+                    n_leads:int=12,
+                    fmt:str="lead_first") -> np.ndarray:
     """ finished, checked,
 
     ensure the `n_leads`-lead (ECG) signal to be of the format of `fmt`
@@ -1717,7 +1778,12 @@ def gen_gaussian_noise(siglen:int, mean:Real=0, std:Real=0) -> np.ndarray:
     return gn
 
 
-def gen_sinusoidal_noise(siglen:int, start_phase:Real, end_phase:Real, amplitude:Real, amplitude_mean:Real=0, amplitude_std:Real=0) -> np.ndarray:
+def gen_sinusoidal_noise(siglen:int,
+                         start_phase:Real,
+                         end_phase:Real,
+                         amplitude:Real,
+                         amplitude_mean:Real=0,
+                         amplitude_std:Real=0) -> np.ndarray:
     """ finished, checked,
 
     generate 1d sinusoidal noise of given length, amplitude, start phase, and end phase
@@ -1748,7 +1814,12 @@ def gen_sinusoidal_noise(siglen:int, start_phase:Real, end_phase:Real, amplitude
     return sn
 
 
-def gen_baseline_wander(siglen:int, fs:Real, bw_fs:Union[Real,Sequence[Real]], amplitude:Union[Real,Sequence[Real]], amplitude_mean:Real=0, amplitude_std:Real=0) -> np.ndarray:
+def gen_baseline_wander(siglen:int,
+                        fs:Real,
+                        bw_fs:Union[Real,Sequence[Real]],
+                        amplitude:Union[Real,Sequence[Real]],
+                        amplitude_mean:Real=0,
+                        amplitude_std:Real=0) -> np.ndarray:
     """ finished, checked,
 
     generate 1d baseline wander of given length, amplitude, and frequency

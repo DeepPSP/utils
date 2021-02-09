@@ -38,7 +38,7 @@ import os
 import wave
 from collections import namedtuple
 from numbers import Real
-from typing import Union, Optional, List, NoReturn
+from typing import Union, Optional, List, NoReturn, Any
 
 import librosa
 import parselmouth as pm
@@ -84,7 +84,12 @@ class Voice(object):
     2. better plot
     3. more voice features
     """
-    def __init__(self, values:Optional[np.ndarray]=None, fs:Optional[Real]=None, start_time:Optional[Real]=None, l_file_path:Optional[List[str]]=None, **kwargs):
+    def __init__(self,
+                 values:Optional[np.ndarray]=None,
+                 fs:Optional[Real]=None,
+                 start_time:Optional[Real]=None,
+                 l_file_path:Optional[List[str]]=None,
+                 **kwargs:Any) -> NoReturn:
         """
         Parameter:
         ----------
@@ -154,7 +159,7 @@ class Voice(object):
         self.f2_slope = []
     
 
-    def load(self, backend:str="librosa", **kwargs) -> NoReturn:
+    def load(self, backend:str="librosa", **kwargs:Any) -> NoReturn:
         """ partly finished,
 
         Parameters:
@@ -251,7 +256,11 @@ class Voice(object):
         self.reset()
 
 
-    def save(self, filename:str, fmt:Optional[str]="wav", fs:Optional[Real]=None, **kwargs):
+    def save(self,
+             filename:str,
+             fmt:Optional[str]="wav",
+             fs:Optional[Real]=None,
+             **kwargs:Any) -> NoReturn:
         """
 
         Parameters:
@@ -288,7 +297,7 @@ class Voice(object):
         raise NotImplementedError
 
 
-    def bandpass_filter(self, **kwargs) -> NoReturn:
+    def bandpass_filter(self, **kwargs:Any) -> NoReturn:
         """ finished,
 
         Parameters:
@@ -315,7 +324,11 @@ class Voice(object):
 # low level features
 
     @indicator_enter_leave_func(verbose=_VERBOSE_LEVEL)
-    def obtain_intensity(self, backend:str="praat", time_range:Optional[ArrayLike]=None, is_filtered:bool=False, **kwargs) -> NoReturn:
+    def obtain_intensity(self,
+                         backend:str="praat",
+                         time_range:Optional[ArrayLike]=None,
+                         is_filtered:bool=False,
+                         **kwargs:Any) -> NoReturn:
         """ partly finished,
 
         Parameters:
@@ -361,7 +374,10 @@ class Voice(object):
             raise NotImplementedError
     
     @indicator_enter_leave_func(verbose=_VERBOSE_LEVEL)
-    def obtain_pitches(self, backend:str="praat", time_range:Optional[ArrayLike]=None, **kwargs) -> NoReturn:
+    def obtain_pitches(self,
+                       backend:str="praat",
+                       time_range:Optional[ArrayLike]=None,
+                       **kwargs:Any) -> NoReturn:
         """ partly finished,
 
         Parameters:
@@ -424,7 +440,10 @@ class Voice(object):
             raise NotImplementedError
     
     @indicator_enter_leave_func(verbose=_VERBOSE_LEVEL)
-    def obtain_formants(self, backend:str="praat", time_range:Optional[ArrayLike]=None, **kwargs) -> NoReturn:
+    def obtain_formants(self,
+                        backend:str="praat",
+                        time_range:Optional[ArrayLike]=None,
+                        **kwargs:Any) -> NoReturn:
         """ partly finished,
 
         Parameters:
@@ -462,7 +481,11 @@ class Voice(object):
             raise NotImplementedError
 
     @indicator_enter_leave_func(verbose=_VERBOSE_LEVEL)
-    def obtain_formants_with_power(self, backend:str="praat", time_range:Optional[ArrayLike]=None, kw_formants:Optional[dict]=None, kw_power:Optional[dict]=None) -> NoReturn:
+    def obtain_formants_with_power(self,
+                                   backend:str="praat",
+                                   time_range:Optional[ArrayLike]=None,
+                                   kw_formants:Optional[dict]=None,
+                                   kw_power:Optional[dict]=None) -> NoReturn:
         """ partly finished,
 
         Parameters:
@@ -512,7 +535,10 @@ class Voice(object):
             raise NotImplementedError
 
     @indicator_enter_leave_func(verbose=_VERBOSE_LEVEL)
-    def obtain_harmonicity(self, backend:str="praat", time_range:Optional[ArrayLike]=None, **kwargs) -> NoReturn:
+    def obtain_harmonicity(self,
+                           backend:str="praat",
+                           time_range:Optional[ArrayLike]=None,
+                           **kwargs:Any) -> NoReturn:
         """ partly finished,
 
         Parameters:
@@ -542,7 +568,10 @@ class Voice(object):
             raise NotImplementedError
     
     @indicator_enter_leave_func(verbose=_VERBOSE_LEVEL)
-    def obtain_spectrogram(self, backend:str="praat", time_range:Optional[ArrayLike]=None, **kwargs) -> NoReturn:
+    def obtain_spectrogram(self,
+                           backend:str="praat",
+                           time_range:Optional[ArrayLike]=None,
+                           **kwargs:Any) -> NoReturn:
         """ not finished,
 
         Parameters:
@@ -573,7 +602,10 @@ class Voice(object):
             raise NotImplementedError
 
     @indicator_enter_leave_func(verbose=_VERBOSE_LEVEL)
-    def obtain_melspectrogram(self, backend:str="librosa", time_range:Optional[ArrayLike]=None, **kwargs):
+    def obtain_melspectrogram(self,
+                              backend:str="librosa",
+                              time_range:Optional[ArrayLike]=None,
+                              **kwargs:Any) -> NoReturn:
         """ not finished,
 
         kwargs for "praat":
@@ -605,7 +637,10 @@ class Voice(object):
             raise NotImplementedError
 
     @indicator_enter_leave_func(verbose=_VERBOSE_LEVEL)
-    def obtain_spectrum(self, backend:str="praat", time_range:Optional[ArrayLike]=None, **kwargs) -> NoReturn:
+    def obtain_spectrum(self,
+                        backend:str="praat",
+                        time_range:Optional[ArrayLike]=None,
+                        **kwargs:Any) -> NoReturn:
         """ not finished,
 
         Parameters:
@@ -632,7 +667,10 @@ class Voice(object):
             raise NotImplementedError
 
     @indicator_enter_leave_func(verbose=_VERBOSE_LEVEL)
-    def obtain_mfcc(self, backend:str="praat", time_range:Optional[ArrayLike]=None, **kwargs) -> NoReturn:
+    def obtain_mfcc(self,
+                    backend:str="praat",
+                    time_range:Optional[ArrayLike]=None,
+                    **kwargs:Any) -> NoReturn:
         """ not finished,
 
         Parameters:
@@ -670,7 +708,10 @@ class Voice(object):
             raise NotImplementedError
 
     @indicator_enter_leave_func(verbose=_VERBOSE_LEVEL)
-    def obtain_jitter(self, backend:str="praat", time_range:Optional[ArrayLike]=None, **kwargs) -> NoReturn:
+    def obtain_jitter(self,
+                      backend:str="praat",
+                      time_range:Optional[ArrayLike]=None,
+                      **kwargs:Any) -> NoReturn:
         """ partly finished,
 
         Jitter is time distortions of recording/playback of a digital audio signal, a deviation of time between the digital and analog samples (deviation of sampling rate)
@@ -711,7 +752,11 @@ class Voice(object):
             raise NotImplementedError
 
 
-    def equalize(self, freqs:List[ArrayLike], gains:Union[List[Real],Real], inplace:bool=False, **kwargs):
+    def equalize(self,
+                 freqs:List[ArrayLike],
+                 gains:Union[List[Real],Real],
+                 inplace:bool=False,
+                 **kwargs:Any) -> Any:
         """
 
         Parameters:
@@ -739,7 +784,12 @@ class Voice(object):
             return Voice(values=se, fs=self.fs, start_time=self.start_time, l_file_path=self.l_file_path, **self.kwargs)
 
 
-    def energy_proportion_curve(self, lowcut:Union[Real, List[Real]], highcut:Union[Real, List[Real]], time_range:Optional[ArrayLike]=None, smoothing:float=0.6, **kwargs) -> np.ndarray:
+    def energy_proportion_curve(self,
+                                lowcut:Union[Real, List[Real]],
+                                highcut:Union[Real, List[Real]],
+                                time_range:Optional[ArrayLike]=None,
+                                smoothing:float=0.6,
+                                **kwargs:Any) -> np.ndarray:
         """
 
         Parameters:
@@ -783,7 +833,11 @@ class Voice(object):
         return epc
 
 
-    def energy_proportion(self, lowcut:Union[Real, List[Real]], highcut:Union[Real, List[Real]], time_range:Optional[ArrayLike]=None, **kwargs) -> float:
+    def energy_proportion(self,
+                          lowcut:Union[Real, List[Real]],
+                          highcut:Union[Real, List[Real]],
+                          time_range:Optional[ArrayLike]=None,
+                          **kwargs:Any) -> float:
         """
 
         Parameters:
@@ -808,7 +862,11 @@ class Voice(object):
 # syllable level features
 
     @indicator_enter_leave_func(verbose=_VERBOSE_LEVEL)
-    def obtain_syllable_segments(self, backend:str="praat", time_range:Optional[ArrayLike]=None, intensity_threshold:Real=40, t_threshold:Real=0.06) -> NoReturn:
+    def obtain_syllable_segments(self,
+                                 backend:str="praat",
+                                 time_range:Optional[ArrayLike]=None,
+                                 intensity_threshold:Real=40,
+                                 t_threshold:Real=0.06) -> NoReturn:
         """ partly finished,
 
         Parameters:
@@ -864,7 +922,11 @@ class Voice(object):
             )
 
     @indicator_enter_leave_func(verbose=_VERBOSE_LEVEL)
-    def obtain_vowels(self, backend:str="praat", time_range:Optional[ArrayLike]=None, trim_by_syllable:bool=True, **kwargs) -> NoReturn:
+    def obtain_vowels(self,
+                      backend:str="praat",
+                      time_range:Optional[ArrayLike]=None,
+                      trim_by_syllable:bool=True,
+                      **kwargs:Any) -> NoReturn:
         """ partly finished,
         
         Parameters:
@@ -948,8 +1010,10 @@ class Voice(object):
 # higher level features
 
     @indicator_enter_leave_func(verbose=_VERBOSE_LEVEL)
-    def obtain_vuv(self, **kwargs) -> NoReturn:
+    def obtain_vuv(self, **kwargs:Any) -> NoReturn:
         """
+
+        TODO: use `librosa.effects. split`
 
         Parameters:
         -----------
@@ -961,7 +1025,7 @@ class Voice(object):
 # ------------------------------------------------------------
 # plot
 
-    def plot(self, items:Optional[Union[str, List[str]]]=None, **kwargs) -> NoReturn:
+    def plot(self, items:Optional[Union[str, List[str]]]=None, **kwargs:Any) -> NoReturn:
         """
 
         Parameters:
@@ -1070,7 +1134,7 @@ class Voice(object):
             ax.set_ylabel("frequency [Hz]")
 
 
-    def _plot_spectrogram(self, ax, cmap, dynamic_range=70, **kwargs):
+    def _plot_spectrogram(self, ax, cmap, dynamic_range=70, **kwargs:Any) -> NoReturn:
         """
         """
         font_prop = kwargs.get("font_prop", None)
@@ -1082,7 +1146,7 @@ class Voice(object):
         ax.set_ylabel("frequency [Hz]")
 
     
-    def _plot_praat(self, **kwargs):
+    def _plot_praat(self, **kwargs:Any) -> NoReturn:
         """
         Parameters:
         -----------
@@ -1158,7 +1222,10 @@ class Voice(object):
         plt.show()
 
 
-    def _plot_energy_proportion(self, lowcut:Union[Real, List[Real]], highcut:Union[Real, List[Real]], **kwargs):
+    def _plot_energy_proportion(self,
+                                lowcut:Union[Real, List[Real]],
+                                highcut:Union[Real, List[Real]],
+                                **kwargs:Any) -> NoReturn:
         """
 
         Parameters:
@@ -1246,7 +1313,11 @@ class VoiceVowel(object):
     """
     vowel
     """
-    def __init__(self, start_time:Real, end_time:Real, frequencies:np.ndarray, ts:np.ndarray):
+    def __init__(self,
+                 start_time:Real,
+                 end_time:Real,
+                 frequencies:np.ndarray,
+                 ts:np.ndarray) -> NoReturn:
         """
         """
         self.start_time = start_time
@@ -1270,7 +1341,12 @@ class SyllableSegment(Voice):
     """
     syllable segment
     """
-    def __init__(self, values: np.ndarray, fs:Real, start_time:Real, end_time:Real, vowel:Optional[Real]=None):
+    def __init__(self,
+                 values:np.ndarray,
+                 fs:Real,
+                 start_time:Real,
+                 end_time:Real,
+                 vowel:Optional[Real]=None) -> NoReturn:
         """
         """
         super().__init__(values, fs, start_time)

@@ -3,7 +3,7 @@
 docstring, to write
 """
 import re
-from typing import Union, Tuple, List, Sequence, Tuple, NoReturn
+from typing import Union, Tuple, List, Sequence, Tuple, NoReturn, Any
 from numbers import Number
 
 import difflib
@@ -71,7 +71,7 @@ def LCSubStr(X:str, Y:str) -> Tuple[int, List[str]]:
 def dict_depth(d:dict) -> int:
     """ finished, checked,
 
-    find the 'depth' of a (possibly) nested dict
+    find the "depth" of a (possibly) nested dict
 
     Parameters:
     -----------
@@ -81,7 +81,7 @@ def dict_depth(d:dict) -> int:
     Returns:
     --------
     depth: int,
-        the 'depth' of `d`
+        the "depth" of `d`
     """
     try:
         depth = 1+max([dict_depth(v) for _,v in d.items() if isinstance(v, dict)])
@@ -170,12 +170,12 @@ def dict_to_str(d:Union[dict, list, tuple], current_depth:int=1, indent_spaces:i
 def str2bool(v:Union[str, bool]) -> bool:
     """ finished, checked,
 
-    converts a 'boolean' value possibly in the format of str to bool
+    converts a "boolean" value possibly in the format of str to bool
 
     Parameters:
     -----------
     v: str or bool,
-        the 'boolean' value
+        the "boolean" value
 
     Returns:
     --------
@@ -188,12 +188,12 @@ def str2bool(v:Union[str, bool]) -> bool:
     """
     if isinstance(v, bool):
        b = v
-    elif v.lower() in ('yes', 'true', 't', 'y', '1'):
+    elif v.lower() in ("yes", "true", "t", "y", "1"):
         b = True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+    elif v.lower() in ("no", "false", "f", "n", "0"):
         b = False
     else:
-        raise ValueError('Boolean value expected.')
+        raise ValueError("Boolean value expected.")
     return b
 
 
@@ -218,7 +218,11 @@ def printmd(md_str:str) -> NoReturn:
         print(md_str)
 
 
-def local_fuzzy_match_1(query_string:str, large_string:str, threshold:float=0.8, best_only:bool=True, verbose:int=0) -> list:
+def local_fuzzy_match_1(query_string:str,
+                       large_string:str,
+                       threshold:float=0.8,
+                       best_only:bool=True,
+                       verbose:int=0) -> list:
     """ finished, checked,
 
     fuzzy matches `query_string` in `large_string`, using `fuzzywuzzy` and `fuzzysearch`
@@ -285,10 +289,14 @@ def local_fuzzy_match_1(query_string:str, large_string:str, threshold:float=0.8,
     return result
 
 
-def local_fuzzy_match_2(query_string:str, large_string:str, threshold:float=0.8, best_only:bool=True, verbose:int=0) -> list:
+def local_fuzzy_match_2(query_string:str,
+                        large_string:str,
+                        threshold:float=0.8,
+                        best_only:bool=True,
+                        verbose:int=0) -> list:
     """ finished, checked,
 
-    fuzzy matches 'query_string' in 'large_string', using `difflib`
+    fuzzy matches "query_string" in "large_string", using `difflib`
 
     Parameters:
     -----------
@@ -346,7 +354,7 @@ def local_fuzzy_match_2(query_string:str, large_string:str, threshold:float=0.8,
             word_res.append(word[i:i+n])
             starts.append(i+large_string.find(word))
             ends.append(i+n+large_string.find(word))
-        match = ''.join(word_res)
+        match = "".join(word_res)
         ratio = len(extract_chinese(match)) / len(extract_chinese(query_string))
         if verbose >= 2:
             print("-"*100)
@@ -374,7 +382,7 @@ def local_fuzzy_match_2(query_string:str, large_string:str, threshold:float=0.8,
 def local_fuzzy_match(query_string:str, large_string:str, threshold:float=0.8, verbose:int=0) -> list:
     """ finished, checked,
 
-    fuzzy matches 'query_string' in 'large_string',
+    fuzzy matches "query_string" in "large_string",
     merged from results obtained using `difflib` and from results using `fuzzywuzzy` and `fuzzysearch`
 
     Parameters:

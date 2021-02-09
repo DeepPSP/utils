@@ -11,7 +11,7 @@ import glob
 from random import shuffle
 from collections import namedtuple, OrderedDict
 import xml.etree.ElementTree as ET
-from typing import Tuple, Union, Optional, Dict, List
+from typing import Tuple, Union, Optional, Dict, List, Any
 
 from PIL import Image
 import numpy as np
@@ -28,7 +28,15 @@ __all__ = [
 ]
 
 
-def dataset_to_tfrecords(img_dirs:Union[str, List[str]], ann_dirs:Union[str, List[str]], ann_fmt:str, tfrecords_save_path:str, pbtxt_dict:Dict[str,int], train_ratio:float=0.8, class_map:Optional[Dict[str,str]]=None, csv_save_path:Optional[str]=None, **kwargs):
+def dataset_to_tfrecords(img_dirs:Union[str, List[str]],
+                         ann_dirs:Union[str, List[str]],
+                         ann_fmt:str,
+                         tfrecords_save_path:str,
+                         pbtxt_dict:Dict[str,int],
+                         train_ratio:float=0.8,
+                         class_map:Optional[Dict[str,str]]=None,
+                         csv_save_path:Optional[str]=None,
+                         **kwargs:Any) -> dict:
     """ finished, checked,
 
     to tfrecords for object detection training
@@ -41,7 +49,7 @@ def dataset_to_tfrecords(img_dirs:Union[str, List[str]], ann_dirs:Union[str, Lis
         directory(s) for the bounding box annotation
     ann_fmt: str,
         format of the bounding box annotations,
-        can be one of 'voc', 'coco', 'yolo', case insensitive
+        can be one of "voc", "coco", "yolo", case insensitive
     tfrecords_save_path: str,
         root path to store the tfrecords for training and test
     pbtxt_dict: dict,
@@ -68,24 +76,24 @@ def dataset_to_tfrecords(img_dirs:Union[str, List[str]], ann_dirs:Union[str, Lis
 
     df_info = pd.DataFrame()
     for i, a in zip(ip, ap):
-        if ann_fmt.lower() == 'voc':
+        if ann_fmt.lower() == "voc":
             df_tmp = voc_to_df(img_dir=i, ann_dir=a, save_path=None, class_map=class_map, **kwargs)
-        elif ann_fmt.lower() == 'coco':
+        elif ann_fmt.lower() == "coco":
             df_tmp = coco_to_df(img_dir=i, ann_dir=a, save_path=None, class_map=class_map, **kwargs)
-        elif ann_fmt.lower() == 'yolo':
+        elif ann_fmt.lower() == "yolo":
             df_tmp = yolo_to_df(img_dir=i, ann_dir=a, save_path=None, class_map=class_map, **kwargs)
         else:
             raise ValueError(f"annotation format {ann_fmt} not recognized")
         df_info = pd.concat([df_info, df_tmp])
     df_info = df_info.reset_index(drop=True)
     
-    all_files = df_info['filename'].unique().tolist()
+    all_files = df_info["filename"].unique().tolist()
     shuffle(all_files)
     split_idx = int(train_ratio*len(all_files))
     train_files = all_files[: split_idx]
     test_files = all_files[split_idx:]
-    df_train = df_info[df_info['filename'].isin(train_files)]
-    df_test = df_info[df_info['filename'].isin(test_files)]
+    df_train = df_info[df_info["filename"].isin(train_files)]
+    df_test = df_info[df_info["filename"].isin(test_files)]
     
     save_suffix = int(time.time())
     if csv_save_path is not None:
@@ -112,7 +120,11 @@ def dataset_to_tfrecords(img_dirs:Union[str, List[str]], ann_dirs:Union[str, Lis
     return ret
 
 
-def voc_to_df(img_dir:str, ann_dir:str, save_path:Optional[str]=None, class_map:Optional[Dict[str,str]]=None, **kwargs) -> pd.DataFrame:
+def voc_to_df(img_dir:str,
+              ann_dir:str,
+              save_path:Optional[str]=None,
+              class_map:Optional[Dict[str,str]]=None,
+              **kwargs:Any) -> pd.DataFrame:
     """ finished, checked,
 
     pascal voc annotations (in xml format) to one DataFrame (csv file)
@@ -135,7 +147,7 @@ def voc_to_df(img_dir:str, ann_dir:str, save_path:Optional[str]=None, class_map:
     """
     xml_list = []
     img_dir_filenames = os.listdir(img_dir)
-    for xml_file in glob.glob(os.path.join(ann_dir, '*.xml')):
+    for xml_file in glob.glob(os.path.join(ann_dir, "*.xml")):
         tree = ET.parse(xml_file)
         img_file = os.path.splitext(os.path.basename(xml_file))[0]
         img_file = [os.path.join(img_dir, item) for item in img_dir_filenames if item.startswith(img_file)]
@@ -144,52 +156,52 @@ def voc_to_df(img_dir:str, ann_dir:str, save_path:Optional[str]=None, class_map:
             continue
         img_file = img_file[0]
         root = tree.getroot()
-        if len(root.findall('object')) == 0:
-            print(f'{xml_file} has no bounding box annotation')
-        for member in root.findall('object'):
-            fw = int(root.find('size').find('width').text)
-            fh = int(root.find('size').find('height').text)
+        if len(root.findall("object")) == 0:
+            print(f"{xml_file} has no bounding box annotation")
+        for member in root.findall("object"):
+            fw = int(root.find("size").find("width").text)
+            fh = int(root.find("size").find("height").text)
             # or obtain fw, fh from image read from `img_file`
-            subcls_name = member.find('name').text
-            xmin = int(member.find('bndbox').find('xmin').text)
-            ymin = int(member.find('bndbox').find('ymin').text)
-            xmax = int(member.find('bndbox').find('xmax').text)
-            ymax = int(member.find('bndbox').find('ymax').text)
+            subcls_name = member.find("name").text
+            xmin = int(member.find("bndbox").find("xmin").text)
+            ymin = int(member.find("bndbox").find("ymin").text)
+            xmax = int(member.find("bndbox").find("xmax").text)
+            ymax = int(member.find("bndbox").find("ymax").text)
             box_width = xmax-xmin
             box_height = ymax-ymin
             box_area = box_width*box_height
             if box_area <= 0:
                 continue
             values = {
-                'filename': root.find('filename').text if root.find('filename') is not None else '',
-                'width': fw,
-                'height': fh,
-                'segmented': root.find('segmented').text if root.find('segmented') is not None else '',
-                'subclass': subcls_name,
-                'pose': member.find('pose').text if member.find('pose') is not None else '',
-                'truncated': member.find('truncated').text if member.find('truncated') is not None else '',
-                'difficult': member.find('difficult').text if member.find('difficult') is not None else '',
-                'xmin': xmin,
-                'ymin': ymin,
-                'xmax': xmax,
-                'ymax': ymax,
-                'box_width': box_width,
-                'box_height': box_height,
-                'box_area': box_area,
+                "filename": root.find("filename").text if root.find("filename") is not None else "",
+                "width": fw,
+                "height": fh,
+                "segmented": root.find("segmented").text if root.find("segmented") is not None else "",
+                "subclass": subcls_name,
+                "pose": member.find("pose").text if member.find("pose") is not None else "",
+                "truncated": member.find("truncated").text if member.find("truncated") is not None else "",
+                "difficult": member.find("difficult").text if member.find("difficult") is not None else "",
+                "xmin": xmin,
+                "ymin": ymin,
+                "xmax": xmax,
+                "ymax": ymax,
+                "box_width": box_width,
+                "box_height": box_height,
+                "box_area": box_area,
             }
             xml_list.append(values)
-    column_names = ['filename', 'width', 'height', 'segmented', 'pose', 'truncated', 'difficult', 'xmin', 'ymin', 'xmax', 'ymax', 'box_width', 'box_height', 'subclass', 'box_area']
+    column_names = ["filename", "width", "height", "segmented", "pose", "truncated", "difficult", "xmin", "ymin", "xmax", "ymax", "box_width", "box_height", "subclass", "box_area"]
     bbox_df = pd.DataFrame(xml_list, columns=column_names)
     if class_map is None:
-        bbox_df['class'] = bbox_df['subclass']
+        bbox_df["class"] = bbox_df["subclass"]
     else:
-        bbox_df['class'] = bbox_df['subclass'].apply(lambda sc:class_map[sc])
+        bbox_df["class"] = bbox_df["subclass"].apply(lambda sc:class_map[sc])
     column_names = [
-        'filename', 'class', 'subclass',
-        'segmented', 'pose', 'truncated', 'difficult',
-        'width', 'height',
-        'xmin', 'ymin', 'xmax', 'ymax',
-        'box_width', 'box_height', 'box_area',
+        "filename", "class", "subclass",
+        "segmented", "pose", "truncated", "difficult",
+        "width", "height",
+        "xmin", "ymin", "xmax", "ymax",
+        "box_width", "box_height", "box_area",
     ]
     bbox_df = bbox_df[column_names]
     if save_path is not None:
@@ -197,7 +209,11 @@ def voc_to_df(img_dir:str, ann_dir:str, save_path:Optional[str]=None, class_map:
     return bbox_df
 
 
-def yolo_to_df(img_dir:str, ann_dir:str, save_path:Optional[str]=None, class_map:Optional[Dict[int,str]]=None, **kwargs) -> pd.DataFrame:
+def yolo_to_df(img_dir:str,
+               ann_dir:str,
+               save_path:Optional[str]=None,
+               class_map:Optional[Dict[int,str]]=None,
+               **kwargs:Any) -> pd.DataFrame:
     """ finished, checked,
 
     yolo annotations (in txt format) to one csv file
@@ -222,21 +238,21 @@ def yolo_to_df(img_dir:str, ann_dir:str, save_path:Optional[str]=None, class_map
     """
     ann_list = []
     img_dir_filenames = os.listdir(img_dir)
-    for ann_file in glob.glob(os.path.join(ann_dir, '*.txt')):
+    for ann_file in glob.glob(os.path.join(ann_dir, "*.txt")):
         img_file = os.path.splitext(os.path.basename(ann_file))[0]
         img_file = [os.path.join(img_dir, item) for item in img_dir_filenames if item.startswith(img_file)]
         if len(img_file) != 1:
             print(f"number of images corresponding to {os.path.basename(xml_file)} is {len(img_file)}")
             continue
         img_file = img_file[0]
-        with tf.gfile.GFile(img_file, 'rb') as fid:
+        with tf.gfile.GFile(img_file, "rb") as fid:
             encoded_jpg = fid.read()
         encoded_jpg_io = io.BytesIO(encoded_jpg)
         image = Image.open(encoded_jpg_io)
         fw, fh = image.size
-        with open(ann_file, 'r') as f:
+        with open(ann_file, "r") as f:
             for l in f:
-                classIndex, xcen, ycen, box_width, box_height = l.strip().split(' ')
+                classIndex, xcen, ycen, box_width, box_height = l.strip().split(" ")
                 classIndex = int(classIndex)
                 if class_map is not None:
                     classname = class_map[classIndex]
@@ -251,24 +267,24 @@ def yolo_to_df(img_dir:str, ann_dir:str, save_path:Optional[str]=None, class_map
                 if box_area <= 0:
                     continue
                 values = {
-                    'filename': os.path.basename(img_file),
-                    'class': classname,
-                    'width': fw,
-                    'height': fh,
-                    'xmin': xmin,
-                    'ymin': ymin,
-                    'xmax': xmax,
-                    'ymax': ymax,
-                    'box_width': box_width,
-                    'box_height': box_height,
-                    'box_area': box_area,
+                    "filename": os.path.basename(img_file),
+                    "class": classname,
+                    "width": fw,
+                    "height": fh,
+                    "xmin": xmin,
+                    "ymin": ymin,
+                    "xmax": xmax,
+                    "ymax": ymax,
+                    "box_width": box_width,
+                    "box_height": box_height,
+                    "box_area": box_area,
                 }
                 ann_list.append(values)
     column_names = [
-        'filename', 'class',
-        'width', 'height',
-        'xmin', 'ymin', 'xmax', 'ymax',
-        'box_width', 'box_height', 'box_area',
+        "filename", "class",
+        "width", "height",
+        "xmin", "ymin", "xmax", "ymax",
+        "box_width", "box_height", "box_area",
     ]
     bbox_df = pd.DataFrame(ann_list, columns=column_names)
     if save_path is not None:
@@ -276,7 +292,11 @@ def yolo_to_df(img_dir:str, ann_dir:str, save_path:Optional[str]=None, class_map
     return bbox_df
 
 
-def coco_to_df(img_dir:str, ann_dir:str, save_path:Optional[str]=None, class_map:Optional[Dict[str,str]]=None, **kwargs) -> pd.DataFrame:
+def coco_to_df(img_dir:str,
+               ann_dir:str,
+               save_path:Optional[str]=None,
+               class_map:Optional[Dict[str,str]]=None,
+               **kwargs:Any) -> pd.DataFrame:
     """ finished, checked,
 
     coco annotations (in json format) to one csv file
@@ -303,12 +323,14 @@ def coco_to_df(img_dir:str, ann_dir:str, save_path:Optional[str]=None, class_map
 def split(df:pd.DataFrame, group) -> List[namedtuple]:
     """
     """
-    data = namedtuple('data', ['filename', 'object'])
+    data = namedtuple("data", ["filename", "object"])
     gb = df.groupby(group)
     return [data(filename, gb.get_group(x)) for filename, x in zip(gb.groups.keys(), gb.groups)]
 
 
-def create_tfexample(group:namedtuple, pbtxt_dict:Dict[str,int], ignore_difficult_instances:bool=False) -> tf.train.Example:
+def create_tfexample(group:namedtuple,
+                     pbtxt_dict:Dict[str,int],
+                     ignore_difficult_instances:bool=False) -> tf.train.Example:
     """ finished, checked,
 
     one image with bounding box annotations to one tf Example
@@ -326,7 +348,7 @@ def create_tfexample(group:namedtuple, pbtxt_dict:Dict[str,int], ignore_difficul
     --------
     tf_example: Example,
     """
-    with tf.gfile.GFile(group.filename, 'rb') as fid:
+    with tf.gfile.GFile(group.filename, "rb") as fid:
         encoded_jpg = fid.read()
     encoded_jpg_io = io.BytesIO(encoded_jpg)
     image = Image.open(encoded_jpg_io)
@@ -347,39 +369,39 @@ def create_tfexample(group:namedtuple, pbtxt_dict:Dict[str,int], ignore_difficul
     difficult_obj = []
 
     for index, row in group.object.iterrows():
-        difficult = bool(int(row['difficult'] or '0'))
+        difficult = bool(int(row["difficult"] or "0"))
         if ignore_difficult_instances and difficult:
             continue
 
         difficult_obj.append(int(difficult))
 
-        width = row['width']
-        height = row['height']
-        xmins.append(float(row['xmin'] / width))
-        xmaxs.append(float(row['xmax'] / width))
-        ymins.append(float(row['ymin'] / height))
-        ymaxs.append(float(row['ymax'] / height))
-        classes_text.append(row['class'].encode('utf8'))
-        classes.append(pbtxt_dict[row['class']])
-        truncated.append(int(row['truncated']))
-        poses.append(row['pose'].encode('utf8'))
+        width = row["width"]
+        height = row["height"]
+        xmins.append(float(row["xmin"] / width))
+        xmaxs.append(float(row["xmax"] / width))
+        ymins.append(float(row["ymin"] / height))
+        ymaxs.append(float(row["ymax"] / height))
+        classes_text.append(row["class"].encode("utf8"))
+        classes.append(pbtxt_dict[row["class"]])
+        truncated.append(int(row["truncated"]))
+        poses.append(row["pose"].encode("utf8"))
 
     tf_example = tf.train.Example(features=tf.train.Features(feature={
-        'image/height': _int64_feature(height),
-        'image/width': _int64_feature(width),
-        'image/filename': _bytes_feature(filename.encode('utf8')),
-        'image/source_id': _bytes_feature(str(image_id).encode('utf8')),
-        'image/encoded': _bytes_feature(encoded_jpg),
-        'image/format': _bytes_feature(b'jpg'),
-        'image/object/bbox/xmin': _float_list_feature(xmins),
-        'image/object/bbox/xmax': _float_list_feature(xmaxs),
-        'image/object/bbox/ymin': _float_list_feature(ymins),
-        'image/object/bbox/ymax': _float_list_feature(ymaxs),
-        'image/object/class/text': _bytes_list_feature(classes_text),
-        'image/object/class/label': _int64_list_feature(classes),
-        'image/object/difficult': tfrecord_util.int64_list_feature(difficult_obj),
-        'image/object/truncated': tfrecord_util.int64_list_feature(truncated),
-        'image/object/view': tfrecord_util.bytes_list_feature(poses),
+        "image/height": _int64_feature(height),
+        "image/width": _int64_feature(width),
+        "image/filename": _bytes_feature(filename.encode("utf8")),
+        "image/source_id": _bytes_feature(str(image_id).encode("utf8")),
+        "image/encoded": _bytes_feature(encoded_jpg),
+        "image/format": _bytes_feature(b"jpg"),
+        "image/object/bbox/xmin": _float_list_feature(xmins),
+        "image/object/bbox/xmax": _float_list_feature(xmaxs),
+        "image/object/bbox/ymin": _float_list_feature(ymins),
+        "image/object/bbox/ymax": _float_list_feature(ymaxs),
+        "image/object/class/text": _bytes_list_feature(classes_text),
+        "image/object/class/label": _int64_list_feature(classes),
+        "image/object/difficult": tfrecord_util.int64_list_feature(difficult_obj),
+        "image/object/truncated": tfrecord_util.int64_list_feature(truncated),
+        "image/object/view": tfrecord_util.bytes_list_feature(poses),
     }))
     return tf_example
 
@@ -405,14 +427,14 @@ def df_to_tfrecord(df:pd.DataFrame, save_path:str, pbtxt_dict:Dict[str,int]) -> 
     """
     writer = tf.python_io.TFRecordWriter(save_path)
     nb_samples = 0
-    grouped = split(df, 'filename')
+    grouped = split(df, "filename")
     for group in grouped:
         tf_example = create_tfexample(group, pbtxt_dict)
         writer.write(tf_example.SerializeToString())
         nb_samples += 1
     writer.close()
-    print(f'Successfully created the TFRecords: {save_path}')
-    print(f'nb_samples = {nb_samples}')
+    print(f"Successfully created the TFRecords: {save_path}")
+    print(f"nb_samples = {nb_samples}")
     return nb_samples
 
 
@@ -439,7 +461,7 @@ GLOBAL_ANN_ID = 0  # global annotation id.
 def get_image_id(filename):
     """Convert a string to a integer."""
     # Warning: this function is highly specific to pascal filename!!
-    # Given filename like '2008_000002', we cannot use id 2008000002 because our
+    # Given filename like "2008_000002", we cannot use id 2008000002 because our
     # code internally will convert the int value to float32 and back to int, which
     # would cause value mismatch int(float32(2008000002)) != int(2008000002).
     # COCO needs int values, here we just use a incremental global_id, but
@@ -461,14 +483,14 @@ import torch
 from torch import Tensor
 from packaging import version
 
-if version.parse(torch.__version__) >= version.parse('1.5.0'):
+if version.parse(torch.__version__) >= version.parse("1.5.0"):
     def _true_divide(dividend, divisor):
         return torch.true_divide(dividend, divisor)
 else:
     def _true_divide(dividend, divisor):
         return dividend / divisor
 
-def bboxes_iou_torch(bboxes_a:Tensor, bboxes_b:Tensor, fmt:str='voc', iou_type:str='iou') -> Tensor:
+def bboxes_iou_torch(bboxes_a:Tensor, bboxes_b:Tensor, fmt:str="voc", iou_type:str="iou") -> Tensor:
     """ finished, checked,
     
     Calculate the Intersection of Unions (IoUs) between bounding boxes.
@@ -501,7 +523,7 @@ def bboxes_iou_torch(bboxes_a:Tensor, bboxes_b:Tensor, fmt:str='voc', iou_type:s
     N, K = bboxes_a.shape[0], bboxes_b.shape[0]
 
     # top left
-    if fmt.lower() == 'voc':  # xmin, ymin, xmax, ymax
+    if fmt.lower() == "voc":  # xmin, ymin, xmax, ymax
         # top left
         tl_intersect = torch.max(bboxes_a[:, np.newaxis, :2], bboxes_b[:, :2]) # of shape `(N,K,2)`
         # bottom right
@@ -509,7 +531,7 @@ def bboxes_iou_torch(bboxes_a:Tensor, bboxes_b:Tensor, fmt:str='voc', iou_type:s
         bb_a = bboxes_a[:, 2:] - bboxes_a[:, :2]
         bb_b = bboxes_b[:, 2:] - bboxes_b[:, :2]
         # bb_* can also be seen vectors representing box_width, box_height
-    elif fmt.lower() == 'coco':  # xmin, ymin, w, h
+    elif fmt.lower() == "coco":  # xmin, ymin, w, h
         tl_intersect = torch.max((bboxes_a[:, np.newaxis, :2] - bboxes_a[:, np.newaxis, 2:] / 2),
                        (bboxes_b[:, :2] - bboxes_b[:, 2:] / 2))
         # bottom right
@@ -531,15 +553,15 @@ def bboxes_iou_torch(bboxes_a:Tensor, bboxes_b:Tensor, fmt:str='voc', iou_type:s
 
     iou = _true_divide(area_intersect, area_union)
 
-    if iou_type.lower() == 'iou':
+    if iou_type.lower() == "iou":
         return iou
 
-    if fmt.lower() == 'voc':  # xmin, ymin, xmax, ymax
+    if fmt.lower() == "voc":  # xmin, ymin, xmax, ymax
         # top left
         tl_union = torch.min(bboxes_a[:, np.newaxis, :2], bboxes_b[:, :2]) # of shape `(N,K,2)`
         # bottom right
         br_union = torch.max(bboxes_a[:, np.newaxis, 2:], bboxes_b[:, 2:])
-    elif fmt.lower() == 'coco':  # xmin, ymin, w, h
+    elif fmt.lower() == "coco":  # xmin, ymin, w, h
         tl_union = torch.min((bboxes_a[:, np.newaxis, :2] - bboxes_a[:, np.newaxis, 2:] / 2),
                        (bboxes_b[:, :2] - bboxes_b[:, 2:] / 2))
         # bottom right
@@ -554,27 +576,27 @@ def bboxes_iou_torch(bboxes_a:Tensor, bboxes_b:Tensor, fmt:str='voc', iou_type:s
 
     giou = iou - (area_covering - area_union) / area_covering
 
-    if iou_type.lower() == 'giou':
+    if iou_type.lower() == "giou":
         return giou
 
-    if fmt.lower() == 'voc':  # xmin, ymin, xmax, ymax
+    if fmt.lower() == "voc":  # xmin, ymin, xmax, ymax
         centre_a = (bboxes_a[..., 2 :] + bboxes_a[..., : 2]) / 2
         centre_b = (bboxes_b[..., 2 :] + bboxes_b[..., : 2]) / 2
-    elif fmt.lower() == 'coco':  # xmin, ymin, w, h
+    elif fmt.lower() == "coco":  # xmin, ymin, w, h
         centre_a = (bboxes_a[..., : 2] + bboxes_a[..., 2 :]) / 2
         centre_b = (bboxes_b[..., : 2] + bboxes_b[..., 2 :]) / 2
 
-    centre_dist = torch.norm(centre_a[:, np.newaxis] - centre_b, p='fro', dim=2)
-    diag_len = torch.norm(bboxes_c, p='fro', dim=2)
+    centre_dist = torch.norm(centre_a[:, np.newaxis] - centre_b, p="fro", dim=2)
+    diag_len = torch.norm(bboxes_c, p="fro", dim=2)
 
     diou = iou - centre_dist.pow(2) / diag_len.pow(2)
 
-    if iou_type.lower() == 'diou':
+    if iou_type.lower() == "diou":
         return diou
 
     # bb_a of shape `(N,2)`, bb_b of shape `(K,2)`
-    v = torch.einsum('nm,km->nk', bb_a, bb_b)
-    v = _true_divide(v, (torch.norm(bb_a, p='fro', dim=1)[:,np.newaxis] * torch.norm(bb_b, p='fro', dim=1)))
+    v = torch.einsum("nm,km->nk", bb_a, bb_b)
+    v = _true_divide(v, (torch.norm(bb_a, p="fro", dim=1)[:,np.newaxis] * torch.norm(bb_b, p="fro", dim=1)))
     # avoid nan for torch.acos near \pm 1
     # https://github.com/pytorch/pytorch/issues/8069
     eps = 1e-7
@@ -584,17 +606,21 @@ def bboxes_iou_torch(bboxes_a:Tensor, bboxes_b:Tensor, fmt:str='voc', iou_type:s
 
     ciou = diou - alpha * v
 
-    if iou_type.lower() == 'ciou':
+    if iou_type.lower() == "ciou":
         return ciou
 
 
-def bboxes_iou_tf(bboxes_a, bboxes_b, fmt='voc', iou_type='iou'):
+def bboxes_iou_tf(bboxes_a, bboxes_b, fmt="voc", iou_type="iou"):
     """
     """
     raise NotImplementedError
 
 
-def nms(boxes:np.ndarray, confs:np.ndarray, box_fmt:str='coco', nms_thresh:float=0.5, min_mode:bool=False):
+def nms(boxes:np.ndarray,
+        confs:np.ndarray,
+        box_fmt:str="coco",
+        nms_thresh:float=0.5,
+        min_mode:bool=False) -> np.ndarray:
     """
     non-maximum suppression
 
@@ -604,7 +630,7 @@ def nms(boxes:np.ndarray, confs:np.ndarray, box_fmt:str='coco', nms_thresh:float
         the bounding boxes
     confs: ndarray, of shape (n,),
         confidence (score) of each bounding box
-    box_fmt: str, default 'coco',
+    box_fmt: str, default "coco",
         the format of the bounding boxes
     nms_thresh: float, default 0.5,
         threshold for eliminating redundant boxes
@@ -620,12 +646,12 @@ def nms(boxes:np.ndarray, confs:np.ndarray, box_fmt:str='coco', nms_thresh:float
     -----------
     [1] https://github.com/Tianxiaomo/pytorch-YOLOv4/blob/master/tool/utils.py
     """
-    if box_fmt.lower() == 'coco':
+    if box_fmt.lower() == "coco":
         x1 = boxes[:, 0]
         y1 = boxes[:, 1]
         x2 = boxes[:, 0] + boxes[:, 2]
         y2 = boxes[:, 1] + boxes[:, 3]
-    elif box_fmt.lower() == 'voc':
+    elif box_fmt.lower() == "voc":
         x1 = boxes[:, 0]
         y1 = boxes[:, 1]
         x2 = boxes[:, 2]

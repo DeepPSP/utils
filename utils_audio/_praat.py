@@ -3,7 +3,7 @@
 improved wrapped praat Sound
 """
 from numbers import Real
-from typing import Union, Optional, List, NoReturn
+from typing import Union, Optional, List, NoReturn, Any
 
 import numpy as np
 np.set_printoptions(precision=5, suppress=True)
@@ -23,7 +23,10 @@ class PMSound(pm.Sound):
 
     TODO: add more methods
     """
-    def __init__(self, values:Optional[np.ndarray]=None, sampling_frequency:Optional[Real]=None, start_time:Optional[Real]=None, file_path:Optional[str]=None):
+    def __init__(self,
+                 values:Optional[np.ndarray]=None,
+                 sampling_frequency:Optional[Real]=None,
+                 start_time:Optional[Real]=None, file_path:Optional[str]=None) -> NoReturn:
         """
         Parameters:
         -----------
@@ -36,7 +39,7 @@ class PMSound(pm.Sound):
         file_path: str, optional,
             paths of the audio file
         """
-        self.pm_true_false = {True: 'yes', False: 'no'}
+        self.pm_true_false = {True: "yes", False: "no"}
         assert values is not None or file_path is not None
         if values is not None:
             return super().__init__(
@@ -45,12 +48,21 @@ class PMSound(pm.Sound):
         else:
             return super().__init__(file_path=file_path)
 
-    def to_formant(self, method:str='burg', time_step:Optional[Real]=None, max_number_of_formants:Real=5.0, maximum_formant:Real=5500.0, window_length:Real=0.025, pre_emphasis_from:Real=50.0, number_of_std_dev:Real=1.5, maximum_number_of_iterations:Real=5, tolerance:Real=1.0e-6) -> pm.Formant:
+    def to_formant(self,
+                   method:str="burg",
+                   time_step:Optional[Real]=None,
+                   max_number_of_formants:Real=5.0,
+                   maximum_formant:Real=5500.0,
+                   window_length:Real=0.025,
+                   pre_emphasis_from:Real=50.0,
+                   number_of_std_dev:Real=1.5,
+                   maximum_number_of_iterations:Real=5,
+                   tolerance:Real=1.0e-6) -> pm.Formant:
         """
         
         Parameters:
         -----------
-        method: str, default 'burg', can also be 'sl', 'keep all', 'robust',
+        method: str, default "burg", can also be "sl", "keep all", "robust",
         time_step: real number, optional, units in (s),
         max_number_of_formants: real number, default 5.0,
         maximum_formant: real number, default 5500.0, units in (Hz),
@@ -61,16 +73,22 @@ class PMSound(pm.Sound):
         tolerance: real number, default 1.0e-6
         """
         m = method.lower()
-        if method == 'burg':
+        if method == "burg":
             return self.to_formant_burg(time_step, max_number_of_formants, maximum_formant, window_length, pre_emphasis_from)
-        elif method in ['sl', 'split levinson', 'split levinson (willems)']:
+        elif method in ["sl", "split levinson", "split levinson (willems)"]:
             return call(self, "To Formant (sl)", time_step or 0.0, max_number_of_formants, maximum_formant, window_length, pre_emphasis_from)
-        elif method == 'keep all':
+        elif method == "keep all":
             return call(self, "To Formant (keep all)", time_step or 0.0, max_number_of_formants, maximum_formant, window_length, pre_emphasis_from)
-        elif method == 'robust':
+        elif method == "robust":
             return call(self, "To Formant (robust)", time_step or 0.0, max_number_of_formants, maximum_formant, window_length, pre_emphasis_from, number_of_std_dev, maximum_number_of_iterations, tolerance)
     
-    def to_melspectrogram(self, window_length:Real=0.015, time_step:Real=0.005, position_of_first_filter:Real=100, distance_between_filters:Real=100, maximum_frequency:Real=0, convert_to_dB_values:bool=True) -> pm.Matrix:
+    def to_melspectrogram(self,
+                          window_length:Real=0.015,
+                          time_step:Real=0.005,
+                          position_of_first_filter:Real=100,
+                          distance_between_filters:Real=100,
+                          maximum_frequency:Real=0,
+                          convert_to_dB_values:bool=True) -> pm.Matrix:
         """
 
         Parameters:
@@ -87,7 +105,11 @@ class PMSound(pm.Sound):
         return ms
 
 
-    def to_power_cepstrogram(self, pitch_floor:Real=60, time_step:Real=0.002, maximum_frequency:Real=5000, pre_emphasis_from:Real=50) -> pm.Matrix:
+    def to_power_cepstrogram(self,
+                             pitch_floor:Real=60,
+                             time_step:Real=0.002,
+                             maximum_frequency:Real=5000,
+                             pre_emphasis_from:Real=50) -> pm.Matrix:
         """
 
         Parameters:
@@ -101,7 +123,12 @@ class PMSound(pm.Sound):
         pc = call(pc, "To Matrix")
         return pc
 
-    def to_power_cepstrum_slice(self, time:Real, pitch_floor:Real=60, time_step:Real=0.002, maximum_frequency:Real=5000, pre_emphasis_from:Real=50) -> pm.Matrix:
+    def to_power_cepstrum_slice(self,
+                                time:Real,
+                                pitch_floor:Real=60,
+                                time_step:Real=0.002,
+                                maximum_frequency:Real=5000,
+                                pre_emphasis_from:Real=50) -> pm.Matrix:
         """
         Parameters:
         -----------
@@ -124,7 +151,11 @@ class PMSound(pm.Sound):
         """
         return call(self, "To PointProcess (periodic, cc)", minimum_pitch, maximum_pitch)
 
-    def to_point_process_periodic_peaks(self, minimum_pitch:Real=75, maximum_pitch:Real=600, include_maxima:bool=True, include_minima:bool=False) -> pm.Data:
+    def to_point_process_periodic_peaks(self,
+                                        minimum_pitch:Real=75,
+                                        maximum_pitch:Real=600,
+                                        include_maxima:bool=True,
+                                        include_minima:bool=False) -> pm.Data:
         """
 
         Parameters:
@@ -136,7 +167,11 @@ class PMSound(pm.Sound):
         """
         return call(self, "To PointProcess (periodic, peaks)", minimum_pitch, maximum_pitch, self.pm_true_false[include_maxima], self.pm_true_false[include_minima])
 
-    def to_point_process_extrema(self, channel:Union[Real, str], include_maxima:bool=True, include_minima:bool=False, interpolation:str='Sinc70') -> pm.Data:
+    def to_point_process_extrema(self,
+                                 channel:Union[Real, str],
+                                 include_maxima:bool=True,
+                                 include_minima:bool=False,
+                                 interpolation:str="Sinc70") -> pm.Data:
         """
 
         Parameters:
@@ -144,10 +179,10 @@ class PMSound(pm.Sound):
         channel: real number or str,
         include_maxima: bool, default True,
         include_minima: bool, default False,
-        interpolation: str, default 'Sinc70',
+        interpolation: str, default "Sinc70",
         """
-        assert isinstance(channel, int) or channel in ['Left', 'Right']
-        assert interpolation in ['None', 'Parabolic', 'Cubic', 'Sinc70', 'Sinc700']
+        assert isinstance(channel, int) or channel in ["Left", "Right"]
+        assert interpolation in ["None", "Parabolic", "Cubic", "Sinc70", "Sinc700"]
         return call(self, "To PointProcess (extrema)", channel, self.pm_true_false[include_maxima], self.pm_true_false[include_minima], interpolation)
 
     def to_point_process_zeroes(self, channel:Union[Real, str], include_raisers:bool=True, include_fallers:bool=False) -> pm.Data:
@@ -159,10 +194,15 @@ class PMSound(pm.Sound):
         include_raisers: bool, default True,
         include_fallers: bool, default False,
         """
-        assert isinstance(channel, int) or channel in ['Left', 'Right']
+        assert isinstance(channel, int) or channel in ["Left", "Right"]
         return call(self, "To PointProcess (zeroes)", channel, self.pm_true_false[include_raisers], self.pm_true_false[include_fallers])
 
-    def to_bark_spectrogram(self, window_length:Real=0.015, time_step:Real=0.005, position_of_first_filter:Real=1, distance_between_filters:Real=1, maximum_frequency:Real=0) -> pm.Data:
+    def to_bark_spectrogram(self,
+                            window_length:Real=0.015,
+                            time_step:Real=0.005,
+                            position_of_first_filter:Real=1,
+                            distance_between_filters:Real=1,
+                            maximum_frequency:Real=0) -> pm.Data:
         """
 
         Parameters:
@@ -187,7 +227,13 @@ class PMSound(pm.Sound):
         """
         return call(self, "To Cochleagram", time_step, frequency_resolution, window_length, forward_masking_time)
 
-    def to_lpc(self, method:str, prediction_order:int=16, window_length:Real=0.025, time_step:Real=0.005, pre_emphasis_frequency:Real=50, **kwargs) -> pm.Data:
+    def to_lpc(self,
+               method:str,
+               prediction_order:int=16,
+               window_length:Real=0.025,
+               time_step:Real=0.005,
+               pre_emphasis_frequency:Real=50,
+               **kwargs:Any) -> pm.Data:
         """
 
         Parameters:
@@ -198,14 +244,14 @@ class PMSound(pm.Sound):
         time_step:real number, default 0.005,
         pre_emphasis_frequency:real number, default 50,
         kwargs: dict, optional,
-            'tolerance1', 'tolerance2' for `method` 'marple', both default 1.0e-6
+            "tolerance1", "tolerance2" for `method` "marple", both default 1.0e-6
         """
         cmd = f"To LPC ({method})"
-        if method in ['autocorrelation', 'covariance', 'burg']:
+        if method in ["autocorrelation", "covariance", "burg"]:
             lpc = call(self, cmd, prediction_order, window_length, time_step, pre_emphasis_frequency)
-        elif method == 'marple':
-            tolerance1 = kwargs.get('tolerance1', 1.0e-6)
-            tolerance2 = kwargs.get('tolerance2', 1.0e-6)
+        elif method == "marple":
+            tolerance1 = kwargs.get("tolerance1", 1.0e-6)
+            tolerance2 = kwargs.get("tolerance2", 1.0e-6)
             lpc = call(self, cmd, prediction_order, window_length, time_step, pre_emphasis_frequency, tolerance1, tolerance2)
         return lpc
 
@@ -217,8 +263,8 @@ class PMSound(pm.Sound):
         fig, (ax_t, ax_f) = plt.subplots(2,1,figsize=(int(25*self.xmax),10),sharex=True)
         plt.subplots_adjust(hspace=0)
         ax_t.plot(self.xs(), self.values.T)
-        ax_t.axhline(self.silence_threshold,linestyle='dashed',linewidth=0.5,color='red')
-        ax_t.axhline(-self.silence_threshold,linestyle='dashed',linewidth=0.5,color='red')
+        ax_t.axhline(self.silence_threshold,linestyle="dashed",linewidth=0.5,color="red")
+        ax_t.axhline(-self.silence_threshold,linestyle="dashed",linewidth=0.5,color="red")
         ax_t2 = ax_t.twinx()
         self._plot_intensity(ax_t2)
         ax_t2.set_xlim([self.xmin, self.xmax])
@@ -233,7 +279,7 @@ class PMSound(pm.Sound):
     def _plot_spectrogram(self, ax, dynamic_range=70, **kwargs):
         """
         """
-        if 'plt' not in dir():
+        if "plt" not in dir():
             import matplotlib.pyplot as plt
         sp = self.to_spectrogram()
         X, Y = sp.x_grid(), sp.y_grid()
@@ -249,7 +295,7 @@ class PMSound(pm.Sound):
         """
         """
         intensity = self.to_intensity()
-        ax.plot(intensity.xs(), intensity.values.T, 'o-', markersize=4, linewidth=0.6, color='yellow')
+        ax.plot(intensity.xs(), intensity.values.T, "o-", markersize=4, linewidth=0.6, color="yellow")
         ax.grid(False)
         ax.set_ylim(0)
         ax.set_ylabel("intensity [dB]")
@@ -260,10 +306,10 @@ class PMSound(pm.Sound):
         replace unvoiced samples by NaN to not plot
         """
         pitches = self.to_pitch()
-        pitch_values = pitches.selected_array['frequency']
+        pitch_values = pitches.selected_array["frequency"]
         pitch_values[pitch_values==0] = np.nan
-        ax.plot(pitches.xs(), pitch_values, 'o-', markersize=9, color='w')
-        ax.plot(pitches.xs(), pitch_values, 'o-', markersize=5, color='b')
+        ax.plot(pitches.xs(), pitch_values, "o-", markersize=9, color="w")
+        ax.plot(pitches.xs(), pitch_values, "o-", markersize=5, color="b")
         ax.grid(False)
         ax.set_ylim(0, pitches.ceiling)
         ax.set_ylabel("fundamental frequency [Hz]")
@@ -276,5 +322,5 @@ class PMSound(pm.Sound):
         nb_x = formants.nx
         for fn in range(1,maximum_formant+1):
             y = np.array([formants.get_value_at_time(fn, x[idx]) for idx in range(nb_x)])
-            ax.plot(x, y, 'o', markersize=5, color='w')
-            ax.plot(x, y, 'o', markersize=2, color='r')
+            ax.plot(x, y, "o", markersize=5, color="w")
+            ax.plot(x, y, "o", markersize=2, color="r")

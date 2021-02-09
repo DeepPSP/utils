@@ -36,7 +36,7 @@ def indicator_enter_leave_func(verbose:int=0):
     return dec_outer
 
 
-def trivial_jit(signature_or_function=None, locals={}, target='cpu', cache=False, pipeline_class=None, **options):
+def trivial_jit(signature_or_function=None, locals={}, target="cpu", cache=False, pipeline_class=None, **options):
     """
 
     Parameters:

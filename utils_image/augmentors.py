@@ -43,7 +43,11 @@ __DEFAULT_SHEAR_ANGLE = 8
 __DEFAULT_ZOOM_RATIO = 0.08
 
 
-def image_augmentation(img:np.ndarray, num:int, aug_operations:Optional[List[str]]=None, verbose:int=0, **kwargs) -> List[np.ndarray]:
+def image_augmentation(img:np.ndarray,
+                       num:int,
+                       aug_operations:Optional[List[str]]=None,
+                       verbose:int=0,
+                       **kwargs:Any) -> List[np.ndarray]:
     """ finished, checked,
 
     perform augmentations on `img`
@@ -56,7 +60,7 @@ def image_augmentation(img:np.ndarray, num:int, aug_operations:Optional[List[str
         times for each operation to be applied to `img`
     aug_operations: list of str, optional,
         augmentations to be applied on `img`,
-        a sublist (the entire list if is None) of ['rotation', 'shift', 'shear', 'zoom',]
+        a sublist (the entire list if is None) of ["rotation", "shift", "shear", "zoom",]
     verbose: int, default 0,
 
     Returns:
@@ -70,7 +74,7 @@ def image_augmentation(img:np.ndarray, num:int, aug_operations:Optional[List[str
     """
     img_augs = []
 
-    legal_operations = ['rotation', 'shift', 'shear', 'zoom',]
+    legal_operations = ["rotation", "shift", "shear", "zoom",]
 
     ops = aug_operations if aug_operations is not None else legal_operations
 
@@ -80,25 +84,25 @@ def image_augmentation(img:np.ndarray, num:int, aug_operations:Optional[List[str
     elif len(_illegal_operations) > 1:
         raise ValueError(f"The operation `{_illegal_operations}` on the input image are illegal!")
 
-    rotation_angle = kwargs.get('rotation_angle', __DEFAULT_ROTATION_ANGLE)
-    shift_ratio = kwargs.get('shift_ratio', __DEFAULT_SHIFT_RATIO)
-    shear_angle = kwargs.get('shear_angle', __DEFAULT_SHEAR_ANGLE)
-    zoom_ratio = kwargs.get('zoom_ratio', __DEFAULT_ZOOM_RATIO)
+    rotation_angle = kwargs.get("rotation_angle", __DEFAULT_ROTATION_ANGLE)
+    shift_ratio = kwargs.get("shift_ratio", __DEFAULT_SHIFT_RATIO)
+    shear_angle = kwargs.get("shear_angle", __DEFAULT_SHEAR_ANGLE)
+    zoom_ratio = kwargs.get("zoom_ratio", __DEFAULT_ZOOM_RATIO)
 
     # rotation
-    if 'rotation' in ops:
+    if "rotation" in ops:
         img_augs += _image_rotation(img, angle=rotation_angle, num=num, verbose=verbose)
     
     # vertical and horizontal shifts
-    if 'shift' in ops:
+    if "shift" in ops:
         img_augs += _image_shift(img, ratio=shift_ratio, num=num, verbose=verbose)
     
     # shear transformation
-    if 'shear' in ops:
+    if "shear" in ops:
         img_augs += _shear_transformation(img, angle=shear_angle, num=num, verbose=verbose)
     
     # zoom
-    if 'zoom' in ops:
+    if "zoom" in ops:
         img_augs += _image_zoom(img, ratio=zoom_ratio, num=num, verbose=verbose)
     
     return img_augs
@@ -134,7 +138,7 @@ def _image_rotation(img:np.ndarray, angle:Real, num:int, verbose:int=0) -> np.nd
     angles = uniform(-_angle, _angle, num)
 
     if verbose >= 1:
-        print(f'angles = {angles}')
+        print(f"angles = {angles}")
     
     for a in angles:
         M = cv2.getRotationMatrix2D((ncols/2,nrows/2),a,1)
@@ -173,8 +177,8 @@ def _image_shift(img:np.ndarray, ratio:float, num:int, verbose:int=0) -> np.ndar
         shifts.append(next(c))
     
     if verbose >= 1:
-        print(f'shift_y = {shift_y},shift_x = {shift_x}')
-        print(f'shifts = {shifts}')
+        print(f"shift_y = {shift_y},shift_x = {shift_x}")
+        print(f"shifts = {shifts}")
     
     for x,y in shifts:
         M = np.array([[1,0,x],[0,1,y]], dtype=np.float32)
@@ -209,9 +213,9 @@ def _shear_transformation(img:np.ndarray, angle:Real, num:int, verbose:int=0) ->
     radians = uniform(-_angle, _angle, num)
     alphas = np.tan(radians)
 
-    nl = '\n'
+    nl = "\n"
     if verbose >= 1:
-        print(f'radians = {radians}{nl}alphas = {alphas}')
+        print(f"radians = {radians}{nl}alphas = {alphas}")
     
     for a in alphas:
         M = np.array([[1,a,0],[0,1,0]], dtype=np.float32)
@@ -246,9 +250,9 @@ def _image_zoom(img:np.ndarray, ratio:float, num:int, verbose:int=0) -> np.ndarr
 
     ratios = uniform(-_ratio, _ratio, num)
 
-    nl = '\n'
+    nl = "\n"
     if verbose >= 1:
-        print(f'ratios = {ratios}')
+        print(f"ratios = {ratios}")
 
     for r in ratios:
         if r == 0:
@@ -266,7 +270,7 @@ def _image_zoom(img:np.ndarray, ratio:float, num:int, verbose:int=0) -> np.ndarr
             pts1 = np.array([[0,0], [nrows,0], [0,ncols], [nrows,ncols]], dtype=np.float32)
         
         if verbose >= 2:
-            print(f'for ratio = {r}{nl}pts1 = {pts1}{nl}pts2 = {pts2}')
+            print(f"for ratio = {r}{nl}pts1 = {pts1}{nl}pts2 = {pts2}")
         
         M = cv2.getPerspectiveTransform(pts1, pts2)
         l_zoomed.append(cv2.warpPerspective(img,M,(ncols,nrows)))
@@ -323,7 +327,13 @@ def add_border(img:np.ndarray, color:ArrayLike=[0,0,0], add_size:Union[int,Array
 #---------------------------------------------------
 # other operations
 
-def add_background(raw_img:np.ndarray, bkgd_img:np.ndarray, mask_func:callable, kw_mask_func:Optional[dict]=None, save_dst:Optional[str]=None, verbose:Union[int,str]=0, **kwargs) -> Union[np.ndarray, NoReturn]:
+def add_background(raw_img:np.ndarray,
+                  bkgd_img:np.ndarray,
+                  mask_func:callable,
+                  kw_mask_func:Optional[dict]=None,
+                  save_dst:Optional[str]=None,
+                  verbose:Union[int,str]=0,
+                  **kwargs:Any) -> Union[np.ndarray, NoReturn]:
     """
 
     raw_img, bkgd_img in BGR format
@@ -351,7 +361,7 @@ def add_background(raw_img:np.ndarray, bkgd_img:np.ndarray, mask_func:callable, 
     crop_ratio = kwargs.get("crop_ratio", 0.2)
 
     if verbose >= 2:
-        if 'plt' not in dir():
+        if "plt" not in dir():
             import matplotlib.pyplot as plt
         plt.figure()
         plt.imshow(raw_img[...,::-1])
@@ -364,7 +374,7 @@ def add_background(raw_img:np.ndarray, bkgd_img:np.ndarray, mask_func:callable, 
     
     if verbose >= 2:
         plt.figure()
-        plt.imshow(refined_mask, cmap='gray')
+        plt.imshow(refined_mask, cmap="gray")
         plt.show()
     
     x_range = np.sort(np.where(refined_mask.sum(axis=1)>0)[0])
@@ -381,7 +391,7 @@ def add_background(raw_img:np.ndarray, bkgd_img:np.ndarray, mask_func:callable, 
         plt.imshow(cropped_img[...,::-1])
         plt.show()
         plt.figure()
-        plt.imshow(cropped_mask, cmap='gray')
+        plt.imshow(cropped_mask, cmap="gray")
         plt.show()
         print(f"cropped_mask.shape = {cropped_mask.shape}")
         print(f"np.unique(cropped_mask) = {np.unique(cropped_mask)}")

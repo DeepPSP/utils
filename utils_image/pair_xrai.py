@@ -7,7 +7,7 @@ from:
 NOTE: totally not checked
 """
 from numbers import Real
-from typing import Optional, List
+from typing import Optional, List, Any, NoReturn
 
 import numpy as np
 np.set_printoptions(precision=5, suppress=True)
@@ -34,10 +34,10 @@ class SaliencyMask(object):
     Base class for saliency masks. Alone, this class doesn't do anything.
     """
     def __init__(self,
-                graph:tf.Graph,
-                session:tf.Session,
-                y:tf.Tensor,
-                x:tf.Tensor):
+                 graph:tf.Graph,
+                 session:tf.Session,
+                 y:tf.Tensor,
+                 x:tf.Tensor) -> NoReturn:
         """Constructs a SaliencyMask by computing dy/dx.
         Args:
         graph: The TensorFlow graph to evaluate masks on.
@@ -66,7 +66,7 @@ class SaliencyMask(object):
         x_value: Input value, not batched.
         feed_dict: (Optional) feed dictionary to pass to the session.run call.
         """
-        raise NotImplementedError('A derived class should implemented GetMask()')
+        raise NotImplementedError("A derived class should implemented GetMask()")
 
     def GetSmoothedMask(self,
                         x_value:np.ndarray,
@@ -110,10 +110,10 @@ class GradientSaliency(SaliencyMask):
     r"""A SaliencyMask class that computes saliency masks with a gradient."""
 
     def __init__(self,
-                graph:tf.Graph,
-                session:tf.Session,
-                y:tf.Tensor,
-                x:tf.Tensor):
+                 graph:tf.Graph,
+                 session:tf.Session,
+                 y:tf.Tensor,
+                 x:tf.Tensor) -> NoReturn:
         super().__init__(graph, session, y, x)
         self.gradients_node = tf.gradients(y, x)[0]
 
@@ -186,7 +186,7 @@ _FELZENSZWALB_MIN_SEGMENT_SIZE = 150
 def _get_segments_felzenszwalb(img:np.ndarray,
                                resize_image:bool=True,
                                scale_range:Optional[ArrayLike]=None,
-                               dilation_rad:int=5):
+                               dilation_rad:int=5) -> List[np.ndarray]:
     """
     Compute image segments based on Felzenszwalb's algorithm.
     
@@ -238,7 +238,7 @@ def _get_segments_felzenszwalb(img:np.ndarray,
                         original_shape,
                         order=0,
                         preserve_range=True,
-                        mode='constant',
+                        mode="constant",
                         anti_aliasing=False).astype(np.int)
         segs.append(seg)
     masks = _unpack_segs_to_masks(segs)
@@ -295,14 +295,14 @@ class XRAIParameters(object):
     TODO: consider using a namedtuple instead?
     """
     def __init__(self,
-                steps:int=100,
-                area_threshold:Real=1.0,
-                return_baseline_predictions:bool=False,
-                return_ig_attributions:bool=False,
-                return_xrai_segments:bool=False,
-                flatten_xrai_segments:bool=True,
-                algorithm:str='full',
-                **kwargs):
+                 steps:int=100,
+                 area_threshold:Real=1.0,
+                 return_baseline_predictions:bool=False,
+                 return_ig_attributions:bool=False,
+                 return_xrai_segments:bool=False,
+                 flatten_xrai_segments:bool=True,
+                 algorithm:str="full",
+                 **kwargs:Any) -> NoReturn:
         # TODO(tolgab) add return_ig_for_every_step functionality
 
         # Number of steps to use for calculating the Integrated Gradients
@@ -342,14 +342,14 @@ class XRAIParameters(object):
         self.return_ig_for_every_step = kwargs.get("return_ig_for_every_step", False)
         self.algorithm = algorithm
         # EXPERIMENTAL - Contains experimental parameters that may change in future.
-        self.experimental_params = {'min_pixel_diff': 50}
+        self.experimental_params = {"min_pixel_diff": 50}
 
 
 class XRAIOutput(object):
     """
     TODO: consider using a namedtuple instead?
     """
-    def __init__(self, attribution_mask:np.ndarray):
+    def __init__(self, attribution_mask:np.ndarray) -> NoReturn:
         # The saliency mask of individual input features. For an [HxWx3] image, the
         # returned attribution is [H,W,1] float32 array. Where HxW are the
         # dimensions of the image.
@@ -379,7 +379,7 @@ class XRAIOutput(object):
 class XRAI(SaliencyMask):
     """
     """
-    def __init__(self, graph:tf.Graph, session:tf.Session, y:tf.Tensor, x:tf.Tensor):
+    def __init__(self, graph:tf.Graph, session:tf.Session, y:tf.Tensor, x:tf.Tensor) -> NoReturn:
         super(XRAI, self).__init__(graph, session, y, x)
         # Initialize integrated gradients.
         self._integrated_gradients = IntegratedGradients(graph, session, y, x)
@@ -390,10 +390,13 @@ class XRAI(SaliencyMask):
         grads = []
         for baseline in baselines:
             grads.append(
-                self._integrated_gradients.GetMask(img,
-                                                    feed_dict=feed_dict,
-                                                    x_baseline=baseline,
-                                                    x_steps=steps))
+                self._integrated_gradients.GetMask(
+                    img,
+                    feed_dict=feed_dict,
+                    x_baseline=baseline,
+                    x_steps=steps
+                )
+            )
         return grads
 
     def _make_baselines(self, x_value:np.ndarray, x_baselines:List[np.ndarray]) -> List[np.ndarray]:
@@ -510,7 +513,7 @@ class XRAI(SaliencyMask):
             _ba = np.array(base_attribution)
             if _ba.shape != x_value.shape:
                 raise ValueError(
-                f'The base attribution shape should be the same as the shape of `x_value`. Expected {x_value.shape}, got {_ba.shape}')
+                f"The base attribution shape should be the same as the shape of `x_value`. Expected {x_value.shape}, got {_ba.shape}")
 
         # Calculate IG attribution if not provided by the caller.
         if base_attribution is None:
@@ -537,23 +540,23 @@ class XRAI(SaliencyMask):
         else:
             segs = _get_segments_felzenszwalb(x_value)
 
-        if extra_parameters.algorithm == 'full':
+        if extra_parameters.algorithm == "full":
             attr_map, attr_data = self._xrai(
                 attr=attr,
                 segs=segs,
                 area_perc_th=extra_parameters.area_threshold,
-                min_pixel_diff=extra_parameters.experimental_params['min_pixel_diff'],
+                min_pixel_diff=extra_parameters.experimental_params["min_pixel_diff"],
                 gain_fun=_gain_density,
                 integer_segments=extra_parameters.flatten_xrai_segments)
-        elif extra_parameters.algorithm == 'fast':
+        elif extra_parameters.algorithm == "fast":
             attr_map, attr_data = self._xrai_fast(
                 attr=attr,
                 segs=segs,
-                min_pixel_diff=extra_parameters.experimental_params['min_pixel_diff'],
+                min_pixel_diff=extra_parameters.experimental_params["min_pixel_diff"],
                 gain_fun=_gain_density,
                 integer_segments=extra_parameters.flatten_xrai_segments)
         else:
-            raise ValueError(f'Unknown algorithm type: {extra_parameters.algorithm}')
+            raise ValueError(f"Unknown algorithm type: {extra_parameters.algorithm}")
 
         results = XRAIOutput(attr_map)
         results.baselines = x_baselines

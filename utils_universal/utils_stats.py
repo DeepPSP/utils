@@ -5,7 +5,7 @@ frequently used functions for statistics, mainly which have been implemented in 
 import random
 import warnings
 from numbers import Real
-from typing import Union, Optional, List, Tuple
+from typing import Union, Optional, List, Tuple, Any
 
 import numpy as np
 np.set_printoptions(precision=5, suppress=True)
@@ -51,10 +51,10 @@ try:
     ss.multivariate_normal.logpdf(1, 1, 1, allow_singular=True)
 except TypeError:
     warnings.warn(
-        'You are using a version of SciPy that does not support the '\
-        'allow_singular parameter in scipy.stats.multivariate_normal.logpdf(). '\
-        'Future versions of FilterPy will require a version of SciPy that '\
-        'implements this keyword',
+        "You are using a version of SciPy that does not support the "\
+        "allow_singular parameter in scipy.stats.multivariate_normal.logpdf(). "\
+        "Future versions of FilterPy will require a version of SciPy that "\
+        "implements this keyword",
         DeprecationWarning)
     _support_singular = False
 
@@ -74,10 +74,10 @@ def autocorr(x:ArrayLike, normalize:bool=False) -> np.ndarray:
     """
     if normalize:
         _x = np.array(x) - np.mean(x)
-        result = np.correlate(_x, _x, mode='full')[result.size//2:]
+        result = np.correlate(_x, _x, mode="full")[result.size//2:]
         result = result / np.sum(np.power(_x, 2))
     else:
-        result = np.correlate(x, x, mode='full')[result.size//2:]
+        result = np.correlate(x, x, mode="full")[result.size//2:]
     return result
 
 
@@ -93,14 +93,17 @@ def gamrnd(k, theta, shape):
     to write
     """
     ret = np.full(shape, np.nan)
+    raise NotImplementedError
+    # return ret
 
-    return ret
 
-
-def kmeans2_is_correct(data:np.ndarray, centroids:np.ndarray, labels:np.ndarray, verbose:int=0) -> bool:
+def kmeans2_is_correct(data:np.ndarray,
+                       centroids:np.ndarray,
+                       labels:np.ndarray,
+                       verbose:int=0) -> bool:
     """ finished, checked,
 
-    检查from scipy.cluster.vq.kmeans2的结果是否正确
+    check if results from scipy.cluster.vq.kmeans2 is corrrect
 
     Parameters:
     -----------
@@ -114,11 +117,11 @@ def kmeans2_is_correct(data:np.ndarray, centroids:np.ndarray, labels:np.ndarray,
     nb_clusters2 = len(set(labels))
 
     if verbose >= 1:
-        print(f'nb_clusters(len(centroids)) = {nb_clusters}, nb_clusters2(len(set(labels))) = {nb_clusters2}')
+        print(f"nb_clusters(len(centroids)) = {nb_clusters}, nb_clusters2(len(set(labels))) = {nb_clusters2}")
         if verbose >= 2:
-            print(f'data = {data}')
-            print(f'centroids = {centroids}')
-            print(f'labels = {labels}')
+            print(f"data = {data}")
+            print(f"centroids = {centroids}")
+            print(f"labels = {labels}")
     
     if nb_clusters != nb_clusters2:
         return False
@@ -131,12 +134,14 @@ def kmeans2_is_correct(data:np.ndarray, centroids:np.ndarray, labels:np.ndarray,
     
     to_check = [lb for lb in range(nb_clusters) if (labels==lb).sum()>1]
     if verbose >= 1:
-        print(f'to_check = {to_check}')
-        print(f'np.sign(data-centroids[lb]) = {[np.sign(data-centroids[lb]) for lb in to_check]}')
+        print(f"to_check = {to_check}")
+        print(f"np.sign(data-centroids[lb]) = {[np.sign(data-centroids[lb]) for lb in to_check]}")
     return all([len(set(np.sign(data-centroids[lb])))>=2 for lb in to_check])  # == 2 or == 3
 
 
-def is_outlier(to_check_val:Real, normal_vals:Union[List[int],List[float],Tuple[int],Tuple[float],np.ndarray], verbose:int=0) -> bool:
+def is_outlier(to_check_val:Real,
+               normal_vals:Union[List[int],List[float],Tuple[int],Tuple[float],np.ndarray],
+               verbose:int=0) -> bool:
     """ finished, checked,
 
     check if to_check_val is an outlier in normal_vals
@@ -154,11 +159,14 @@ def is_outlier(to_check_val:Real, normal_vals:Union[List[int],List[float],Tuple[
     lower_bound = perc25 - 1.5 * iqr
     upper_bound = perc75 + 1.5 * iqr
     if verbose >= 1:
-        print(f'75 percentile = {perc75}, 25 percentile = {perc25}, iqr = {iqr}, lower_bound = {lower_bound}, upper_bound = {upper_bound}')
+        print(f"75 percentile = {perc75}, 25 percentile = {perc25}, iqr = {iqr}, lower_bound = {lower_bound}, upper_bound = {upper_bound}")
     return not lower_bound <= to_check_val <= upper_bound
 
 
-def log_multivariate_normal_density(X:ArrayLike, means:ArrayLike, covars:ArrayLike, min_covar:float=1.e-7) -> np.ndarray:
+def log_multivariate_normal_density(X:ArrayLike,
+                                    means:ArrayLike,
+                                    covars:ArrayLike,
+                                    min_covar:float=1.e-7) -> np.ndarray:
     """ finished, not checked,
     
     Log probability for full covariance matrices.
@@ -189,7 +197,9 @@ def log_multivariate_normal_density(X:ArrayLike, means:ArrayLike, covars:ArrayLi
     return log_prob
 
 
-def mahalanobis(x:Union[list,tuple,np.ndarray,float], mean:Union[list,tuple,np.ndarray,float], cov:Union[list,tuple,np.ndarray,float]) -> float:
+def mahalanobis(x:Union[list,tuple,np.ndarray,float],
+                mean:Union[list,tuple,np.ndarray,float],
+                cov:Union[list,tuple,np.ndarray,float]) -> float:
     """
     Computes the Mahalanobis distance between the state vector x from the
     Gaussian `mean` with covariance `cov`. This can be thought as the number
@@ -233,7 +243,11 @@ def mahalanobis(x:Union[list,tuple,np.ndarray,float], mean:Union[list,tuple,np.n
     return sqrt(dist)
 
 
-def log_likelihood(z:Union[np.ndarray,float,int], x:np.ndarray, P:np.ndarray, H:np.ndarray, R:np.ndarray) -> Union[np.ndarray,float,int]:
+def log_likelihood(z:Union[np.ndarray,float,int],
+                   x:np.ndarray,
+                   P:np.ndarray,
+                   H:np.ndarray,
+                   R:np.ndarray) -> Union[np.ndarray,float,int]:
     """
     Returns log-likelihood of the measurement z given the Gaussian
     posterior (x, P) using measurement function H and measurement covariance error R
@@ -250,7 +264,11 @@ def log_likelihood(z:Union[np.ndarray,float,int], x:np.ndarray, P:np.ndarray, H:
     return ss.multivariate_normal.logpdf(z, np.dot(H, x), S)
 
 
-def likelihood(z:Union[np.ndarray,float,int], x:np.ndarray, P:np.ndarray, H:np.ndarray, R:np.ndarray) -> Union[np.ndarray,float,int]:
+def likelihood(z:Union[np.ndarray,float,int],
+               x:np.ndarray,
+               P:np.ndarray,
+               H:np.ndarray,
+               R:np.ndarray) -> Union[np.ndarray,float,int]:
     """
     Returns likelihood of the measurement z given the Gaussian
     posterior (x, P) using measurement function H and measurement covariance error R
@@ -266,7 +284,7 @@ def likelihood(z:Union[np.ndarray,float,int], x:np.ndarray, P:np.ndarray, H:np.n
     return np.exp(log_likelihood(z, x, P, H, R))
 
 
-def covariance_ellipse(P, deviations=1):
+def covariance_ellipse(P:np.ndarray, deviations:int=1) -> Tuple[float,float,float]:
     """
     Returns a tuple defining the ellipse representing the 2 dimensional covariance matrix P.
 
@@ -288,12 +306,12 @@ def covariance_ellipse(P, deviations=1):
     height = deviations * sqrt(s[1])
 
     if height > width:
-        raise ValueError('width must be greater than height')
+        raise ValueError("width must be greater than height")
 
     return (orientation, width, height)
 
 
-def _eigsorted(cov, asc=True):
+def _eigsorted(cov:np.ndarray, asc:bool=True) -> Tuple[np.ndarray,np.ndarray]:
     """
     Computes eigenvalues and eigenvectors of a covariance matrix and returns them sorted by eigenvalue.
 
@@ -440,7 +458,7 @@ def sample_entropy(s:ArrayLike, sample_length:int, tolerance:Optional[Real]=None
     
     Note:
     -----
-        The parameter 'sample_length' is equal to m + 1 in Ref[1].
+        The parameter "sample_length" is equal to m + 1 in Ref[1].
 
     References:
     -----------
@@ -464,7 +482,7 @@ def sample_entropy(s:ArrayLike, sample_length:int, tolerance:Optional[Real]=None
 
 
     for i in range(n - M - 1):
-        template = time_series[i:(i+M+1)]  # We have 'M+1' elements in the template
+        template = time_series[i:(i+M+1)]  # We have "M+1" elements in the template
         rem_time_series = time_series[i+1:]
 
         searchlist = np.nonzero(np.abs(rem_time_series - template[0]) < tolerance)[0]
@@ -491,7 +509,10 @@ def sample_entropy(s:ArrayLike, sample_length:int, tolerance:Optional[Real]=None
     return sampen
 
 
-def multiscale_entropy(s:ArrayLike, sample_length:int, tolerance:Optional[Real]=None, maxscale:Optional[int]=None) -> np.ndarray:
+def multiscale_entropy(s:ArrayLike,
+                       sample_length:int,
+                       tolerance:Optional[Real]=None,
+                       maxscale:Optional[int]=None) -> np.ndarray:
     """ finished, not checked,
     
     calculate the multiscale entropy of the given time series considering
@@ -518,7 +539,7 @@ def multiscale_entropy(s:ArrayLike, sample_length:int, tolerance:Optional[Real]=
     """
     sig_len = len(s)
     if tolerance is None:
-        #we need to fix the tolerance at this level. If it remains 'None' it will be changed in call to sample_entropy()
+        #we need to fix the tolerance at this level. If it remains "None" it will be changed in call to sample_entropy()
         tolerance = 0.1*np.std(s)
     if maxscale is None:
         maxscale = len(s)
@@ -569,7 +590,7 @@ def permutation_entropy(s:ArrayLike, order:int=3, delay:int=1, normalize:bool=Fa
     temp = np.empty((order, len(x) - (order - 1) * delay))
     for i in range(order):
         temp[i] = x[i * delay:i * delay + temp.shape[1]]
-    sorted_idx = temp.T.argsort(kind='quicksort')
+    sorted_idx = temp.T.argsort(kind="quicksort")
     # Associate unique integer to each permutations
     hashval = (np.multiply(sorted_idx, hashmult)).sum(1)
     # Return the counts
@@ -619,7 +640,9 @@ def multiscale_permutation_entropy(s:ArrayLike, order:int, delay:int, scale:int)
     return np.array(mspe)
 
 
-def filter_by_percentile(s:ArrayLike, q:Union[int,List[int]], return_mask:bool=False) -> Union[np.ndarray,Tuple[np.ndarray,np.ndarray]]:
+def filter_by_percentile(s:ArrayLike,
+                         q:Union[int,List[int]],
+                         return_mask:bool=False) -> Union[np.ndarray,Tuple[np.ndarray,np.ndarray]]:
     """
 
     Parameters:
@@ -644,7 +667,12 @@ def filter_by_percentile(s:ArrayLike, q:Union[int,List[int]], return_mask:bool=F
         return _s[validity]
 
 
-def train_test_split_dataframe(df:pd.DataFrame, split_cols:Optional[Union[str,List[str],Tuple[str]]]=None, non_split_cols:Optional[Union[str,List[str],Tuple[str]]]=None, test_ratio:float=0.2, verbose:int=0, **kwargs) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def train_test_split_dataframe(df:pd.DataFrame,
+                               split_cols:Optional[Union[str,List[str],Tuple[str]]]=None,
+                               non_split_cols:Optional[Union[str,List[str],Tuple[str]]]=None,
+                               test_ratio:float=0.2,
+                               verbose:int=0,
+                               **kwargs:Any) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """ partly finished,
 
     make a train-test-split of a DataFrame,
@@ -658,7 +686,7 @@ def train_test_split_dataframe(df:pd.DataFrame, split_cols:Optional[Union[str,Li
     df: DataFrame,
         the DataFrame to be split
     split_cols: str, or list or tuple of str, optional,
-        name(s) of the column(s) to be treated as the 'labels',
+        name(s) of the column(s) to be treated as the "labels",
     non_split_cols: str, or list or tuple of str, optional,
         name(s) of the column(s) that should not be split,
         to prevent possible data leakage,
@@ -675,7 +703,7 @@ def train_test_split_dataframe(df:pd.DataFrame, split_cols:Optional[Union[str,Li
     1. all values of cells in each column of `split_cols` and `non_split_cols` should be hashable
     2. when `split_cols` or `non_split_cols` is a very large list,
        or when some of these columns have large lists of unique values,
-       then each 'item' to be split can have very few elements,
+       then each "item" to be split can have very few elements,
        even fewer than 1/`test_ratio`,
        in which cases the test dataframe would be empty
 
@@ -729,7 +757,11 @@ def train_test_split_dataframe(df:pd.DataFrame, split_cols:Optional[Union[str,Li
     return df_train, df_test
 
 
-def _train_test_split_dataframe_strafified(df:pd.DataFrame, split_cols:List[str], test_ratio:float=0.2, verbose:int=0, **kwargs) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def _train_test_split_dataframe_strafified(df:pd.DataFrame,
+                                           split_cols:List[str],
+                                           test_ratio:float=0.2,
+                                           verbose:int=0,
+                                           **kwargs:Any) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     ref. the function `train_test_split_dataframe`
     """
@@ -769,7 +801,11 @@ def _train_test_split_dataframe_strafified(df:pd.DataFrame, split_cols:List[str]
     return df_train, df_test
 
 
-def _train_test_split_dataframe_with_nonsplits(df:pd.DataFrame, non_split_cols:List[str], test_ratio:float=0.2, verbose:int=0, **kwargs) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def _train_test_split_dataframe_with_nonsplits(df:pd.DataFrame,
+                                               non_split_cols:List[str],
+                                               test_ratio:float=0.2,
+                                               verbose:int=0,
+                                               **kwargs:Any) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     ref. the function `train_test_split_dataframe`
     """
@@ -783,7 +819,10 @@ def _train_test_split_dataframe_with_nonsplits(df:pd.DataFrame, non_split_cols:L
     pass
 
 
-def _train_test_split_dataframe_naive(df:pd.DataFrame, test_ratio:float=0.2, verbose:int=0, **kwargs) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def _train_test_split_dataframe_naive(df:pd.DataFrame,
+                                      test_ratio:float=0.2,
+                                      verbose:int=0,
+                                      **kwargs:Any) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     ref. the function `train_test_split_dataframe`
     """
@@ -797,7 +836,12 @@ def _train_test_split_dataframe_naive(df:pd.DataFrame, test_ratio:float=0.2, ver
     return df_train, df_test
 
 
-def _train_test_split_dataframe_hybrid(df:pd.DataFrame, split_cols:List[str], non_split_cols:List[str], test_ratio:float=0.2, verbose:int=0, **kwargs) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def _train_test_split_dataframe_hybrid(df:pd.DataFrame,
+                                       split_cols:List[str],
+                                       non_split_cols:List[str],
+                                       test_ratio:float=0.2,
+                                       verbose:int=0,
+                                       **kwargs:Any) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     ref. the function `train_test_split_dataframe`
     """

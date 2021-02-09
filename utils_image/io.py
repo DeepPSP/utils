@@ -6,7 +6,7 @@ Date: 2019/12/3
 remarks: utilities for io of images
 """
 import os
-from typing import Tuple, Union, Optional, Tuple, NoReturn
+from typing import Tuple, Union, Optional, Tuple, Any, NoReturn
 from random import shuffle
 
 import numpy as np
@@ -29,7 +29,7 @@ class RandomImagePicker(object):
     """
     iterator
     """
-    def __init__(self, directory:str):
+    def __init__(self, directory:str) -> NoReturn:
         """
         """
         self.dir = directory
@@ -122,7 +122,7 @@ def get_decimal_from_dms(dms:ArrayLike, ref:str) -> float:
     minutes = dms[1][0] / dms[1][1] / 60.0
     seconds = dms[2][0] / dms[2][1] / 3600.0
 
-    if ref in ['S', 'W']:
+    if ref in ["S", "W"]:
         degrees = -degrees
         minutes = -minutes
         seconds = -seconds
@@ -133,9 +133,9 @@ def get_decimal_from_dms(dms:ArrayLike, ref:str) -> float:
 def get_coordinates(geotags:dict) -> Tuple[float]:
     """
     """
-    lat = get_decimal_from_dms(geotags['GPSLatitude'], geotags['GPSLatitudeRef'])
+    lat = get_decimal_from_dms(geotags["GPSLatitude"], geotags["GPSLatitudeRef"])
 
-    lon = get_decimal_from_dms(geotags['GPSLongitude'], geotags['GPSLongitudeRef'])
+    lon = get_decimal_from_dms(geotags["GPSLongitude"], geotags["GPSLongitudeRef"])
 
     return (lat,lon)
 
@@ -145,22 +145,22 @@ def exif_color_space(img: Image, verbose:int=0) -> str:
     read color profile info. of Image
     """
     exif = img._getexif() or {}
-    if exif.get(0xA001) == 1 or exif.get(0x0001) == 'R98':
-        img_cs = 'srgb'
+    if exif.get(0xA001) == 1 or exif.get(0x0001) == "R98":
+        img_cs = "srgb"
         if verbose >= 1:
-            print ('This image uses sRGB color space')
-    elif exif.get(0xA001) == 2 or exif.get(0x0001) == 'R03':
-        img_cs = 'adobe_rgb'
+            print ("This image uses sRGB color space")
+    elif exif.get(0xA001) == 2 or exif.get(0x0001) == "R03":
+        img_cs = "adobe_rgb"
         if verbose >= 1:
-            print ('This image uses Adobe RGB color space')
+            print ("This image uses Adobe RGB color space")
     elif exif.get(0xA001) is None and exif.get(0x0001) is None:
-        img_cs = 'unspecified'
+        img_cs = "unspecified"
         if verbose >= 1:
-            print ('Empty EXIF tags ColorSpace and InteropIndex')
+            print ("Empty EXIF tags ColorSpace and InteropIndex")
     else:
-        img_cs = 'unknown'
+        img_cs = "unknown"
         if verbose >= 1:
-            print (f'This image uses UNKNOWN color space ({exif.get(0xA001)}, {exif.get(0x0001)})')
+            print (f"This image uses UNKNOWN color space ({exif.get(0xA001)}, {exif.get(0x0001)})")
     return img_cs
 
 
@@ -170,7 +170,11 @@ def exif_color_space(img: Image, verbose:int=0) -> str:
 
 # -------------------------------------------------
 
-def normalize_image(img:np.ndarray, value_range:ArrayLike, resize_shape:Optional[Tuple[int,int]]=None, backend:str='skimage', **kwargs) -> np.ndarray:
+def normalize_image(img:np.ndarray,
+                    value_range:ArrayLike,
+                    resize_shape:Optional[Tuple[int,int]]=None,
+                    backend:str="skimage",
+                    **kwargs:Any) -> np.ndarray:
     """
     Normalize an image by resizing it and rescaling its values
 
@@ -188,9 +192,9 @@ def normalize_image(img:np.ndarray, value_range:ArrayLike, resize_shape:Optional
     normalized_img: ndarray
         resized and rescaled image
     """
-    if backend == 'skimage':
+    if backend == "skimage":
         from skimage.transform import resize
-    elif backend == 'cv2':
+    elif backend == "cv2":
         from cv2 import resize
     dtype = kwargs.get("dtype", np.float32)
     verbose = kwargs.get("verbose", 0)
@@ -200,14 +204,14 @@ def normalize_image(img:np.ndarray, value_range:ArrayLike, resize_shape:Optional
     normalized_img = (img - img_min) / (img_max - img_min)
     normalized_img = normalized_img * (value_range[1] - value_range[0]) + value_range[0]
     if resize_shape is not None:
-        if backend == 'skimage':
+        if backend == "skimage":
             normalized_img = resize(normalized_img,
                         resize_shape,
                         order=3,
-                        mode='constant',
+                        mode="constant",
                         preserve_range=True,
                         anti_aliasing=True)
-        elif backend == 'cv2':
+        elif backend == "cv2":
             normalized_img = resize(normalized_img, resize_shape[::-1])
     normalized_img = normalized_img.astype(dtype)
     return normalized_img
@@ -236,7 +240,7 @@ def synthesis_img(raw_img:np.ndarray, bkgd_img:np.ndarray, raw_mask:np.ndarray, 
         the generated image
     """
     if verbose >= 2:
-        if 'plt' not in dir():
+        if "plt" not in dir():
             import matplotlib.pyplot as plt
         plt.figure()
         plt.imshow(raw_img[...,::-1])
@@ -245,7 +249,7 @@ def synthesis_img(raw_img:np.ndarray, bkgd_img:np.ndarray, raw_mask:np.ndarray, 
         plt.imshow(bkgd_img[...,::-1])
         plt.show()
         plt.figure()
-        plt.imshow(raw_mask, cmap='gray')
+        plt.imshow(raw_mask, cmap="gray")
         plt.show()
     
     refined_mask = np.where(raw_mask>125, np.ones_like(raw_mask,dtype=np.uint8), np.zeros_like(raw_mask,dtype=np.uint8))
@@ -253,7 +257,7 @@ def synthesis_img(raw_img:np.ndarray, bkgd_img:np.ndarray, raw_mask:np.ndarray, 
     
     if verbose >= 2:
         plt.figure()
-        plt.imshow(refined_mask, cmap='gray')
+        plt.imshow(refined_mask, cmap="gray")
         plt.show()
     
     x_range = np.sort(np.where(refined_mask.sum(axis=1)>0)[0])
@@ -270,7 +274,7 @@ def synthesis_img(raw_img:np.ndarray, bkgd_img:np.ndarray, raw_mask:np.ndarray, 
         plt.imshow(cropped_img[...,::-1])
         plt.show()
         plt.figure()
-        plt.imshow(cropped_mask, cmap='gray')
+        plt.imshow(cropped_mask, cmap="gray")
         plt.show()
         print(f"cropped_mask.shape = {cropped_mask.shape}")
         print(f"np.unique(cropped_mask) = {np.unique(cropped_mask)}")

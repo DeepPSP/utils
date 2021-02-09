@@ -27,7 +27,7 @@ __all__ = [
 ]
 
 
-def plot_single_lead_ecg(s:ArrayLike, fs:Real, use_idx:bool=False, **kwargs) -> NoReturn:
+def plot_single_lead_ecg(s:ArrayLike, fs:Real, use_idx:bool=False, **kwargs:Any) -> NoReturn:
     """ NOT finished, NOT checked,
 
     single lead ECG plot,
@@ -66,29 +66,29 @@ def plot_single_lead_ecg(s:ArrayLike, fs:Real, use_idx:bool=False, **kwargs) -> 
         fig, ax = plt.subplots(figsize=(fig_sz, 6))
         ax.plot(secs, mvs, color="black")
 
-        ax.axhline(y=0, linestyle='-', linewidth='1.0', color='red')
+        ax.axhline(y=0, linestyle="-", linewidth="1.0", color="red")
         ax.xaxis.set_major_locator(plt.MultipleLocator(0.2))
         ax.xaxis.set_minor_locator(plt.MultipleLocator(0.04))
         ax.yaxis.set_major_locator(plt.MultipleLocator(0.5))
         ax.yaxis.set_minor_locator(plt.MultipleLocator(0.1))
-        ax.grid(which='major', linestyle='-', linewidth='0.5', color='red')
-        ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
+        ax.grid(which="major", linestyle="-", linewidth="0.5", color="red")
+        ax.grid(which="minor", linestyle=":", linewidth="0.5", color="black")
         ax.set_xlim(secs[0], secs[-1])
         ax.set_ylim(-1.5, 1.5)
         if waves:
             for w, w_indices in waves.items():
                 epoch_w = [wi-idx_start for wi in w_indices if idx_start <= wi < idx_end]
                 for wi in epoch_w:
-                    ax.axvline(wi, linestyle='dashed', linewidth=0.7, color='magenta')
+                    ax.axvline(wi, linestyle="dashed", linewidth=0.7, color="magenta")
         if use_idx:
-            plt.xlabel('Samples')
+            plt.xlabel("Samples")
         else:
-            plt.xlabel('Time [s]')
-        plt.ylabel('Voltage [mV]')
+            plt.xlabel("Time [s]")
+        plt.ylabel("Voltage [mV]")
         plt.show()
 
 
-def plot_hypnogram(sleep_stage_curve:ArrayLike, style:str='original', **kwargs) -> NoReturn:
+def plot_hypnogram(sleep_stage_curve:ArrayLike, style:str="original", **kwargs:Any) -> NoReturn:
     """ NOT finished, NOT checked,
 
     plot the hypnogram
@@ -96,44 +96,50 @@ def plot_hypnogram(sleep_stage_curve:ArrayLike, style:str='original', **kwargs) 
     Parameters:
     -----------
     sleep_stage_curve: array_like,
-        the sleep stage curve, each element is of the form 't, val',
+        the sleep stage curve, each element is of the form "t, val",
         allowed stages are (case insensitive)
         - awake
         - REM
         - NREM1, NREM2, NREM3, NREM4
-    style: str, default 'original'
-        style of the hypnogram, can be the original style, or 'vspan'
+    style: str, default "original"
+        style of the hypnogram, can be the original style, or "vspan"
     kwargs: dict,
         other key word arguments, including
         - ax: the axis to plot
     """
-    all_stages = ['NREM4', 'NREM3', 'NREM2', 'NREM1', 'REM', 'awake',]
+    all_stages = ["NREM4", "NREM3", "NREM2", "NREM1", "REM", "awake",]
     all_stages = [item for item in all_stages if item.lower() in set([p[1].lower() for p in sleep_stage_curve])]
     all_stages = {all_stages[idx]:idx for idx in range(1,len(all_stages)+1)}
 
     palette = {
-        'awake': 'orange',
-        'REM': 'yellow',
-        'NREM1': 'green',
-        'NREM2': 'cyan',
-        'NREM3': 'blue',
-        'NREM4': 'purple',
+        "awake": "orange",
+        "REM": "yellow",
+        "NREM1": "green",
+        "NREM2": "cyan",
+        "NREM3": "blue",
+        "NREM4": "purple",
     }
     patches = {k: mpatches.Patch(color=c, label=k) for k,c in palette.items()}
 
-    ax = kwargs.get('ax', None)
+    ax = kwargs.get("ax", None)
     if ax is None:
         fig, ax = plt.subplots(figsize=(20,12))
 
-    if style == 'original':
+    if style == "original":
         pass
-    elif style == 'vspan':
+    elif style == "vspan":
         pass
 
     raise NotImplementedError
 
 
-def plot_confusion_matrix(y_true:ArrayLike, y_pred:ArrayLike, classes:Sequence[str], normalize:Optional[str]=None, title:Optional[str]=None, save_path:Optional[str]=None, cmap:Optional[Any]=None) -> Any:
+def plot_confusion_matrix(y_true:ArrayLike,
+                          y_pred:ArrayLike,
+                          classes:Sequence[str],
+                          normalize:Optional[str]=None,
+                          title:Optional[str]=None,
+                          save_path:Optional[str]=None,
+                          cmap:Optional[Any]=None) -> Any:
     """ finished, NOT checked,
 
     This function prints and plots the confusion matrix.
@@ -149,7 +155,7 @@ def plot_confusion_matrix(y_true:ArrayLike, y_pred:ArrayLike, classes:Sequence[s
     classes: sequence of str,
         sequence of names of the classes
     normalize: str, optional, case insensitive,
-        can be one of 'true', 'pred', 'all', or None
+        can be one of "true", "pred", "all", or None
         if not None, normalizes confusion matrix over the true (rows),
         predicted (columns) conditions or all the population
     title: str, optional,
@@ -176,7 +182,7 @@ def plot_confusion_matrix(y_true:ArrayLike, y_pred:ArrayLike, classes:Sequence[s
     #         include_values=True,
     #         cmap=(cmap or plt.cm.Blues),
     #         xticks_rotation=30,
-    #         values_format=('.2f' if normalize else 'd'),
+    #         values_format=(".2f" if normalize else "d"),
     #     )
     #     return disp
     # except:
@@ -184,12 +190,12 @@ def plot_confusion_matrix(y_true:ArrayLike, y_pred:ArrayLike, classes:Sequence[s
 
     if not title:
         if normalize:
-            title = f'Normalized confusion matrix (along {normalize})'
+            title = f"Normalized confusion matrix (along {normalize})"
         else:
-            title = 'Confusion matrix'
+            title = "Confusion matrix"
 
     fig, ax = plt.subplots(figsize=(5, 5), dpi=150)
-    im = ax.imshow(cm, interpolation='nearest', cmap=(cmap or plt.cm.Blues))
+    im = ax.imshow(cm, interpolation="nearest", cmap=(cmap or plt.cm.Blues))
     # ax.figure.colorbar(im, ax=ax)
     # We want to show all ticks...
     ax.set(
@@ -198,19 +204,19 @@ def plot_confusion_matrix(y_true:ArrayLike, y_pred:ArrayLike, classes:Sequence[s
         # ... and label them with the respective list entries
         xticklabels=classes, yticklabels=classes,
         # title=title,
-        # ylabel='True label',
-        # xlabel='Predicted label',
+        # ylabel="True label",
+        # xlabel="Predicted label",
     )
     ax.set_title(title, fontsize=18)
     ax.set_xlabel("True severity",fontsize=14)
     ax.set_ylabel("Predicted severity",fontsize=14)
-    ax.tick_params(axis = 'both', which = 'major', labelsize = 16)
+    ax.tick_params(axis="both", which="major", labelsize=16)
 
     # Rotate the tick labels and set their alignment.
     plt.setp(ax.get_xticklabels(), rotation=30, ha="right", rotation_mode="anchor")
 
     # Loop over data dimensions and create text annotations.
-    fmt = '.2f' if normalize else 'd'
+    fmt = ".2f" if normalize else "d"
     thresh = cm.max() / 2.
     for i in range(cm.shape[0]):
         for j in range(cm.shape[1]):
@@ -223,7 +229,7 @@ def plot_confusion_matrix(y_true:ArrayLike, y_pred:ArrayLike, classes:Sequence[s
     fig.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, bbox_inches='tight', transparent=True)
+        plt.savefig(save_path, bbox_inches="tight", transparent=True)
 
     return ax
 
@@ -250,7 +256,7 @@ class EcgAnimation(animation.FuncAnimation):
         -----------
         to write
         """
-        rc('animation', html='jshtml')
+        rc("animation", html="jshtml")
 
         self.signal = np.array(signal)
         if self._auto_infer_units() == "mV":
@@ -304,17 +310,17 @@ class EcgAnimation(animation.FuncAnimation):
     def _create_background(self,) -> NoReturn:
         """
         """
-        self._ax.axhline(y=0, linestyle='-', linewidth='1.0', color='red')
+        self._ax.axhline(y=0, linestyle="-", linewidth="1.0", color="red")
         self._ax.xaxis.set_major_locator(plt.MultipleLocator(0.2))
         self._ax.xaxis.set_minor_locator(plt.MultipleLocator(0.04))
         self._ax.yaxis.set_major_locator(plt.MultipleLocator(500))
         self._ax.yaxis.set_minor_locator(plt.MultipleLocator(1000))
-        self._ax.grid(which='major', linestyle='-', linewidth='0.5', color='red')
-        self._ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
+        self._ax.grid(which="major", linestyle="-", linewidth="0.5", color="red")
+        self._ax.grid(which="minor", linestyle=":", linewidth="0.5", color="black")
         self._ax.set_xlim(0, self.__default_duration_anim__)
         self._ax.set_ylim(-np.max(np.abs(self.signal))*1.2, np.max(np.abs(self.signal))*1.2)
-        self._ax.set_xlabel('Time [s]')
-        self._ax.set_ylabel('Voltage [μV]')
+        self._ax.set_xlabel("Time [s]")
+        self._ax.set_ylabel("Voltage [μV]")
         self._line, = self._ax.plot([], [])
 
     def _animate(self, frame:int) -> Tuple[mpl.artist.Artist]:
@@ -348,14 +354,14 @@ class EcgAnimation(animation.FuncAnimation):
         Returns:
         --------
         units: str,
-            units of `data`, 'μV' or 'mV'
+            units of `data`, "μV" or "mV"
         """
         _MAX_mV = 20  # 20mV, seldom an ECG device has range larger than this value
         max_val = np.max(self.signal) - np.min(self.signal)
         if max_val > _MAX_mV:
-            units = 'μV'
+            units = "μV"
         else:
-            units = 'mV'
+            units = "mV"
         return units
 
 
@@ -383,7 +389,7 @@ class EcgAnimation(animation.FuncAnimation):
 #         """
 #         super().__init__()
 #         output = W.Output()
-#         rc('animation', html='jshtml')
+#         rc("animation", html="jshtml")
 
 #         self.signal = np.array(signal)
 #         if self._auto_infer_units() == "mV":
@@ -464,17 +470,17 @@ class EcgAnimation(animation.FuncAnimation):
 #     def _create_background(self,) -> NoReturn:
 #         """
 #         """
-#         self._ax.axhline(y=0, linestyle='-', linewidth='1.0', color='red')
+#         self._ax.axhline(y=0, linestyle="-", linewidth="1.0", color="red")
 #         self._ax.xaxis.set_major_locator(plt.MultipleLocator(0.2))
 #         self._ax.xaxis.set_minor_locator(plt.MultipleLocator(0.04))
 #         self._ax.yaxis.set_major_locator(plt.MultipleLocator(0.5))
 #         self._ax.yaxis.set_minor_locator(plt.MultipleLocator(0.1))
-#         self._ax.grid(which='major', linestyle='-', linewidth='0.5', color='red')
-#         self._ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
+#         self._ax.grid(which="major", linestyle="-", linewidth="0.5", color="red")
+#         self._ax.grid(which="minor", linestyle=":", linewidth="0.5", color="black")
 #         self._ax.set_xlim(0, self.__default_duration_anim__)
 #         # ax.set_ylim(-np.max(np.abs(self.signal))*1.2, np.max(np.abs(self.signal))*1.2)
-#         self._ax.set_xlabel('Time [s]')
-#         self._ax.set_ylabel('Voltage [μV]')
+#         self._ax.set_xlabel("Time [s]")
+#         self._ax.set_ylabel("Voltage [μV]")
 #         self._line, = self._ax.plot([], [])
 
 #     def _animate(self, frame_idx:int) -> Tuple[mpl.artist.Artist]:
@@ -503,9 +509,9 @@ class EcgAnimation(animation.FuncAnimation):
 #         """
 #         """
 #         l = W.Layout(
-#             border='solid 1px black',
-#             margin='0px 10px 10px 0px',
-#             padding='5px 5px 5px 5px'
+#             border="solid 1px black",
+#             margin="0px 10px 10px 0px",
+#             padding="5px 5px 5px 5px"
 #         )
 #         return l
 
@@ -517,12 +523,12 @@ class EcgAnimation(animation.FuncAnimation):
 #         Returns:
 #         --------
 #         units: str,
-#             units of `data`, 'μV' or 'mV'
+#             units of `data`, "μV" or "mV"
 #         """
 #         _MAX_mV = 20  # 20mV, seldom an ECG device has range larger than this value
 #         max_val = np.max(self.signal) - np.min(self.signal)
 #         if max_val > _MAX_mV:
-#             units = 'μV'
+#             units = "μV"
 #         else:
-#             units = 'mV'
+#             units = "mV"
 #         return units
