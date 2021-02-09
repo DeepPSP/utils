@@ -11,7 +11,10 @@ from random import shuffle
 
 import numpy as np
 np.set_printoptions(precision=5, suppress=True)
-import cv2
+try:
+    import cv2
+except:
+    cv2 = None
 
 from ..common import ArrayLike
 
@@ -195,6 +198,8 @@ def normalize_image(img:np.ndarray,
     if backend == "skimage":
         from skimage.transform import resize
     elif backend == "cv2":
+        if cv2 is None:
+            raise ValueError(f"cv2 is not available!")
         from cv2 import resize
     dtype = kwargs.get("dtype", np.float32)
     verbose = kwargs.get("verbose", 0)
@@ -212,12 +217,18 @@ def normalize_image(img:np.ndarray,
                         preserve_range=True,
                         anti_aliasing=True)
         elif backend == "cv2":
+            if cv2 is None:
+                raise ValueError(f"cv2 is not available!")
             normalized_img = resize(normalized_img, resize_shape[::-1])
     normalized_img = normalized_img.astype(dtype)
     return normalized_img
 
 
-def synthesis_img(raw_img:np.ndarray, bkgd_img:np.ndarray, raw_mask:np.ndarray, save_path:Optional[str]=None, verbose:int=0):
+def synthesis_img(raw_img:np.ndarray,
+                  bkgd_img:np.ndarray,
+                  raw_mask:np.ndarray,
+                  save_path:Optional[str]=None,
+                  verbose:int=0):
     """ finished, checked,
 
     generate synthetic image using `raw_img` with background `bkgd_img`, where the unchanged foreground is given by `raw_mask`
@@ -280,7 +291,15 @@ def synthesis_img(raw_img:np.ndarray, bkgd_img:np.ndarray, raw_mask:np.ndarray, 
         print(f"np.unique(cropped_mask) = {np.unique(cropped_mask)}")
 
     bkgd_ratio = max(1, cropped_img.shape[0]/bkgd_img.shape[0], cropped_img.shape[1]/bkgd_img.shape[1])
-    cropped_bkgd = cv2.resize(bkgd_img, (int(bkgd_ratio*cropped_img.shape[1]), int(bkgd_ratio*cropped_img.shape[0])))
+    if cv2 is None:
+        cropped_bkgd = np.array(PIL.Image.fromarray(bkgd_img).resize(
+            (int(bkgd_ratio*cropped_img.shape[1]), int(bkgd_ratio*cropped_img.shape[0]))
+        ))
+    else:
+        cropped_bkgd = cv2.resize(
+            bkgd_img,
+            (int(bkgd_ratio*cropped_img.shape[1]), int(bkgd_ratio*cropped_img.shape[0]))
+        )
     cropped_bkgd_x_min = randint(0, cropped_bkgd.shape[0]-cropped_img.shape[0]+1)
     cropped_bkgd_y_min = randint(0, cropped_bkgd.shape[1]-cropped_img.shape[1]+1)
     cropped_bkgd = cropped_bkgd[cropped_bkgd_x_min:cropped_bkgd_x_min+cropped_img.shape[0], cropped_bkgd_y_min:cropped_bkgd_y_min+cropped_img.shape[1]]
@@ -296,7 +315,10 @@ def synthesis_img(raw_img:np.ndarray, bkgd_img:np.ndarray, raw_mask:np.ndarray, 
     sys_img = np.where(cropped_mask_3d==1, cropped_img, cropped_bkgd)
     
     if save_path is not None:
-        cv2.imwrite(save_path, sys_img)
+        if cv2 is None:
+            PIL.Image.fromarray(sys_img).save(save_path)
+        else:
+            cv2.imwrite(save_path, sys_img)
 
     return sys_img
 
@@ -328,6 +350,9 @@ def _get_refined_mask(img:np.ndarray, raw_mask:np.ndarray) -> Tuple[np.ndarray]:
     [3] https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_morphological_ops/py_morphological_ops.html
     """
     cm_2_pxl = 50
+
+    if cv2 is None:
+        raise ValueError(f"cv2 is not available!")
     
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # CLAHE
