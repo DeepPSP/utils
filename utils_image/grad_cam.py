@@ -13,7 +13,10 @@ from keras.layers.core import Layer
 from keras.models import Model
 import keras.backend as K
 import tensorflow as tf
-import cv2
+try:
+    import cv2
+except:
+    cv2 = None
 
 from ..common import ArrayLike, modulo
 

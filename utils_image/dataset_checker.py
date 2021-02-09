@@ -12,7 +12,10 @@ import os
 import numpy as np
 np.set_printoptions(precision=5, suppress=True)
 import pandas as pd
-import cv2
+try:
+    import cv2
+except:
+    cv2 = None
 import matplotlib.pyplot as plt
 
 

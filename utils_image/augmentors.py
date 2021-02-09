@@ -19,7 +19,10 @@ from copy import deepcopy
 from numbers import Real
 from typing import Union, Optional, Any, Callable, Tuple, Dict, List, NoReturn
 
-import cv2
+try:
+    import cv2
+except:
+    cv2 = None
 import pandas as pd
 import numpy as np
 np.set_printoptions(precision=5, suppress=True)

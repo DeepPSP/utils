@@ -15,9 +15,12 @@ experiment result: backend "cv2" is 10-100 times faster than backend "naive"
 """
 from copy import deepcopy
 from numbers import Real
-from typing import Union, Optional, NoReturn
+from typing import Union, Optional, NoReturn, Any
 
-import cv2
+try:
+    import cv2
+except:
+    cv2 = None
 import colour
 import numpy as np
 np.set_printoptions(precision=5, suppress=True)
@@ -42,7 +45,11 @@ _AVAILABLE_CVT_COLOR_BACKENDS = [
 ]
 
 
-def generate_pure_color_image(height:int, width:int, rgb_color:ArrayLike_Int, show:bool=True, **kwargs) -> np.ndarray:
+def generate_pure_color_image(height:int,
+                              width:int,
+                              rgb_color:ArrayLike_Int,
+                              show:bool=True,
+                              **kwargs:Any) -> np.ndarray:
     """ finished, checked,
 
     Create an RGB image of pure color `rgb_color`
@@ -81,7 +88,9 @@ def generate_pure_color_image(height:int, width:int, rgb_color:ArrayLike_Int, sh
     return pure_color_image
 
 
-def compatible_imshow(img_path:str, return_fmt:Optional[str]=None, **kwargs) -> Union[np.ndarray,NoReturn]:
+def compatible_imshow(img_path:str,
+                      return_fmt:Optional[str]=None,
+                      **kwargs:Any) -> Union[np.ndarray,NoReturn]:
     """ not finished, not checked,
 
     show the image correctly using cv2 and plt
@@ -167,7 +176,11 @@ def compatible_imread_cv2(img_path:str, return_fmt:str) -> np.ndarray:
 # color converter
 
 
-def convert_color(img:np.ndarray, src_fmt:str, dst_fmt:str, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def convert_color(img:np.ndarray,
+                  src_fmt:str,
+                  dst_fmt:str,
+                  backend:Optional[str]=None,
+                  **kwargs:Any) -> np.ndarray:
     """ partly finished, partly checked,
 
     TODO: check compatibiliy of each backend
@@ -255,7 +268,7 @@ def convert_color(img:np.ndarray, src_fmt:str, dst_fmt:str, backend:Optional[str
     return dst_img
 
 
-def _rgb_to_grey(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def _rgb_to_grey(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> np.ndarray:
     """ not finished, finished part checked,
 
     convert `img` from the color space of RGB to the color space of gray levels
@@ -292,7 +305,7 @@ def _rgb_to_grey(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.nda
     return grey
 
 
-def _rgb_to_ciexyz(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def _rgb_to_ciexyz(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> np.ndarray:
     """ not finished, finished part checked,
 
     convert `img` from the color space of RGB to the color space of CIEXYZ
@@ -337,7 +350,7 @@ def _rgb_to_ciexyz(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.n
     return cie_xyz
 
 
-def _rgb_to_ciexyy(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def _rgb_to_ciexyy(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> np.ndarray:
     """ not finished, finished part checked,
 
     convert `img` from the color space of RGB to the color space of CIExyY
@@ -372,7 +385,7 @@ def _rgb_to_ciexyy(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.n
     return cie_xyy
 
 
-def _rgb_to_ciexy(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def _rgb_to_ciexy(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> np.ndarray:
     """ not finished, finished part checked,
 
     convert `img` from the color space of RGB to the color space of CIExy
@@ -407,7 +420,11 @@ def _rgb_to_ciexy(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.nd
     return cie_xy
 
 
-def _ciexyz_to_cielab(img:np.ndarray, illuminant:str="D65", observer:int=2, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def _ciexyz_to_cielab(img:np.ndarray,
+                      illuminant:str="D65",
+                      observer:int=2,
+                      backend:Optional[str]=None,
+                      **kwargs:Any) -> np.ndarray:
     """ not finished, finished part checked,
 
     convert `img` from the color space of CIEXYZ to the color space of CIELAB
@@ -458,7 +475,11 @@ def _ciexyz_to_cielab(img:np.ndarray, illuminant:str="D65", observer:int=2, back
     return cie_lab
 
 
-def _rgb_to_cielab(img:np.ndarray, illuminant:str="D65", observer:int=2, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def _rgb_to_cielab(img:np.ndarray,
+                   illuminant:str="D65",
+                   observer:int=2,
+                   backend:Optional[str]=None,
+                   **kwargs:Any) -> np.ndarray:
     """ not finished, finished part checked,
 
     convert `img` from the color space of RGB to the color space of CIELAB
@@ -496,7 +517,11 @@ def _rgb_to_cielab(img:np.ndarray, illuminant:str="D65", observer:int=2, backend
     return cie_lab
 
 
-def _rgb_to_cieluv(img:np.ndarray, illuminant:str="D65", observer:int=2, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def _rgb_to_cieluv(img:np.ndarray,
+                   illuminant:str="D65",
+                   observer:int=2,
+                   backend:Optional[str]=None,
+                   **kwargs:Any) -> np.ndarray:
     """ not finished, finished part checked,
 
     convert `img` from the color space of RGB to the color space of CIELUV
@@ -532,7 +557,7 @@ def _rgb_to_cieluv(img:np.ndarray, illuminant:str="D65", observer:int=2, backend
     return cieluv
 
 
-def _rgb_to_ycbcr(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def _rgb_to_ycbcr(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> np.ndarray:
     """ not finished, finished part checked,
 
     convert `img` from the color space of RGB to the color space of YCbCr
@@ -564,7 +589,7 @@ def _rgb_to_ycbcr(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.nd
     return ycbcr
 
 
-def _rgb_to_yiq(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def _rgb_to_yiq(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> np.ndarray:
     """ not finished, finished part checked,
 
     convert `img` from the color space of RGB to the color space of YIQ
@@ -602,7 +627,7 @@ def _rgb_to_yiq(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.ndar
     return yiq
 
 
-def _rgb_to_hsv(img:np.ndarray, scale:Real=1, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def _rgb_to_hsv(img:np.ndarray, scale:Real=1, backend:Optional[str]=None, **kwargs:Any) -> np.ndarray:
     """ not finished, finished part checked,
 
     convert `img` from the color space of RGB to the color space of HSV
@@ -642,7 +667,7 @@ def _rgb_to_hsv(img:np.ndarray, scale:Real=1, backend:Optional[str]=None, **kwar
     return hsv
 
 
-def _rgb_to_cmyk(img:np.ndarray, scale:Real=1, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def _rgb_to_cmyk(img:np.ndarray, scale:Real=1, backend:Optional[str]=None, **kwargs:Any) -> np.ndarray:
     """ not finished, finished part checked,
 
     convert `img` from the color space of RGB to the color space of CMYK
@@ -694,7 +719,7 @@ def _rgb_to_cmyk(img:np.ndarray, scale:Real=1, backend:Optional[str]=None, **kwa
     return cmyk
 
 
-def _rgb_to_hex(img:np.ndarray, **kwargs) -> np.ndarray:
+def _rgb_to_hex(img:np.ndarray, **kwargs:Any) -> np.ndarray:
     """ not finished, finished part checked,
 
     convert `img` from the color space of RGB to the format of hex
@@ -716,7 +741,7 @@ def _rgb_to_hex(img:np.ndarray, **kwargs) -> np.ndarray:
     return img_hex
 
 
-def _ciexyz_to_rgb(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.ndarray:
+def _ciexyz_to_rgb(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> np.ndarray:
     """ not finished, not checked,
 
     convert `img` from the color space of CIEXYZ to the color space of RGB
@@ -752,7 +777,7 @@ def _ciexyz_to_rgb(img:np.ndarray, backend:Optional[str]=None, **kwargs) -> np.n
     return rgb
 
 
-def _validate_img_fmt(img:np.ndarray, fmt:str, **kwargs) -> Union[np.ndarray, NoReturn]:
+def _validate_img_fmt(img:np.ndarray, fmt:str, **kwargs:Any) -> Union[np.ndarray, NoReturn]:
     """ not finished,
 
     check if `img` is a valid image in the format (color space) of `fmt`
@@ -777,7 +802,7 @@ def _validate_img_fmt(img:np.ndarray, fmt:str, **kwargs) -> Union[np.ndarray, No
     return valid_img
 
 
-def _validate_rgb(rgb_img:np.ndarray, verbose:int=0, **kwargs) -> Union[np.ndarray, NoReturn]:
+def _validate_rgb(rgb_img:np.ndarray, verbose:int=0, **kwargs:Any) -> Union[np.ndarray, NoReturn]:
     """ finished, checked,
 
     check if `rgb_img` is a valid RGB image
@@ -832,7 +857,11 @@ def _rescale_rgb(rgb_img:np.ndarray, verbose:int=0) -> np.ndarray:
 #--------------------------------------------------------------
 # some applications
 
-def get_color_type(roi_pixels:ArrayLike, color_space:str, rule_func:callable, kw_rf:Optional[dict]=None, **kwargs) -> tuple:
+def get_color_type(roi_pixels:ArrayLike,
+                   color_space:str,
+                   rule_func:callable,
+                   kw_rf:Optional[dict]=None,
+                   **kwargs:Any) -> tuple:
     """
 
     Parameters:
@@ -890,7 +919,7 @@ def get_color_type(roi_pixels:ArrayLike, color_space:str, rule_func:callable, kw
 class ColorSpace(object):
     """
     """
-    def __init__(self, name:str):
+    def __init__(self, name:str) -> NoReturn:
         """
         """
         self.name = name
@@ -936,8 +965,6 @@ HSV_RANGE = []
 YIQ_RANGE = []
 YCBCR_RANGE = []
 CMYK_RANGE = []
-
-
 
 
 
