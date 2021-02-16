@@ -22,8 +22,6 @@ pydub:
     https://github.com/jiaaro/pydub
 SoundFile:
     https://github.com/bastibe/SoundFile
-audioread:
-    https://github.com/beetbox/audioread
 
 other packages；
     https://github.com/tuffy/python-audio-tools (or http://audiotools.sourceforge.net)
