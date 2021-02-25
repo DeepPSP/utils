@@ -4,6 +4,7 @@ utilities for signal processing, which numpy, scipy, etc. lack
 """
 from copy import deepcopy
 from collections import namedtuple
+from itertools import repeat
 from numbers import Number, Real
 from typing import Union, List, NamedTuple, Optional, Tuple, Sequence, Any, NoReturn
 
@@ -41,8 +42,10 @@ __all__ = [
     "butter_bandpass_filter",
     "hampel",
     "detect_flat_lines",
-    "MovingAverage",
+    "MovingAverage", "smooth",
     "gen_gaussian_noise", "gen_sinusoidal_noise", "gen_baseline_wander",
+    "remove_spikes_naive",
+    "ensure_lead_fmt", "ensure_siglen",
 ]
 
 
@@ -1199,7 +1202,7 @@ def resample_discontinuous_irregular_timeseries(s:ArrayLike,
                                                 method:str="spline",
                                                 return_with_time:bool=True,
                                                 tnew:Optional[ArrayLike]=None,
-                                                options:dict={},
+                                                interp_kw:dict={},
                                                 verbose:int=0) -> List[np.ndarray]:
     """ finished, checked,
 
@@ -1219,8 +1222,10 @@ def resample_discontinuous_irregular_timeseries(s:ArrayLike,
         return a 2d array, with the 0-th coordinate being time
     tnew: array_like, optional,
         the array of time of the output array
-    options: dict, default {},
+    interp_kw: dict, default {},
         additional options for the corresponding methods in scipy.interpolate
+    verbose: int, default 0,
+        verbosity
 
     Returns:
     --------
@@ -1244,7 +1249,7 @@ def resample_discontinuous_irregular_timeseries(s:ArrayLike,
             method=method,
             return_with_time=return_with_time,
             tnew=l_tnew[idx],
-            options=options,
+            interp_kw=interp_kw,
             verbose=verbose
         )
         result.append(r)
@@ -1755,6 +1760,52 @@ def ensure_lead_fmt(values:Sequence[Real],
     return out_values
 
 
+def ensure_siglen(values:Sequence[Real], siglen:int, fmt:str="lead_first") -> np.ndarray:
+    """ finished, checked,
+
+    ensure the (ECG) signal to be of length `siglen`,
+    strategy:
+        if `values` has length greater than `siglen`,
+        the central `siglen` samples will be adopted;
+        otherwise, zero padding will be added to both sides
+
+    Parameters:
+    -----------
+    values: sequence,
+        values of the `n_leads`-lead (ECG) signal
+    siglen: int,
+        length of the signal supposed to have
+    fmt: str, default "lead_first", case insensitive,
+        format of the input and output values, can be one of
+        "lead_first" (alias "channel_first"), "lead_last" (alias "channel_last")
+
+    Returns:
+    --------
+    out_values: ndarray,
+        ECG signal in the format of `fmt` and of fixed length `siglen`
+    """
+    if fmt.lower() in ["channel_last", "lead_last"]:
+        _values = np.array(values).T
+    else:
+        _values = np.array(values).copy()
+    original_siglen = _values.shape[1]
+    n_leads = _values.shape[0]
+
+    if original_siglen >= siglen:
+        start = (original_siglen - siglen) // 2
+        end = start + siglen
+        out_values = _values[..., start:end]
+    else:
+        pad_left = (siglen - original_siglen)//2
+        pad_right = siglen - pad_left
+        out_values = np.concatenate([np.zeros((n_leads, pad_left)), _values, np.zeros((n_leads, pad_right))], axis=1)
+
+    if fmt.lower() in ["channel_last", "lead_last"]:
+        out_values = out_values.T
+    
+    return out_values
+
+
 def gen_gaussian_noise(siglen:int, mean:Real=0, std:Real=0) -> np.ndarray:
     """ finished, checked,
 
@@ -1864,3 +1915,28 @@ def gen_baseline_wander(siglen:int,
         end_phase = duration * bf * 360 + start_phase
         bw += gen_sinusoidal_noise(siglen, start_phase, end_phase, a, 0, 0)
     return bw
+
+
+def remove_spikes_naive(sig:np.ndarray) -> np.ndarray:
+    """ finished, checked,
+
+    remove `spikes` from `sig` using a naive method proposed in entry 0416 of CPSC2019
+
+    `spikes` here refers to abrupt large bumps with (abs) value larger than 20 mV,
+    do NOT confuse with `spikes` in paced rhythm
+
+    Parameters:
+    -----------
+    sig: ndarray,
+        single-lead ECG signal with potential spikes
+    
+    Returns:
+    --------
+    filtered_sig: ndarray,
+        ECG signal with `spikes` removed
+    """
+    b = list(filter(lambda k: k > 0, np.argwhere(np.abs(sig)>20).squeeze(-1)))
+    filtered_sig = sig.copy()
+    for k in b:
+        filtered_sig[k] = filtered_sig[k-1]
+    return filtered_sig
