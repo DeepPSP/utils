@@ -44,7 +44,7 @@ class BibLookup(object):
     """
     __name__ = "BibLookup"
 
-    def __init__(self, align:str="middle", email:Optional[str]=None) -> NoReturn:
+    def __init__(self, align:str="middle", email:Optional[str]=None, **kwargs) -> NoReturn:
         """ finished, checked,
 
         Parameters:
@@ -54,6 +54,8 @@ class BibLookup(object):
             can be one of "middle", "left", "left-middle", "left_middle"
         email: str, optional,
             email for querying PubMed publications
+        kwargs: additional key word arguments, including
+            "verbose",
         """
         self.align = align.lower()
         self.email = email
@@ -77,6 +79,8 @@ class BibLookup(object):
         self.__arxiv_pattern = f"^(?:{self.__arxiv_pattern_prefix})?(?:[\w\-]+\/\d+|\d+\.\d+(v(\d+))?)$"
         # self.__arxiv_pattern_old = f"^(?:{self.__arxiv_pattern_prefix})?[\w\-]+\/\d+$"
         self.__default_err = "Not Found"
+
+        self.verbose = kwargs.get("verbose", 0)
 
 
     def __call__(self, identifier:str, align:Optional[str]=None) -> str:
@@ -333,8 +337,11 @@ class BibLookup(object):
             the string `s` enclosed with braces
         """
         s_str = str(s).strip()
-        new_s = s_str.strip("{},")
-        new_s = f"{{{new_s}}}"
+        # new_s = s_str.strip("{},")  # counter example "publisher = {{IOP} Publishing},"
+        # new_s = f"{{{new_s}}}"
+        new_s = s_str.strip(",")
+        if not all([new_s.startswith("{"), new_s.endswith("}")]):
+            new_s = f"{{{new_s}}}"
         if s_str.endswith(","):
             new_s += ","
         return new_s
