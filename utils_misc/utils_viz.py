@@ -24,7 +24,7 @@ __all__ = [
     "plot_single_lead_ecg",
     "plot_hypnogram",
     "plot_confusion_matrix",
-    "EcgAnimation"，
+    "EcgAnimation",
 ]
 
 
