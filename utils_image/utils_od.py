@@ -41,8 +41,8 @@ def dataset_to_tfrecords(img_dirs:Union[str, List[str]],
 
     to tfrecords for object detection training
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img_dirs: str, or list of str,
         directory(s) for the image files
     ann_dirs: str, or list of str,
@@ -61,8 +61,8 @@ def dataset_to_tfrecords(img_dirs:Union[str, List[str]],
     csv_save_path: str, optional,
         path to store the csv files containing infomation (filename, width, height, class, xmin, ymin, xmax, ymax, subclass, area) of the whole dataset, and the traing set and the test set
 
-    Returns:
-    --------
+    Returns
+    -------
     ret, dict,
         with items "nb_train", "nb_test"
     """
@@ -129,8 +129,8 @@ def voc_to_df(img_dir:str,
 
     pascal voc annotations (in xml format) to one DataFrame (csv file)
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img_dir: str,
         directory of the image files
     ann_dir: str,
@@ -140,8 +140,8 @@ def voc_to_df(img_dir:str,
     class_map: dict, optional,
         label map, from class names of the annotations to the class names for training
 
-    Returns:
-    --------
+    Returns
+    -------
     bbox_df: DataFrame,
         annotations in one DataFrame
     """
@@ -218,8 +218,8 @@ def yolo_to_df(img_dir:str,
 
     yolo annotations (in txt format) to one csv file
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img_dir: str,
         directory of the image files
     ann_dir: str,
@@ -229,12 +229,14 @@ def yolo_to_df(img_dir:str,
     class_map: dict, optional,
         label map, from class indices of the annotations to the class names for training
 
-    Returns:
-    --------
+    Returns
+    -------
     bbox_df: DataFrame,
         annotations in one DataFrame
 
-    NOTE: each line of each file is of the form `classIndex xcen ycen w h`
+    NOTE
+    ----
+    each line of each file is of the form `classIndex xcen ycen w h`
     """
     ann_list = []
     img_dir_filenames = os.listdir(img_dir)
@@ -301,8 +303,8 @@ def coco_to_df(img_dir:str,
 
     coco annotations (in json format) to one csv file
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img_dir: str,
         directory of the image files
     ann_dir: str,
@@ -312,8 +314,8 @@ def coco_to_df(img_dir:str,
     class_map: dict, optional,
         label map, from class names of the annotations to the class names for training
 
-    Returns:
-    --------
+    Returns
+    -------
     bbox_df: DataFrame,
         annotations in one DataFrame
     """
@@ -335,8 +337,8 @@ def create_tfexample(group:namedtuple,
 
     one image with bounding box annotations to one tf Example
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     group: namedtuple,
         with "filename" and "data", "data" consisting of bounding boxes and image width, height
     pbtxt_dict: dict,
@@ -344,8 +346,8 @@ def create_tfexample(group:namedtuple,
     ignore_difficult_instances: bool, default False,
         ignore the difficult instances (bounding boxes) or not
 
-    Returns:
-    --------
+    Returns
+    -------
     tf_example: Example,
     """
     with tf.gfile.GFile(group.filename, "rb") as fid:
@@ -411,8 +413,8 @@ def df_to_tfrecord(df:pd.DataFrame, save_path:str, pbtxt_dict:Dict[str,int]) -> 
 
     construct tfrecord from information stored in a DataFrame,
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     df: DataFrame,
         the DataFrame which stores the information for constructing the tfrecord
     save_path: str,
@@ -420,8 +422,8 @@ def df_to_tfrecord(df:pd.DataFrame, save_path:str, pbtxt_dict:Dict[str,int]) -> 
     pbtxt_dict: dict,
         label map, from class name to class number
     
-    Returns:
-    --------
+    Returns
+    -------
     nb_samples: int,
         number of samples (images) for the tfrecord
     """
@@ -497,8 +499,8 @@ def bboxes_iou_torch(bboxes_a:Tensor, bboxes_b:Tensor, fmt:str="voc", iou_type:s
     IoU is calculated as a ratio of area of the intersection
     and area of the union.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     bbox_a (array): An array whose shape is :math:`(N, 4)`.
         :math:`N` is the number of bounding boxes.
         The dtype should be :obj:`numpy.float32`.
@@ -506,8 +508,8 @@ def bboxes_iou_torch(bboxes_a:Tensor, bboxes_b:Tensor, fmt:str="voc", iou_type:s
         whose shape is :math:`(K, 4)`.
         The dtype should be :obj:`numpy.float32`.
     
-    Returns:
-    --------
+    Returns
+    -------
     array:
         An array whose shape is :math:`(N, K)`. \
         An element at index :math:`(n, k)` contains IoUs between \
@@ -624,8 +626,8 @@ def nms(boxes:np.ndarray,
     """
     non-maximum suppression
 
-    Paramters:
-    ----------
+    Paramters
+    ---------
     boxes: ndarray, of shape (n, 4),
         the bounding boxes
     confs: ndarray, of shape (n,),
@@ -638,12 +640,12 @@ def nms(boxes:np.ndarray,
         if True, denominator of computing the intersection ratio will be the area of the smaller box;
         otherwise the area of the union of two boxes
 
-    Returns:
-    --------
+    Returns
+    -------
     ndarray, of shape (m, 4), m <= n
 
-    References:
-    -----------
+    References
+    ----------
     [1] https://github.com/Tianxiaomo/pytorch-YOLOv4/blob/master/tool/utils.py
     """
     if box_fmt.lower() == "coco":

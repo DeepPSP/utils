@@ -18,16 +18,16 @@ __all__ = [
 class BibLookup(object):
     """ finished, continuous improving,
 
-    References:
-    -----------
+    References
+    ----------
     [1] https://github.com/davidagraf/doi2bib2
     [2] https://arxiv.org/help/api
     [3] https://github.com/mfcovington/pubmed-lookup/
     [4] https://serpapi.com/google-scholar-cite-api
     [5] https://www.bibtex.com/
 
-    Example:
-    --------
+    Example
+    -------
     >>> bl = BibLookup(align="middle")
     >>> res = bl("1707.07183")
     @article{wen2017_1707.07183v2,
@@ -47,8 +47,8 @@ class BibLookup(object):
     def __init__(self, align:str="middle", email:Optional[str]=None, **kwargs) -> NoReturn:
         """ finished, checked,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         align: str, default "middle",
             alignment of the final output, case insensitive,
             can be one of "middle", "left", "left-middle", "left_middle"
@@ -86,8 +86,8 @@ class BibLookup(object):
     def __call__(self, identifier:str, align:Optional[str]=None) -> str:
         """ finished, checked,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         identifier: str,
             identifier of a publication,
             can be DOI, PMID (or url), PMCID (or url), arXiv id,
@@ -95,8 +95,8 @@ class BibLookup(object):
             alignment of the final output, case insensitive,
             if specified, `self.align` is ignored
         
-        Returns:
-        --------
+        Returns
+        -------
         res: str,
             the final output in the `str` format
         """
@@ -120,14 +120,14 @@ class BibLookup(object):
     def _obtain_feed_content(self, identifier:str) -> Tuple[str, dict]:
         """ finished, checked,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         identifier: str,
             identifier of a publication,
             can be DOI, PMID (or url), PMCID (or url), arXiv id,
 
-        Returns:
-        --------
+        Returns
+        -------
         category: str,
             one of "doi", "pm", "arxiv"
         fc: dict,
@@ -190,13 +190,13 @@ class BibLookup(object):
 
         handle a DOI query using POST
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         feed_content: dict,
             the content to feed to POST
 
-        Returns:
-        --------
+        Returns
+        -------
         res: str,
             decoded query result
         """
@@ -210,13 +210,13 @@ class BibLookup(object):
 
         handle a PubMed query using POST
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         feed_content: dict,
             the content to feed to POST
 
-        Returns:
-        --------
+        Returns
+        -------
         res: str,
             decoded query result
         """
@@ -236,13 +236,13 @@ class BibLookup(object):
 
         handle a arXiv query using GET
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         feed_content: dict,
             the content to feed to GET
 
-        Returns:
-        --------
+        Returns
+        -------
         res: dict,
             decoded and parsed query result
         """
@@ -275,16 +275,16 @@ class BibLookup(object):
     def _align_result(self, res:Union[str,Dict[str,str]], align:Optional[str]=None) -> str:
         """ finished, checked,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         res: str or dict,
             result obtained via GET or POST
         align: str, optional,
             alignment of the final output, case insensitive,
             if specified, `self.align` is ignored
 
-        Returns:
-        --------
+        Returns
+        -------
         new_str: str,
             the aligned bib string
         """
@@ -326,13 +326,13 @@ class BibLookup(object):
 
         ensure that the input string is enclosed with braces
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         s: str,
             the input string, possibly enclosed with braces and possibly not
 
-        Returns:
-        --------
+        Returns
+        -------
         new_s: str,
             the string `s` enclosed with braces
         """

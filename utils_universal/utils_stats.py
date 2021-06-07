@@ -64,12 +64,12 @@ def autocorr(x:ArrayLike, normalize:bool=False) -> np.ndarray:
 
     autocorrelation of the time series x
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     if normalize:
@@ -84,12 +84,12 @@ def autocorr(x:ArrayLike, normalize:bool=False) -> np.ndarray:
 def gamrnd(k, theta, shape):
     """ not finished,
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     ret = np.full(shape, np.nan)
@@ -105,12 +105,12 @@ def kmeans2_is_correct(data:np.ndarray,
 
     check if results from scipy.cluster.vq.kmeans2 is corrrect
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     nb_clusters = len(centroids)
@@ -146,12 +146,12 @@ def is_outlier(to_check_val:Real,
 
     check if to_check_val is an outlier in normal_vals
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     perc75, perc25 = np.percentile(normal_vals, [75,25])
@@ -171,12 +171,12 @@ def log_multivariate_normal_density(X:ArrayLike,
     
     Log probability for full covariance matrices.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     _X =  np.array(X)
@@ -206,8 +206,8 @@ def mahalanobis(x:Union[list,tuple,np.ndarray,float],
     of standard deviations x is from the mean, i.e. a return value of 3 means
     x is 3 std from mean.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x: (N,) array_like, or float,
         Input state vector
     mean: (N,) array_like, or float,
@@ -215,13 +215,13 @@ def mahalanobis(x:Union[list,tuple,np.ndarray,float],
     cov: (N, N) array_like  or float,
         covariance of the multivariate Gaussian
 
-    Returns:
-    --------
+    Returns
+    -------
     mahalanobis: float,
         The Mahalanobis distance between vectors `x` and `mean`
     
-    Examples:
-    ---------
+    Examples
+    --------
     >>> mahalanobis(x=3., mean=3.5, cov=4.**2) # univariate case
     0.125
     >>> mahalanobis(x=3., mean=6, cov=1) # univariate, 3 std away
@@ -252,12 +252,12 @@ def log_likelihood(z:Union[np.ndarray,float,int],
     Returns log-likelihood of the measurement z given the Gaussian
     posterior (x, P) using measurement function H and measurement covariance error R
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     S = np.dot(H, np.dot(P, H.T)) + R
@@ -273,12 +273,12 @@ def likelihood(z:Union[np.ndarray,float,int],
     Returns likelihood of the measurement z given the Gaussian
     posterior (x, P) using measurement function H and measurement covariance error R
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     return np.exp(log_likelihood(z, x, P, H, R))
@@ -288,15 +288,15 @@ def covariance_ellipse(P:np.ndarray, deviations:int=1) -> Tuple[float,float,floa
     """
     Returns a tuple defining the ellipse representing the 2 dimensional covariance matrix P.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     P: nd.array shape (2,2),
        covariance matrix
     deviations: int (optional, default = 1),
        # of standard deviations. Default is 1.
     
-    Returns:
-    --------
+    Returns
+    -------
     (angle_radians, width_radius, height_radius),
     """
 
@@ -315,16 +315,16 @@ def _eigsorted(cov:np.ndarray, asc:bool=True) -> Tuple[np.ndarray,np.ndarray]:
     """
     Computes eigenvalues and eigenvectors of a covariance matrix and returns them sorted by eigenvalue.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     cov: ndarray,
         covariance matrix
     asc: bool, default=True,
         determines whether we are sorted smallest to largest (asc=True),
         or largest to smallest (asc=False)
 
-    Returns:
-    --------
+    Returns
+    -------
     eigval: 1D ndarray,
         eigenvalues of covariance ordered largest to smallest
     eigvec: 2D ndarray,
@@ -346,12 +346,12 @@ def rand_student_t(df:Real, mu:Real=0, std:Real=1) -> Real:
     return random number distributed by student's t distribution with
     `df` degrees of freedom with the specified mean and standard deviation.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
 
@@ -365,8 +365,8 @@ def samp_ent(s:ArrayLike, m:int, r:Real) -> float:
 
     sample entropy of signal `s`, equals ent.sample_entropy(s, m, r)[-1], a simple version
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     s: array_like,
         the signal (time series)
     m: int,
@@ -374,8 +374,8 @@ def samp_ent(s:ArrayLike, m:int, r:Real) -> float:
     r: real number,
         tolerance
 
-    Returns:
-    --------
+    Returns
+    -------
     sample entropy, ratio "#templates of length k+1" / "#templates of length k"
 
     copied from
@@ -404,12 +404,12 @@ def samp_ent(s:ArrayLike, m:int, r:Real) -> float:
 def shannon_entropy(s:ArrayLike) -> float:
     """Return the Shannon Entropy of the sample data.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     s: Vector or string of the sample data
 
-    Returns:
-    --------
+    Returns
+    -------
     The Shannon Entropy as float value
     """
     # Create a frequency data
@@ -440,8 +440,8 @@ def sample_entropy(s:ArrayLike, sample_length:int, tolerance:Optional[Real]=None
     It is quite fast for random data, but can be slower is there is
     structure in the input time series.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     s: array_like
         the time series for analysis
     sample_length: int,
@@ -449,19 +449,19 @@ def sample_entropy(s:ArrayLike, sample_length:int, tolerance:Optional[Real]=None
     tolerance: real number, optional,
         tolerance (defaults to 0.1 * std(time_series)))
     
-    Returns:
-    --------
+    Returns
+    -------
     np.ndarray, the vector of sample entropies
 
         SE[k] is ratio "#templates of length k+1" / "#templates of length k"
         where #templates of length 0" = n*(n - 1) / 2, by definition
     
-    Note:
-    -----
-        The parameter "sample_length" is equal to m + 1 in Ref[1].
+    NOTE
+    ----
+    The parameter "sample_length" is equal to m + 1 in Ref[1].
 
-    References:
-    -----------
+    References
+    ----------
     [1] http://en.wikipedia.org/wiki/Sample_Entropy
     [2] http://physionet.incor.usp.br/physiotools/sampen/
     [3] Madalena Costa, Ary Goldberger, CK Peng. Multiscale entropy analysis of biological signals
@@ -518,8 +518,8 @@ def multiscale_entropy(s:ArrayLike,
     calculate the multiscale entropy of the given time series considering
     different time-scales of the time series
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     s: array_like,
         the time series for analysis
     sample_length: int,
@@ -529,12 +529,12 @@ def multiscale_entropy(s:ArrayLike,
     maxscale: int, optional
         (to check)
 
-    Returns:
-    --------
+    Returns
+    -------
     np.ndarray, the vector containing multiscale entropy
 
-    Reference:
-    ----------
+    Reference
+    ---------
     [1] http://en.pudn.com/downloads149/sourcecode/math/detail646216_en.html
     """
     sig_len = len(s)
@@ -571,8 +571,8 @@ def permutation_entropy(s:ArrayLike, order:int=3, delay:int=1, normalize:bool=Fa
         if True, divide by log2(factorial(m)) to normalize the entropy
         between 0 and 1. Otherwise, return the permutation entropy in bit
 
-    Returns:
-    --------
+    Returns
+    -------
     pe: float,
         permutation entropy
 
@@ -608,8 +608,8 @@ def multiscale_permutation_entropy(s:ArrayLike, order:int, delay:int, scale:int)
     
     Calculate the Multiscale Permutation Entropy
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     s: array_like,
         time series for analysis
     order: int,
@@ -619,12 +619,12 @@ def multiscale_permutation_entropy(s:ArrayLike, order:int, delay:int, scale:int)
     scale: int,
         scale factor
 
-    Returns:
-    --------
+    Returns
+    -------
     np.ndarray, the vector containing multiscale permutation entropy
 
-    Reference:
-    ----------
+    Reference
+    ---------
     [1] Francesco Carlo Morabito et al. Multivariate Multi-Scale Permutation Entropy for
         Complexity Analysis of Alzheimer’s Disease EEG. www.mdpi.com/1099-4300/14/7/1186
     [2] http://www.mathworks.com/matlabcentral/fileexchange/37288-multiscale-permutation-entropy-mpe/content/MPerm.m
@@ -645,12 +645,12 @@ def filter_by_percentile(s:ArrayLike,
                          return_mask:bool=False) -> Union[np.ndarray,Tuple[np.ndarray,np.ndarray]]:
     """
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     """
     _s = np.array(s)
     original_shape = _s.shape
@@ -681,7 +681,7 @@ def train_test_split_dataframe(df:pd.DataFrame,
     1. the distributions of certain features are the same in both the train and the test set
     2. subjects with some certain features are not split, preventing data leakage
 
-    Parameters:
+    Parameters
     ----------
     df: DataFrame,
         the DataFrame to be split
@@ -695,11 +695,12 @@ def train_test_split_dataframe(df:pd.DataFrame,
         ratio of the test DataFrame, 0.0-1.0
     verbose: int, default 0
 
-    Returns:
-    --------
+    Returns
+    -------
     (df_train, df_test): tuple of DataFrame
 
-    NOTE:
+    NOTE
+    ----
     1. all values of cells in each column of `split_cols` and `non_split_cols` should be hashable
     2. when `split_cols` or `non_split_cols` is a very large list,
        or when some of these columns have large lists of unique values,

@@ -160,15 +160,16 @@ class Voice(object):
     def load(self, backend:str="librosa", **kwargs:Any) -> NoReturn:
         """ partly finished,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         backend: str, default `librosa`,
             backend module that reads the audio files
         kwargs: dict,
             arguments for the `backend` reading the audio files,
             for example `sr` for `librosa`
 
-        NOTE:
+        NOTE
+        ----
         1. files that Praat can read:
         http://www.fon.hum.uva.nl/praat/manual/Sound_files_3__Files_that_Praat_can_read.html
         """
@@ -232,7 +233,7 @@ class Voice(object):
     def resample(self, new_fs:Real) -> NoReturn:
         """
 
-        Parameters:
+        Parameters
         ----------
         new_fs: real,
             the new frequency
@@ -261,8 +262,8 @@ class Voice(object):
              **kwargs:Any) -> NoReturn:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         filename: str,
             name of the file to save
         fmt: str, default "wav", optional,
@@ -298,8 +299,8 @@ class Voice(object):
     def bandpass_filter(self, **kwargs:Any) -> NoReturn:
         """ finished,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         kwargs: dict,
             arguments for butter bandpass filter, including "lowcut", "highcut", "order"
         """
@@ -329,8 +330,8 @@ class Voice(object):
                          **kwargs:Any) -> NoReturn:
         """ partly finished,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         backend: str, default "praat",
             backend for computation of voice intensity
         time_range: array_like, optional,
@@ -378,8 +379,8 @@ class Voice(object):
                        **kwargs:Any) -> NoReturn:
         """ partly finished,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         backend: str, default "praat",
             backend for computation of voice intensity
         time_range: array_like, optional,
@@ -444,8 +445,8 @@ class Voice(object):
                         **kwargs:Any) -> NoReturn:
         """ partly finished,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         backend: str, default "praat",
             backend for computation of voice intensity
         time_range: array_like, optional,
@@ -486,8 +487,8 @@ class Voice(object):
                                    kw_power:Optional[dict]=None) -> NoReturn:
         """ partly finished,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         backend: str, default "praat",
             backend for computation of voice intensity
         time_range: array_like, optional,
@@ -539,8 +540,8 @@ class Voice(object):
                            **kwargs:Any) -> NoReturn:
         """ partly finished,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         backend: str, default "praat",
             backend for computation of voice intensity
         time_range: array_like, optional,
@@ -572,8 +573,8 @@ class Voice(object):
                            **kwargs:Any) -> NoReturn:
         """ not finished,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         backend: str, default "praat",
             backend for computation of voice intensity
         time_range: array_like, optional,
@@ -641,8 +642,8 @@ class Voice(object):
                         **kwargs:Any) -> NoReturn:
         """ not finished,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         backend: str, default "praat",
             backend for computation of voice intensity
         time_range: array_like, optional,
@@ -671,8 +672,8 @@ class Voice(object):
                     **kwargs:Any) -> NoReturn:
         """ not finished,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         backend: str, default "praat",
             backend for computation of voice intensity
         time_range: array_like, optional,
@@ -714,8 +715,8 @@ class Voice(object):
 
         Jitter is time distortions of recording/playback of a digital audio signal, a deviation of time between the digital and analog samples (deviation of sampling rate)
         
-        Parameters:
-        -----------
+        Parameters
+        ----------
         backend: str, default "praat",
             backend for computation of voice intensity
         time_range: array_like, optional,
@@ -757,16 +758,16 @@ class Voice(object):
                  **kwargs:Any) -> Any:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         freqs: list of array_like,
             list of frequency bands to be equalized
         gains: real, or list of real,
             the gains corresponding to the `freqs` for equalization
         inplace: bool, default False
 
-        Returns:
-        --------
+        Returns
+        -------
         None or equalized Voice
         """
         se = self.values.copy()
@@ -790,8 +791,8 @@ class Voice(object):
                                 **kwargs:Any) -> np.ndarray:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         lowcut: real,
             lower bound of the frequency band to compute energy proportion
         highcut: real,
@@ -799,8 +800,8 @@ class Voice(object):
         time_range: array_like, optional,
             of the form [start_sec, end_sec], time range for computation
 
-        Returns:
-        --------
+        Returns
+        -------
         epc: ndarray, of shape (n,2),
         """
         df = np.diff(self.spectrogram.y_grid())[0]
@@ -838,8 +839,8 @@ class Voice(object):
                           **kwargs:Any) -> float:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         lowcut: real,
             lower bound of the frequency band to compute energy proportion
         highcut: real,
@@ -847,8 +848,8 @@ class Voice(object):
         time_range: array_like, optional,
             of the form [start_sec, end_sec], time range for computation
 
-        Returns:
-        --------
+        Returns
+        -------
         proportion: float,
         """
         epc = self.energy_proportion_curve(lowcut=lowcut, highcut=highcut, time_range=time_range, **kwargs)
@@ -867,8 +868,8 @@ class Voice(object):
                                  t_threshold:Real=0.06) -> NoReturn:
         """ partly finished,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         backend: str, default "praat",
             backend for computation of voice intensity
         time_range: array_like, optional,
@@ -927,8 +928,8 @@ class Voice(object):
                       **kwargs:Any) -> NoReturn:
         """ partly finished,
         
-        Parameters:
-        -----------
+        Parameters
+        ----------
         backend: str, default "praat",
             backend for computation of voice intensity
         time_range: array_like, optional,
@@ -1013,8 +1014,8 @@ class Voice(object):
 
         TODO: use `librosa.effects. split`
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
 
         """
         raise NotImplementedError
@@ -1026,8 +1027,8 @@ class Voice(object):
     def plot(self, items:Optional[Union[str, List[str]]]=None, **kwargs:Any) -> NoReturn:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         items: str or list of str, optional,
             items to plot, including "spectrogram", "signal", "pitches", "formants", "intensity", "vuv"
 
@@ -1146,8 +1147,8 @@ class Voice(object):
     
     def _plot_praat(self, **kwargs:Any) -> NoReturn:
         """
-        Parameters:
-        -----------
+        Parameters
+        ----------
 
         """
         if "plt" not in dir():
@@ -1226,8 +1227,8 @@ class Voice(object):
                                 **kwargs:Any) -> NoReturn:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
 
         """
         c = self.energy_proportion_curve(lowcut=lowcut, highcut=highcut, **kwargs)

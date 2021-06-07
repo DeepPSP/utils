@@ -32,7 +32,7 @@ def bboxes_iou(bboxes_a:Tensor, bboxes_b:Tensor, fmt:str="voc", iou_type:str="io
 	Calculate the Intersection of Unions (IoUs) between bounding boxes.
     IoU is calculated as a ratio of area of the intersection and area of the union.
 
-    Parameters:
+    Parameters
 	-----------
 	bbox_a: Tensor,
         a `Tensor` whose shape is :math:`(N, 4)`.
@@ -51,7 +51,7 @@ def bboxes_iou(bboxes_a:Tensor, bboxes_b:Tensor, fmt:str="voc", iou_type:str="io
     iou_type: str, default "iou", case insensitive,
         IoU type, can be one of "iou", "giou", "diou", "ciou",
         for the details of each IoU, ref. [1]
-    Returns:
+    Returns
 	--------
 	iou: Tensor,
         of shape :math:`(N, K)`.
@@ -59,8 +59,8 @@ def bboxes_iou(bboxes_a:Tensor, bboxes_b:Tensor, fmt:str="voc", iou_type:str="io
         the :math:`n` th bounding box in :obj:`bbox_a`
         and :math:`k` th bounding box in :obj:`bbox_b`.
 
-    References:
-    -----------
+    References
+    ----------
     [1] Zheng, Zhaohui, et al. "Enhancing Geometric Factors in Model Learning and Inference for Object Detection and Instance Segmentation." arXiv preprint arXiv:2005.03572 (2020).
     [2] https://github.com/chainer/chainercv
     """

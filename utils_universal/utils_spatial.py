@@ -2,7 +2,8 @@
 """
 utilities for spatial objects and computations, which numpy, scipy, etc. lack
 
-NOTE:
+NOTE
+----
 implemented geometric objects in sympy:
     Point, Point2D, Point3D,
     Line, Ray, Segment, Line2D, Segment2D, Ray2D, Line3D, Segment3D, Ray3D,
@@ -107,8 +108,8 @@ class LineSegment2D(GeometricObject):
     def __init__(self, *points:Any, **kwargs:Any) -> NoReturn:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         points: array like, of shape (2,2)
             the 2 end points of the line segment
         """
@@ -135,8 +136,8 @@ class LineSegment2D(GeometricObject):
     def affine_transform(self, mat:ArrayLike, shift:Optional[ArrayLike]=None):
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         mat: array like,
         shift: array like,
         """
@@ -168,8 +169,8 @@ class Triangle2D(GeometricObject):
     def __init__(self, *points:Any, **kwargs:Any) -> NoReturn:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         points: array like, of shape (3,2)
             the 3 apexes of the triangle
         """
@@ -272,8 +273,8 @@ class ConvexCone2D(GeometricObject):
                  **kwargs:Any) -> NoReturn:
         """ finished, checked,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         apex: array_like,
             point in 2d Cartesian space, apex of the 2D convex cone
         axis_vec: array_like, optional,
@@ -286,8 +287,8 @@ class ConvexCone2D(GeometricObject):
         right_vec:
             vector of the right (compared to the axis vector) border line
 
-        NOTE:
-        -----
+        NOTE
+        ----
         `axis_vec` and `angle`, or `left_vec` and `right_vec` should be specified at the same time
 
         TODO:
@@ -333,13 +334,13 @@ class ConvexCone2D(GeometricObject):
     def to_relative_polar_coord(self, point:ArrayLike) -> np.ndarray:
         """ finished, checked,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         point: array_like,
             a point in the 2d cartesian space
 
-        Returns:
-        --------
+        Returns
+        -------
         ndarray,
             polar coordinates of `point`
         """
@@ -381,8 +382,8 @@ class ConvexCone2D(GeometricObject):
         1. correct the errors when `xlim` and `ylim` (when given in kwargs) are not so appropriate (sovled!)
         2. (?absurd) support the case where the box formed by `xlim` and `ylim` (when given in kwargs) do not include the `self.apex`
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         show: bool, default False,
             to show the plot or return it
         kw_ray: dict, optional,
@@ -393,8 +394,8 @@ class ConvexCone2D(GeometricObject):
             other key word arguments that can be passed,
             including "fig", "ax", "xlim", "ylim"
 
-        Returns:
-        --------
+        Returns
+        -------
         tuple, or None,
             if `show` is set True, then none will be returned,
             otherwise (fig, ax) is returned
@@ -469,14 +470,14 @@ class ConvexCone2D(GeometricObject):
         """
         check the dimension of the ambient space of the passed points or vectors is 2 or not
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         points_and_vectors: array_like,
             the points and vectors to check
         in_details: bool, default False,
             to specify for each point or vector, or return a boolean conclusion for all of them
         
-        Returns: bool, or ndarray
+        Returns bool, or ndarray
         """
         is_valid = np.array([
             np.array(item).flatten().shape[0]==2 for item in points_and_vectors if item is not None
@@ -514,8 +515,8 @@ class Fan2D(ConvexCone2D):
                  **kwargs:Any) -> NoReturn:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         radius: real number,
         apex: array_like,
         axis_vec: array_like, optional,
@@ -541,13 +542,13 @@ class Fan2D(ConvexCone2D):
     def is_inside(self, point:ArrayLike, strict:bool=False) -> bool:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         point: array_like,
         strict: bool, default False,
 
-        Returns:
-        --------
+        Returns
+        -------
         to write
         """
         dist_to_apex = LA.norm(np.array(point)-self.apex)
@@ -583,8 +584,8 @@ class Ellipse(GeometricObject):
     def __init__(self, center:ArrayLike, axis_vecs:ArrayLike) -> NoReturn:
         """ not finished,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         center: array_like,
         axis_vec: array_like,
         """
@@ -594,8 +595,8 @@ class Ellipse(GeometricObject):
     def intersect_with(self, other):
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         other:
         """
         pass
@@ -619,8 +620,8 @@ class Circle(Ellipse):
     """
     def __init__(self, center:ArrayLike, radius:Real) -> NoReturn:
         """
-        Parameters:
-        -----------
+        Parameters
+        ----------
         center: array_like,
         radius: real number,
         """
@@ -653,8 +654,8 @@ class BoundingBox(ss.Rectangle):
     def __init__(self, xmin:Real, ymin:Real, xmax:Real, ymax:Real, verbose:int=0) -> NoReturn:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         xmin, ymin, xmax, ymax: real,
             as the names indicate
         verbose: int, default 0,
@@ -687,13 +688,13 @@ class BoundingBox(ss.Rectangle):
 
         compute the intersection with another BoundingBox
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         other: BoundingBox,
             the other BoundingBox to intersect with
 
-        Returns:
-        --------
+        Returns
+        -------
         BoundingBox or None
         """
         nl = "\n"
@@ -722,8 +723,8 @@ class BoundingBox(ss.Rectangle):
         compute the union with another BoundingBox,
         union refers to the smallest BoundingBox that contains both BoundingBox
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         other: BoundingBox,
             the other BoundingBox to make union
         force: bool, default True,
@@ -731,8 +732,8 @@ class BoundingBox(ss.Rectangle):
         inplace: bool, default False,
             perform union inplace or return a new instance
 
-        Returns:
-        --------
+        Returns
+        -------
         BoudingBox or None
         """
         if (not force) and self.intersect_with(other) is None:
@@ -751,8 +752,8 @@ class BoundingBox(ss.Rectangle):
         
         resize the BoundingBox by `ratio`
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         ratio: float,
             the ratio for resize, must be > -1
         x_thre: list, of two numbers,
@@ -762,8 +763,8 @@ class BoundingBox(ss.Rectangle):
         inplace: bool, default False,
             perform resize inplace or return a new instance
 
-        Returns:
-        --------
+        Returns
+        -------
         BoundingBox or None
         """
         assert ratio > -1
@@ -818,8 +819,8 @@ class Rectangle2D(ss.Rectangle):
     def __init__(self, ymin:Real, xmin:Real, ymax:Real, xmax:Real) -> NoReturn:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         xmin, ymin, xmax, ymax: real,
             as the names indicate
         """
@@ -861,15 +862,15 @@ def is_in_hull(points:ArrayLike, hull:Union[ss.Delaunay,ss.ConvexHull,ArrayLike]
     """
     test if points in `points` are in `hull`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     points: array_like,
         an `NxK` coordinates of `N` points in `K` dimensions
     hull: Delaunay object or ConvexHull object, or array_like,
         the objects which defines the hull, essentially an `MxK` array of the coordinates of `M` points in `K`dimensions
 
-    Returns:
-    --------
+    Returns
+    -------
     ndarray of bool
     """
     if isinstance(hull, ss.Delaunay):
@@ -889,12 +890,12 @@ def convex_hull_inflation(ch:ss.ConvexHull,
 
     TODO: consider the choice of "center_of_mass"
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     ch_vertices = ch.points[ch.vertices]
@@ -918,8 +919,8 @@ def split_2d_plane_into_convex_cones(center:ArrayLike,
 
     split the 2d real cartesian space into convex cones
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     center: array_like,
         point in 2d space, center of the splitting
     split_vecs: array_like,
@@ -928,8 +929,8 @@ def split_2d_plane_into_convex_cones(center:ArrayLike,
         other key word arguments, including
         "verbose", and "xlim", "ylim", etc. for plotting the convex cones
 
-    Returns:
-    --------
+    Returns
+    -------
     list of `ConvexCone2D`
     """
     verbose = kwargs.get("verbose", 0)
@@ -997,12 +998,12 @@ def get_rot_mat_2d(angle:Real) -> np.ndarray:
     """
     angle in radians
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     rot_mat = np.array([[math.cos(angle), -math.sin(angle)], [math.sin(angle), math.cos(angle)]])
@@ -1014,12 +1015,12 @@ def get_line_2d(point1:ArrayLike, point2:ArrayLike) -> np.ndarray:
 
     get the line passing through `point1` and `point2`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     line, ndarray,
         the planar function of the line is line[0]*x+line[1]*y+line[2]=0
     """
@@ -1035,12 +1036,12 @@ def get_line_2d(point1:ArrayLike, point2:ArrayLike) -> np.ndarray:
 def is_pass_through_2d(line:np.ndarray, point:ArrayLike) -> np.ndarray:
     """
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     return np.dot(line, np.array(point).tolist()+[1]) == 0
@@ -1051,15 +1052,15 @@ def get_perpendicular_line_2d(line:np.ndarray, point:ArrayLike) -> np.ndarray:
 
     get the line passing through `point` and being perpendicular to `line`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     line: ndarray,
         of the form np.array([a,b,c]), given by ax+by+c=0
     point: array_like,
         a point in the 2d cartesian space
     
-    Returns:
-    --------
+    Returns
+    -------
     perp_line: ndarray,
         the line passing through `point` and being perpendicular to `line`
     """
@@ -1071,12 +1072,12 @@ def get_perpendicular_line_2d(line:np.ndarray, point:ArrayLike) -> np.ndarray:
 def get_line_intersection_2d(line1:np.ndarray, line2:np.ndarray) -> np.ndarray:
     """
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     system = np.array([line1, line2])
@@ -1093,12 +1094,12 @@ def affine_trans_2d(points:np.ndarray, shift:np.ndarray, rotation:Real) -> np.nd
     """
     rotation in radians
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     rot_mat = get_rot_mat_2d(rotation)
@@ -1114,12 +1115,12 @@ def affine_trans_2d(points:np.ndarray, shift:np.ndarray, rotation:Real) -> np.nd
 def vec2rad(vec:ArrayLike, val_start_from:Real=0) -> float:
     """
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     _v = np.array(vec).flatten()
@@ -1138,12 +1139,12 @@ def vec2rad(vec:ArrayLike, val_start_from:Real=0) -> float:
 def vec2polar(vec:ArrayLike) -> np.ndarray:
     """
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     _v = np.array(vec).flatten()
@@ -1163,12 +1164,12 @@ def vec2polar(vec:ArrayLike) -> np.ndarray:
 def rearrange_vectors_2d(vectors:ArrayLike) -> np.ndarray:
     """ rearrange 2d vectors anticlockwise
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     vec_radians = [vec2rad(item) for item in vectors]
@@ -1180,15 +1181,17 @@ def rearrange_convex_contour_points_2d(points:ArrayLike) -> np.ndarray:
     
     rearrange points in a in 2d convex contour anticlockwise
 
-    NOTE: whether or not the points in `points` form a convex contour is NOT checked
+    NOTE
+    ----
+    whether or not the points in `points` form a convex contour is NOT checked
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     points: array_like,
         array of points in a 2d convex contour
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     _p = np.array(points)
@@ -1202,12 +1205,12 @@ def smallest_circle(points:ArrayLike, method:str="msw") -> dict:
     """
     one can use `cv2.minEnclosingCircle` instead
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     if method.lower() == "msw":
@@ -1219,12 +1222,12 @@ def smallest_circle(points:ArrayLike, method:str="msw") -> dict:
 def _smallest_circle_msw(points:ArrayLike, base:ArrayLike) -> dict:
     """
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     pass
@@ -1233,12 +1236,12 @@ def _smallest_circle_msw(points:ArrayLike, base:ArrayLike) -> dict:
 def _smallest_circle_welzl(points:ArrayLike, base:ArrayLike) -> dict:
     """
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     if len(points) == 0 or len(base) == 3:
@@ -1261,12 +1264,12 @@ def _smallest_circle_welzl(points:ArrayLike, base:ArrayLike) -> dict:
 def _smallest_circle_trivial(points:Optional[ArrayLike]=None) -> Union[dict, None]:
     """
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     if points is None or len(points) == 0:
@@ -1295,12 +1298,12 @@ def _smallest_circle_trivial(points:Optional[ArrayLike]=None) -> Union[dict, Non
 def get_circle_passing_through(p1:ArrayLike, p2:ArrayLike, p3:ArrayLike) -> dict:
     """
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     _p1, _p2, _p3 = np.array(p1), np.array(p2), np.array(p3)
@@ -1332,12 +1335,12 @@ def get_circle_passing_through(p1:ArrayLike, p2:ArrayLike, p3:ArrayLike) -> dict
 def merge_boxes(box1:ArrayLike, box2:ArrayLike, **kwargs:Any) -> Union[np.ndarray, NoReturn]:
     """
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     to write
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     ymin1, xmin1, ymax1, xmax1 = box1

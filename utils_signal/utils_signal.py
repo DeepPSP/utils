@@ -66,8 +66,8 @@ def detect_peaks(x:ArrayLike,
     """
     Detect peaks in data based on their amplitude and other features.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x: 1D array_like,
         data
     mph: positive number, optional,
@@ -100,13 +100,13 @@ def detect_peaks(x:ArrayLike,
         if True (1), plot data in matplotlib figure
     ax: a matplotlib.axes.Axes instance, optional,
 
-    Returns:
-    --------
+    Returns
+    -------
     ind : 1D array_like
         indeces of the peaks in `x`.
 
-    Notes:
-    ------
+    Notes
+    -----
     The detection of valleys instead of peaks is performed internally by simply
     negating the data: `ind_valleys = detect_peaks(-x)`
     
@@ -114,8 +114,8 @@ def detect_peaks(x:ArrayLike,
 
     See this IPython Notebook [1]_.
 
-    References:
-    -----------
+    References
+    ----------
     [1] http://nbviewer.ipython.org/github/demotu/BMC/blob/master/notebooks/DetectPeaks.ipynb
 
     Examples
@@ -270,7 +270,7 @@ def _plot(x, mph, mpd, threshold, edge, valley, ax, ind):
     """
     Plot results of the detect_peaks function, see its help.
 
-    Parameters: ref. the function `detect_peaks`
+    Parameters ref. the function `detect_peaks`
     """
     if "plt" not in dir():
         import matplotlib.pyplot as plt
@@ -303,8 +303,8 @@ def phasor_transform(s:ArrayLike, rv:Real) -> np.ndarray:
 
     phasor transform, applied to `s`, with sensitivity controlled by `rv`
 
-    Reference:
-    ----------
+    Reference
+    ---------
     [1] Maršánová L, Němcová A, Smíšek R, et al. Automatic Detection of P Wave in ECG During Ventricular Extrasystoles[C]//World Congress on Medical Physics and Biomedical Engineering 2018. Springer, Singapore, 2019: 381-385.
     """
     return np.vectorize(atan2)(s,rv)
@@ -314,15 +314,15 @@ def compute_snr(original:ArrayLike, noised:ArrayLike) -> float:
     """
     computation of signal to noise ratio of the noised signal
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     original: array_like,
         the original signal
     noised: array_like,
         the noise component of the original signal
 
-    Returns:
-    --------
+    Returns
+    -------
     snr, float,
         the signal-to-noise ration of the signal `original`
     """
@@ -335,8 +335,8 @@ def compute_snr_improvement(original:ArrayLike, noised:ArrayLike, denoised:Array
     computation of the improvement of signal to noise ratio of the denoised signal,
     compared to the noised signal
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     original: array_like,
         the original signal
     noised: array_like,
@@ -344,8 +344,8 @@ def compute_snr_improvement(original:ArrayLike, noised:ArrayLike, denoised:Array
     denoised: array_like,
         denoised signal of `original`
 
-    Returns:
-    --------
+    Returns
+    -------
     snr, float,
         the signal-to-noise ration of the signal `original`
     """
@@ -363,8 +363,8 @@ def uni_polyn_der(coeff:ArrayLike, order:int=1, coeff_asc:bool=True) -> np.ndarr
     >>> print(timeit(lambda : np.polyder([1,2,3,4,5,6,7],5), number=100000))
     >>> print(timeit(lambda : uni_polyn_der([1,2,3,4,5,6,7],5), number=100000))
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     coeff: array like,
         coefficients of the univariate polynomial,
     order: non negative integer
@@ -372,8 +372,8 @@ def uni_polyn_der(coeff:ArrayLike, order:int=1, coeff_asc:bool=True) -> np.ndarr
     coeff_asc: bool
         coefficients in ascending order (a_0,a_1,...,a_n) or not (descending order, a_n,...,a_0)
     
-    Returns:
-    --------
+    Returns
+    -------
     der: np.ndarray
         coefficients of the order-th derivative
     """
@@ -403,8 +403,8 @@ def eval_uni_polyn(x:Union[Real,list,tuple,np.ndarray],
 
     evaluate `x` at the univariate polynomial defined by `coeff`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x: real number or array_like,
         the value(s) for the the univariate polynomial to evaluate at
     coeff: array_like,
@@ -413,8 +413,8 @@ def eval_uni_polyn(x:Union[Real,list,tuple,np.ndarray],
         if True, the degrees of the monomials corr. to the coefficients is in ascending order,
         otherwise, in descending order
 
-    Returns:
-    --------
+    Returns
+    -------
     value_at_x: real number or sequence of real numbers,
         value(s) of the univariate polynomial defined by `coeff` at point(s) of `x`
     """
@@ -438,18 +438,18 @@ def noise_std_estimator(data:ArrayLike) -> float:
 
     median estimator for the unknown std of the noise
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     data: array_like,
         the input signal
 
-    Returns:
-    --------
+    Returns
+    -------
     estimation: float,
         the estimated standard deviation of the noised data
 
-    Reference:
-    ----------
+    Reference
+    ---------
     [1] Katkovnik V, Stankovic L. Instantaneous frequency estimation using the Wigner distribution with varying and data-driven window length[J]. IEEE Transactions on signal processing, 1998, 46(9): 2315-2325.
     """
     estimation = np.median(np.abs(np.diff(data))) / 0.6745
@@ -461,14 +461,14 @@ def der_operator(responce_len:int, input_len:int, order:int) -> np.ndarray:
 
     derivation operator in matrix form
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     responce_len: int
     input_len: int
     order:int
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     """
     if responce_len+order > input_len:
@@ -480,17 +480,17 @@ def der_operator(responce_len:int, input_len:int, order:int) -> np.ndarray:
 def lstsq_with_smoothness_prior(data:ArrayLike) -> np.ndarray:
     """ not finished,
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     data: array_like
         the signal to smooth
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
 
-    Reference:
-    ----------
+    Reference
+    ---------
     [1]. Sameni, Reza. "Online Filtering Using Piecewise Smoothness Priors: Application to Normal and Abnormal Electrocardiogram Denoising." Signal Processing 133.C (2017): 52-63. Web.
     """
     raise NotImplementedError
@@ -506,8 +506,8 @@ def generate_rr_interval(nb_beats:int,
                          hf_std:float=0.01) -> np.ndarray:
     """ finished, not checked,
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     nb_beats: int,
     bpm_mean: real number,
     bpm_std: real number,
@@ -518,8 +518,8 @@ def generate_rr_interval(nb_beats:int,
     lf_std: float, default 0.01,
     ff_std: float, default 0.01,
 
-    Returns:
-    --------
+    Returns
+    -------
     to write
     
     """
@@ -544,8 +544,8 @@ def generate_rr_interval(nb_beats:int,
 def is_ecg_signal(s:ArrayLike, fs:int, wavelet_name:str="db6", verbose:int=0) -> bool:
     """ finished, to be improved,
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     s: array_like,
         the signal to be denoised
     fs: int,
@@ -555,8 +555,8 @@ def is_ecg_signal(s:ArrayLike, fs:int, wavelet_name:str="db6", verbose:int=0) ->
     verbose: int, default 0,
         for detailedness of printing
 
-    Returns:
-    --------
+    Returns
+    -------
     True if the signal `s` is valid ecg signal, else return False
     """
     nl = "\n"
@@ -752,8 +752,8 @@ def wavelet_denoise(s:ArrayLike,
 
     denoise and amplify (if necessary) signal `s`, using wavelet decomposition
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     s: array_like,
         the signal to be denoised
     fs: int,
@@ -771,12 +771,13 @@ def wavelet_denoise(s:ArrayLike,
     verbose: int, default 0,
         for detailedness of printing
 
-    Returns:
-    --------
+    Returns
+    -------
     WaveletDenoiseResult, with field_names: "is_ecg", "amplified_ratio", "amplified_signal", "raw_r_peaks"
     
-    TODO:
-    -----
+    TODO
+    ----
+
     """
     nl = "\n"
     if amplify_mode not in ["ecg", "qrs", "all", "none"]:
@@ -1080,8 +1081,8 @@ def wavelet_rec_iswt(coeffs:List[List[np.ndarray]],
 
     reconstruct signal, using pywt.iswt, using coefficients obtained by pywt.swt of level in `levels`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     coeffs: list of list (pair) of np.ndarray,
         wavelet ceofficients (list of [cA_n,cD_n], ..., [cA_1,cD_1]), obtained by pywt.swt
     levels: list of int,
@@ -1091,8 +1092,8 @@ def wavelet_rec_iswt(coeffs:List[List[np.ndarray]],
     verbose: int, default 0,
         the detailedness of printing
 
-    Returns:
-    --------
+    Returns
+    -------
     np.ndarray, the reconstructed signal
     """
     if verbose >= 2:
@@ -1132,8 +1133,8 @@ def resample_irregular_timeseries(s:ArrayLike,
     resample the 2d irregular timeseries `s` into a 1d or 2d regular time series with frequency `output_fs`,
     elements of `s` are in the form [time, value], where the unit of `time` is ms
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     s: array_like,
         the 2d irregular timeseries
     output_fs: Real, default 2,
@@ -1147,11 +1148,12 @@ def resample_irregular_timeseries(s:ArrayLike,
     interp_kw: dict, default {},
         additional options for the corresponding methods in scipy.interpolate
 
-    Returns:
-    --------
+    Returns
+    -------
     np.ndarray, a 1d or 2d regular time series with frequency `output_fs`
 
-    NOTE:
+    NOTE
+    ----
     pandas also has the function to regularly resample irregular timeseries
     """
     if method not in ["spline", "interp1d"]:
@@ -1211,8 +1213,8 @@ def resample_discontinuous_irregular_timeseries(s:ArrayLike,
     where discontinuity means time gap greater than `allowd_gap`,
     elements of `s` are in the form [time, value], where the unit of `time` is ms
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     s: array_like,
         the 2d irregular timeseries
     output_fs: Real, default 2,
@@ -1228,11 +1230,12 @@ def resample_discontinuous_irregular_timeseries(s:ArrayLike,
     verbose: int, default 0,
         verbosity
 
-    Returns:
-    --------
+    Returns
+    -------
     list of np.ndarray, 1d or 2d regular time series with frequency `output_freq`
 
-    NOTE:
+    NOTE
+    ----
     pandas also has the function to regularly resample irregular timeseries
     """
     time_series = np.atleast_2d(s)
@@ -1277,8 +1280,8 @@ def butter_bandpass(lowcut:Real,
 
     Butterworth Bandpass Filter Design
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     lowcut: real,
         low cutoff frequency
     highcut: real,
@@ -1289,17 +1292,17 @@ def butter_bandpass(lowcut:Real,
         order of the filter
     verbose: int, default 0
 
-    Returns:
-    --------
+    Returns
+    -------
     b, a: tuple of ndarray,
         coefficients of numerator and denominator of the filter
 
-    NOTE:
-    -----
+    NOTE
+    ----
     according to `lowcut` and `highcut`, the filter type might fall to lowpass or highpass filter
 
-    References:
-    -----------
+    References
+    ----------
     [2] scipy.signal.butter
     [1] https://scipy-cookbook.readthedocs.io/items/ButterworthBandpass.html
     """
@@ -1343,8 +1346,8 @@ def butter_bandpass_filter(data:ArrayLike,
 
     Butterworth Bandpass
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     data: array_like,
         data to be filtered
     lowcut: real,
@@ -1357,13 +1360,13 @@ def butter_bandpass_filter(data:ArrayLike,
         order of the filter
     verbose: int, default 0
 
-    Returns:
-    --------
+    Returns
+    -------
     y, ndarray,
         the filtered signal
 
-    References:
-    -----------
+    References
+    ----------
     [1] https://scipy-cookbook.readthedocs.io/items/ButterworthBandpass.html
     [2] https://dsp.stackexchange.com/questions/19084/applying-filter-in-scipy-signal-use-lfilter-or-filtfilt
     """
@@ -1381,8 +1384,8 @@ def hampel(input_series:ArrayLike,
 
     Hampel filter
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     input_series: array_like,
         the signal to be filtered
     window_size: int,
@@ -1394,16 +1397,16 @@ def hampel(input_series:ArrayLike,
     use_jit: bool, default False,
         whether or not use `@numba.jit(nopython=True)`
 
-    Returns:
-    --------
+    Returns
+    -------
     new_series: ndarray,
         the filtered signal
     outlier_indices: list of int,
         indices of the outliers, if `return_outlier` is True,
         otherwise empty list
 
-    References:
-    -----------
+    References
+    ----------
     [1] https://towardsdatascience.com/outlier-detection-with-hampel-filter-85ddf523c73d
     [2] https://www.mathworks.com/help/signal/ref/hampel.html
     [3] Hampel, F. R. (1974). The influence curve and its role in robust estimation. Journal of the american statistical association, 69(346), 383-393.
@@ -1475,8 +1478,8 @@ def detect_flat_lines(s:np.ndarray,
 
     detect flat (with tolerance) lines of length >= `window`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     s: ndarray,
         the signal
     window: int,
@@ -1485,15 +1488,15 @@ def detect_flat_lines(s:np.ndarray,
         difference within `tolerance` will be considered "flat"
     verbose: int, default 0,
 
-    Returns:
-    --------
+    Returns
+    -------
     flat_locs: ndarray,
         indices of samples in `s` of the flat lines
     flat_prop: float,
         proportion of flat parts in `s`
     
-    References:
-    -----------
+    References
+    ----------
     https://github.com/gslapnicar/bp-estimation-mimic3/blob/master/cleaning_scripts/flat_lines.m
     """
     n = len(s)
@@ -1521,14 +1524,14 @@ class MovingAverage(object):
 
     moving average
 
-    References:
-    -----------
+    References
+    ----------
     [1] https://en.wikipedia.org/wiki/Moving_average
     """
     def __init__(self, data:ArrayLike, **kwargs:Any) -> NoReturn:
         """
-        Parameters:
-        -----------
+        Parameters
+        ----------
         data: array_like,
             the series data to compute its moving average
         """
@@ -1537,8 +1540,8 @@ class MovingAverage(object):
 
     def cal(self, method:str, **kwargs:Any) -> np.ndarray:
         """
-        Parameters:
-        -----------
+        Parameters
+        ----------
         method: str,
             method for computing moving average, can be one of
             - "sma", "simple", "simple moving average"
@@ -1563,8 +1566,8 @@ class MovingAverage(object):
         """
         simple moving average
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         window: int, default 5,
             window length of the moving average
         center: bool, default False,
@@ -1596,8 +1599,8 @@ class MovingAverage(object):
         which is also the function used in Tensorboard Scalar panel,
         whose parameter `smoothing` is the `weight` here
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         weight: float, default 0.6,
             weight of the previous data point
         """
@@ -1627,8 +1630,8 @@ class MovingAverage(object):
         """
         weighted moving average
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         window: int, default 5,
             window length of the moving average
         """
@@ -1655,8 +1658,8 @@ def smooth(x:np.ndarray,
     (with the window size) in both ends so that transient parts are minimized
     in the begining and end part of the output signal.
     
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x: ndarray,
         the input signal 
     window_len: int, default 11,
@@ -1670,19 +1673,19 @@ def smooth(x:np.ndarray,
     keep_dtype: bool, default True,
         dtype of the returned value keeps the same with that of `x` or not
 
-    Returns:
-    --------
+    Returns
+    -------
     y: ndarray,
         the smoothed signal
         
-    Example:
-    --------
+    Example
+    -------
     >>> t = linspace(-2, 2, 0.1)
     >>> x = sin(t) + randn(len(t)) * 0.1
     >>> y = smooth(x)
     
-    See also:
-    ---------
+    See also
+    --------
     np.hanning, np.hamming, np.bartlett, np.blackman, np.convolve
     scipy.signal.lfilter
     scipy.signal.filtfilt
@@ -1691,8 +1694,8 @@ def smooth(x:np.ndarray,
 
     NOTE: length(output) != length(input), to correct this: return y[(window_len/2-1):-(window_len/2)] instead of just y.
 
-    References:
-    -----------
+    References
+    ----------
     [1] https://scipy-cookbook.readthedocs.io/items/SignalSmooth.html
     """
     radius = min(len(x), window_len)
@@ -1734,16 +1737,16 @@ def ensure_lead_fmt(values:Sequence[Real],
 
     ensure the `n_leads`-lead (ECG) signal to be of the format of `fmt`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     values: sequence,
         values of the `n_leads`-lead (ECG) signal
     fmt: str, default "lead_first", case insensitive,
         format of the output values, can be one of
         "lead_first" (alias "channel_first"), "lead_last" (alias "channel_last")
 
-    Returns:
-    --------
+    Returns
+    -------
     out_values: ndarray,
         ECG signal in the format of `fmt`
     """
@@ -1770,8 +1773,8 @@ def ensure_siglen(values:Sequence[Real], siglen:int, fmt:str="lead_first") -> np
         the central `siglen` samples will be adopted;
         otherwise, zero padding will be added to both sides
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     values: sequence,
         values of the `n_leads`-lead (ECG) signal
     siglen: int,
@@ -1780,8 +1783,8 @@ def ensure_siglen(values:Sequence[Real], siglen:int, fmt:str="lead_first") -> np
         format of the input and output values, can be one of
         "lead_first" (alias "channel_first"), "lead_last" (alias "channel_last")
 
-    Returns:
-    --------
+    Returns
+    -------
     out_values: ndarray,
         ECG signal in the format of `fmt` and of fixed length `siglen`
     """
@@ -1813,8 +1816,8 @@ def gen_gaussian_noise(siglen:int, mean:Real=0, std:Real=0) -> np.ndarray:
 
     generate 1d Gaussian noise of given length, mean, and standard deviation
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     siglen: int,
         length of the noise signal
     mean: real number, default 0,
@@ -1822,8 +1825,8 @@ def gen_gaussian_noise(siglen:int, mean:Real=0, std:Real=0) -> np.ndarray:
     std: real number, default 0,
         standard deviation of the noise
 
-    Returns:
-    --------
+    Returns
+    -------
     gn: ndarray,
         the gaussian noise of given length, mean, and standard deviation
     """
@@ -1841,8 +1844,8 @@ def gen_sinusoidal_noise(siglen:int,
 
     generate 1d sinusoidal noise of given length, amplitude, start phase, and end phase
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     siglen: int,
         length of the (noise) signal
     start_phase: real number,
@@ -1856,8 +1859,8 @@ def gen_sinusoidal_noise(siglen:int,
     amplitude_std: real number, default 0,
         standard deviation of an extra Gaussian noise
 
-    Returns:
-    --------
+    Returns
+    -------
     sn: ndarray,
         the sinusoidal noise of given length, amplitude, start phase, and end phase
     """
@@ -1877,8 +1880,8 @@ def gen_baseline_wander(siglen:int,
 
     generate 1d baseline wander of given length, amplitude, and frequency
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     siglen: int,
         length of the (noise) signal
     fs: real number,
@@ -1892,13 +1895,13 @@ def gen_baseline_wander(siglen:int,
     amplitude_std: real number, default 0,
         standard deviation of an extra Gaussian noise
 
-    Returns:
-    --------
+    Returns
+    -------
     bw: ndarray,
         the baseline wander of given length, amplitude, frequency
 
-    Example:
-    --------
+    Example
+    -------
     >>> gen_baseline_wander(4000, 400, [0.4,0.1,0.05], [0.1,0.2,0.4])
     """
     bw = gen_gaussian_noise(siglen, amplitude_mean, amplitude_std)
@@ -1927,13 +1930,13 @@ def remove_spikes_naive(sig:np.ndarray) -> np.ndarray:
     `spikes` here refers to abrupt large bumps with (abs) value larger than 20 mV,
     do NOT confuse with `spikes` in paced rhythm
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     sig: ndarray,
         single-lead ECG signal with potential spikes
     
-    Returns:
-    --------
+    Returns
+    -------
     filtered_sig: ndarray,
         ECG signal with `spikes` removed
     """
@@ -1953,8 +1956,8 @@ def get_ampl(sig:np.ndarray,
 
     get amplitude of a signal (near critical points if given)
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     sig: ndarray,
         (ecg) signal
     fs: real number,
@@ -1970,8 +1973,8 @@ def get_ampl(sig:np.ndarray,
         positions of critical points near which to compute amplitude,
         e.g. can be rpeaks, t peaks, etc.
 
-    Returns:
-    --------
+    Returns
+    -------
     ampl: float, or ndarray,
         amplitude of the signal
     """

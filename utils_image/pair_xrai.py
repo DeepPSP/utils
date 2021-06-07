@@ -4,7 +4,9 @@ from:
     https://github.com/PAIR-code/saliency/blob/master/saliency/base.py
     https://github.com/PAIR-code/saliency/blob/master/saliency/integrated_gradients.py
 
-NOTE: totally not checked
+NOTE
+----
+totally not checked
 """
 from numbers import Real
 from typing import Optional, List, Any, NoReturn
@@ -78,7 +80,7 @@ class SaliencyMask(object):
         """
         Returns a mask that is smoothed with the SmoothGrad method.
 
-        Parameters:
+        Parameters
         ----------
         x_value: ndarray,
             input value, not batched.
@@ -123,7 +125,7 @@ class GradientSaliency(SaliencyMask):
         """
         Returns a vanilla gradient mask.
 
-        Parameters:
+        Parameters
         ----------
         x_value: ndarray,
             input value, not batched.
@@ -149,7 +151,7 @@ class IntegratedGradients(GradientSaliency):
         """
         Returns a integrated gradients mask.
 
-        Parameters:
+        Parameters
         ----------
         x_value: ndarray,
             input ndarray
@@ -190,8 +192,8 @@ def _get_segments_felzenszwalb(img:np.ndarray,
     """
     Compute image segments based on Felzenszwalb's algorithm.
     
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         input image.
     resize_image: bool, default True,
@@ -204,13 +206,13 @@ def _get_segments_felzenszwalb(img:np.ndarray,
     dilation_rad:
         sets how much each segment is dilated to include edges, larger values cause more blobby segments, smaller values get sharper areas. Defaults to 5.
     
-    Returns:
-    --------
+    Returns
+    -------
     masks: list,
         a list of boolean masks as np.ndarrays if size HxW for img size of HxWxC.
 
-    References:
-    -----------
+    References
+    ----------
     [1] Efficient graph-based image segmentation, Felzenszwalb, P.F. and Huttenlocher, D.P. International Journal of Computer Vision, 2004
     """
 
@@ -425,8 +427,8 @@ class XRAI(SaliencyMask):
         """
         Applies XRAI method on an input image and returns the result saliency heatmap.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         x_value: ndarray,
             input value, not batched
         feed_dict: dict, optional,
@@ -450,8 +452,8 @@ class XRAI(SaliencyMask):
             If algorithm type is unknown (not full or fast).
             If the shape of `base_attribution` dosn't match the shape of `x_value`
         
-        Returns:
-        --------
+        Returns
+        -------
         ndarray: a numpy array that contains the saliency heatmap.
         
         TODO(tolgab) Add output_selector functionality from XRAI API doc
@@ -474,7 +476,7 @@ class XRAI(SaliencyMask):
         """
         Applies XRAI method on an input image and returns the result saliency heatmap along with other detailed information.
 
-        Parameters:
+        Parameters
         ----------
         x_value: ndarray,
             input value, not batched.
@@ -499,8 +501,8 @@ class XRAI(SaliencyMask):
             If algorithm type is unknown (not full or fast).
             If the shape of `base_attribution` dosn't match the shape of `x_value`
         
-        Returns:
-        --------
+        Returns
+        -------
         XRAIOutput: an object that contains the output of the XRAI algorithm.
 
         TODO(tolgab) Add output_selector functionality from XRAI API doc
@@ -584,8 +586,8 @@ class XRAI(SaliencyMask):
         """
         Run XRAI saliency given attributions and segments.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         attr: ndarray,
             source attributions for XRAI.
             XRAI attributions will be same size as the input attr.
@@ -601,8 +603,8 @@ class XRAI(SaliencyMask):
         integer_segments: bool, default True,
             see `XRAIParameters`
 
-        Returns:
-        --------
+        Returns
+        -------
         tuple: saliency heatmap and list of masks or an integer image with
             area ranks depending on the parameter integer_segments.
         """
@@ -677,8 +679,8 @@ class XRAI(SaliencyMask):
         Run approximate XRAI saliency given attributions and segments.
         This version does not consider mask overlap during importance ranking, significantly speeding up the algorithm for less accurate results.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         attr: ndarray,
             source attributions for XRAI.
             XRAI attributions will be same size as the input attr.
@@ -694,8 +696,8 @@ class XRAI(SaliencyMask):
         integer_segments: bool, default True,
             see `XRAIParameters`
 
-        Returns:
-        --------
+        Returns
+        -------
         tuple: saliency heatmap and list of masks or an integer image with
             area ranks depending on the parameter integer_segments.
         """

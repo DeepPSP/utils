@@ -54,8 +54,8 @@ def generate_pure_color_image(height:int,
 
     Create an RGB image of pure color `rgb_color`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     height: int,
         height of the image to be generated
     width: int,
@@ -67,8 +67,8 @@ def generate_pure_color_image(height:int,
     kwargs: dict,
         additional arguments controlling the appearance of the printed image
 
-    Returns:
-    --------
+    Returns
+    -------
     pure_color_image: ndarray,
         the pure color image in the RGB format
     """
@@ -95,8 +95,8 @@ def compatible_imshow(img_path:str,
 
     show the image correctly using cv2 and plt
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img_path: str,
         path of the image
     return_fmt: str, optional,
@@ -108,8 +108,8 @@ def compatible_imshow(img_path:str,
         CIEXYZ, CIELAB;
         additional arguments controlling the appearance of the printed image
 
-    Returns:
-    --------
+    Returns
+    -------
     rt_img: ndarray, or None
         the image in the format of `return_fmt`
     """
@@ -146,15 +146,15 @@ def compatible_imread_cv2(img_path:str, return_fmt:str) -> np.ndarray:
 
     read the image correctly in the format `return_fmt` using cv2
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img_path: str,
         path of the image
     return_fmt: str,
         return format (color space) of the image
 
-    Returns:
-    --------
+    Returns
+    -------
     rt_img: ndarray, or None
         the image in the format (color space) of `return_fmt`
     """
@@ -185,8 +185,8 @@ def convert_color(img:np.ndarray,
 
     TODO: check compatibiliy of each backend
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image whose color space is to be converted from `src_fmt` to `dst_fmt`
     src_fmt: str,
@@ -204,8 +204,8 @@ def convert_color(img:np.ndarray,
         `scale` for the following format (color space):
         HSV, CMYK, etc.
 
-    Returns:
-    --------
+    Returns
+    -------
     dst_img: ndarray,
         the image in the format (color space) `dst_fmt`
     """
@@ -273,8 +273,8 @@ def _rgb_to_grey(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> np
 
     convert `img` from the color space of RGB to the color space of gray levels
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image, in the format (color space) RGB8, be converted to CIEXYZ
     backend: str, default `_CVT_COLOR_BACKEND`, currently can be one in `_AVAILABLE_CVT_COLOR_BACKENDS`,
@@ -282,13 +282,13 @@ def _rgb_to_grey(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> np
     kwargs: dict,
         not used, only to be compatible with other color space conversion functions
 
-    Returns:
-    --------
+    Returns
+    -------
     grey: ndarray,
         `img` in the format (color space) of grey levels
 
-    References:
-    -----------
+    References
+    ----------
     """
     if backend is None:
         backend = _CVT_COLOR_BACKEND
@@ -310,8 +310,8 @@ def _rgb_to_ciexyz(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> 
 
     convert `img` from the color space of RGB to the color space of CIEXYZ
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image, in the format (color space) RGB8, be converted to CIEXYZ
     backend: str, default `_CVT_COLOR_BACKEND`, currently can be one in `_AVAILABLE_CVT_COLOR_BACKENDS`,
@@ -319,13 +319,13 @@ def _rgb_to_ciexyz(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> 
     kwargs: dict,
         not used, only to be compatible with other color space conversion functions
 
-    Returns:
-    --------
+    Returns
+    -------
     cie_xyz: ndarray,
         `img` in the format (color space) of CIEXYZ
 
-    References:
-    -----------
+    References
+    ----------
     [1] https://www.w3.org/Graphics/Color/sRGB
     [2] https://en.wikipedia.org/wiki/SRGB#Specification_of_the_transformation
     [3] https://www.cambridgeincolour.com/tutorials/gamma-correction.htm
@@ -355,8 +355,8 @@ def _rgb_to_ciexyy(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> 
 
     convert `img` from the color space of RGB to the color space of CIExyY
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image, in the format (color space) RGB8, be converted to CIExyY
     backend: str, default `_CVT_COLOR_BACKEND`, currently can be one in `_AVAILABLE_CVT_COLOR_BACKENDS`,
@@ -364,8 +364,8 @@ def _rgb_to_ciexyy(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> 
     kwargs: dict,
         not used, only to be compatible with other color space conversion functions
 
-    Returns:
-    --------
+    Returns
+    -------
     cie_xyy: ndarray,
         `img` in the format (color space) of CIExyY
     """
@@ -390,8 +390,8 @@ def _rgb_to_ciexy(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> n
 
     convert `img` from the color space of RGB to the color space of CIExy
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image, in the format (color space) RGB8, be converted to CIExy
     backend: str, default `_CVT_COLOR_BACKEND`, currently can be one in `_AVAILABLE_CVT_COLOR_BACKENDS`,
@@ -399,8 +399,8 @@ def _rgb_to_ciexy(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> n
     kwargs: dict,
         not used, only to be compatible with other color space conversion functions
 
-    Returns:
-    --------
+    Returns
+    -------
     cie_xy: ndarray,
         `img` in the format (color space) of CIExy
     """
@@ -429,8 +429,8 @@ def _ciexyz_to_cielab(img:np.ndarray,
 
     convert `img` from the color space of CIEXYZ to the color space of CIELAB
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image whose color space is to be converted from CIEXYZ to CIELAB
     illuminant: str, default "D65",
@@ -440,13 +440,13 @@ def _ciexyz_to_cielab(img:np.ndarray,
     backend: str, default `_CVT_COLOR_BACKEND`, currently can be one in `_AVAILABLE_CVT_COLOR_BACKENDS`,
         the backend to perform the color space conversion
 
-    Returns:
-    --------
+    Returns
+    -------
     cie_lab: ndarray,
         `img` in the format (color space) of CIELAB
 
-    References:
-    -----------
+    References
+    ----------
     [1] https://en.wikipedia.org/wiki/CIELAB_color_space#CIELAB%E2%80%93CIEXYZ_conversions
     [2] https://en.wikipedia.org/wiki/Standard_illuminant
     """
@@ -484,8 +484,8 @@ def _rgb_to_cielab(img:np.ndarray,
 
     convert `img` from the color space of RGB to the color space of CIELAB
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image, in the format (color space) RGB8, to be converted to CIELAB
     illuminant: str, default "D65",
@@ -495,8 +495,8 @@ def _rgb_to_cielab(img:np.ndarray,
     backend: str, default `_CVT_COLOR_BACKEND`, currently can be one in `_AVAILABLE_CVT_COLOR_BACKENDS`,
         the backend to perform the color space conversion
 
-    Returns:
-    --------
+    Returns
+    -------
     cie_lab: ndarray,
         `img` in the format (color space) of CIELAB
     """
@@ -526,8 +526,8 @@ def _rgb_to_cieluv(img:np.ndarray,
 
     convert `img` from the color space of RGB to the color space of CIELUV
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image, in the format (color space) RGB8, to be converted to CIELUV
     illuminant: str, default "D65",
@@ -537,8 +537,8 @@ def _rgb_to_cieluv(img:np.ndarray,
     backend: str, default `_CVT_COLOR_BACKEND`, currently can be "cv2", "PIL", or "naive",
         the backend to perform the color space conversion
 
-    Returns:
-    --------
+    Returns
+    -------
     cie_luv: ndarray,
         `img` in the format (color space) of CIELUV
     """
@@ -562,15 +562,15 @@ def _rgb_to_ycbcr(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> n
 
     convert `img` from the color space of RGB to the color space of YCbCr
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image, in the format (color space) RGB8, to be converted to YCbCr
     backend: str, default `_CVT_COLOR_BACKEND`, currently can be one in `_AVAILABLE_CVT_COLOR_BACKENDS`,
         the backend to perform the color space conversion
 
-    Returns:
-    --------
+    Returns
+    -------
     cie_luv: ndarray,
         `img` in the format (color space) of CIELUV
     """
@@ -594,20 +594,20 @@ def _rgb_to_yiq(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> np.
 
     convert `img` from the color space of RGB to the color space of YIQ
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image, in the format (color space) RGB8, to be converted to YIQ
     backend: str, default `_CVT_COLOR_BACKEND`, currently can be one in `_AVAILABLE_CVT_COLOR_BACKENDS`,
         the backend to perform the color space conversion
 
-    Returns:
-    --------
+    Returns
+    -------
     yiq: ndarray,
         `img` in the format (color space) of YIQ
 
-    References:
-    -----------
+    References
+    ----------
     [1] https://en.wikipedia.org/wiki/YIQ
     """
     if backend is None:
@@ -632,8 +632,8 @@ def _rgb_to_hsv(img:np.ndarray, scale:Real=1, backend:Optional[str]=None, **kwar
 
     convert `img` from the color space of RGB to the color space of HSV
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image, in the format (color space) RGB8, to be converted to HSV
     scale: real number, default 360, can also be 1,
@@ -641,13 +641,13 @@ def _rgb_to_hsv(img:np.ndarray, scale:Real=1, backend:Optional[str]=None, **kwar
     backend: str, default `_CVT_COLOR_BACKEND`, currently can be one in `_AVAILABLE_CVT_COLOR_BACKENDS`,
         the backend to perform the color space conversion
 
-    Returns:
-    --------
+    Returns
+    -------
     hsv: ndarray,
         `img` in the format (color space) of HSV
 
-    References:
-    -----------
+    References
+    ----------
     [1] https://en.wikipedia.org/wiki/HSL_and_HSV
     """
     if backend is None:
@@ -672,8 +672,8 @@ def _rgb_to_cmyk(img:np.ndarray, scale:Real=1, backend:Optional[str]=None, **kwa
 
     convert `img` from the color space of RGB to the color space of CMYK
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image, in the format (color space) RGB8, to be converted to CMYK
     scale: real number, default 100, can also be 1.0,
@@ -681,13 +681,13 @@ def _rgb_to_cmyk(img:np.ndarray, scale:Real=1, backend:Optional[str]=None, **kwa
     backend: str, default `_CVT_COLOR_BACKEND`, currently can be one in `_AVAILABLE_CVT_COLOR_BACKENDS`,
         the backend to perform the color space conversion
 
-    Returns:
-    --------
+    Returns
+    -------
     cmyk: ndarray,
         `img` in the format (color space) of CMYK
 
-    References:
-    -----------
+    References
+    ----------
     [1] https://en.wikipedia.org/wiki/
     """
     if backend is None:
@@ -724,15 +724,15 @@ def _rgb_to_hex(img:np.ndarray, **kwargs:Any) -> np.ndarray:
 
     convert `img` from the color space of RGB to the format of hex
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image, in the format (color space) RGB8, be converted to hex
     kwargs: dict,
         not used, only to be compatible with other color space conversion functions
 
-    Returns:
-    --------
+    Returns
+    -------
     img_hex: ndarray,
         `img` in the format of hex
     """
@@ -746,8 +746,8 @@ def _ciexyz_to_rgb(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> 
 
     convert `img` from the color space of CIEXYZ to the color space of RGB
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image, in the format (color space) CIEXYZ, be converted to RGB
     backend: str, default `_CVT_COLOR_BACKEND`, currently can be one in `_AVAILABLE_CVT_COLOR_BACKENDS`,
@@ -755,8 +755,8 @@ def _ciexyz_to_rgb(img:np.ndarray, backend:Optional[str]=None, **kwargs:Any) -> 
     kwargs: dict,
         not used, only to be compatible with other color space conversion functions
 
-    Returns:
-    --------
+    Returns
+    -------
     rgb: ndarray,
         `img` in the format (color space) of RGB
     """
@@ -782,15 +782,15 @@ def _validate_img_fmt(img:np.ndarray, fmt:str, **kwargs:Any) -> Union[np.ndarray
 
     check if `img` is a valid image in the format (color space) of `fmt`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image to be validated
     fmt: str,
         format (color space) of `img`
 
-    Returns:
-    --------
+    Returns
+    -------
     valid_img: ndarray,
         the validated image
     """
@@ -807,14 +807,14 @@ def _validate_rgb(rgb_img:np.ndarray, verbose:int=0, **kwargs:Any) -> Union[np.n
 
     check if `rgb_img` is a valid RGB image
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     rgb_img: ndarray,
         the image to be checked
     verbose: int, default 0, not used currently
 
-    Returns:
-    --------
+    Returns
+    -------
     valid_img: ndarray,
         the validated RGB image
     """
@@ -834,14 +834,14 @@ def _rescale_rgb(rgb_img:np.ndarray, verbose:int=0) -> np.ndarray:
     if `rgb_img` is with values in 0.0-1.0, rescale it into values within 0-255,
     vice versa
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     rgb_img: ndarray,
         the image to be rescaled
     verbose: int, default 0, not used currently
 
-    Returns:
-    --------
+    Returns
+    -------
     rescaled_img: ndarray,
         the validated RGB image
     """
@@ -864,8 +864,8 @@ def get_color_type(roi_pixels:ArrayLike,
                    **kwargs:Any) -> tuple:
     """
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     roi_pixels: array_like,
         pixels of region of interest, in RGB
     color_space: str,
@@ -877,8 +877,8 @@ def get_color_type(roi_pixels:ArrayLike,
     kwargs: dict,
         other parameters, to write
 
-    Returns:
-    --------
+    Returns
+    -------
     ret, dict, with items `centroid`, `color_type`
     """
     cs = color_space.lower()

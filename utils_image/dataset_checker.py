@@ -33,8 +33,8 @@ class ObjectDetectionCheck(object):
                  **kwargs:Any) -> NoReturn:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         checker: str,
             indicator for whom checking the dataset
         ann_path: str,

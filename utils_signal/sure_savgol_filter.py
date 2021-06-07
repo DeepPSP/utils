@@ -33,7 +33,7 @@ def fit_savgol_sure(data:ArrayLike,
         orders=[1,5]
         radii=20ms(e.g. 5 for frequency=250)
 
-    Parameters:
+    Parameters
     ----------
     data: array_like,
         the signal to be filtered
@@ -45,13 +45,13 @@ def fit_savgol_sure(data:ArrayLike,
     sure_reg: bool, default False,
     verbose: int, default 0,
 
-    Returns:
-    --------
+    Returns
+    -------
     filtered: ndarray,
         the filtered signal
 
-    Reference:
-    ----------
+    Reference
+    ---------
     [1] Krishnan S R, Seelamantula C S. On the selection of optimum Savitzky-Golay filters[J]. IEEE transactions on signal processing, 2012, 61(2): 380-391.
     """
     filtered = []
@@ -132,15 +132,15 @@ def fit_savgol_sure(data:ArrayLike,
 def generate_savgol_matrix(order:int, radius:int) -> np.ndarray:
     """ finished, checked,
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     order: int,
         order of the filter
     radius: int,
         radius of the window of the filter
 
-    Returns:
-    --------
+    Returns
+    -------
     sm: ndarray,
         matrix of the filter of the given order and window radius
     """
@@ -156,14 +156,14 @@ def savgol_polyn_coeffs(x:ArrayLike, order:int) -> Tuple[np.ndarray]:
 
     compute coefficients of the savitzky golay polynomial that best fit the data x
 
-    Parameters:
+    Parameters
     ----------
     x: array_like,
         the signal to be fitted to get the coefficients
     order: int,
 
-    Returns:
-    --------
+    Returns
+    -------
     polyn_coeffs, H, tuple of ndarray,
         where polyn_coeffs, of shape (order+1,), are coefficients of the polynomial, in ascending order
         H is the matrix, such that polyn_coeffs = H x, of shape (order+1, len(x))
@@ -190,7 +190,7 @@ def sure_savgol_objective_func(order:int, radius:int, data:ArrayLike, verbose:in
 
     the SURE objective function with Savitzky-Golay filter for an instance centered in `data`
 
-    Parameters:
+    Parameters
     ----------
     order: int,
         order of the filter
@@ -201,12 +201,12 @@ def sure_savgol_objective_func(order:int, radius:int, data:ArrayLike, verbose:in
     verbose: int, default 0,
         printing verbosity
 
-    Returns:
-    --------
+    Returns
+    -------
     cost: float,
 
-    Reference:
-    ----------
+    Reference
+    ---------
     [1] Krishnan S R, Seelamantula C S. On the selection of optimum Savitzky-Golay filters[J]. IEEE transactions on signal processing, 2012, 61(2): 380-391.
     """
     halflen, remainder = divmod(len(data), 2)
@@ -244,7 +244,7 @@ def reg_sure_savgol_objective_func(order:int, radius:int, data:ArrayLike, verbos
     
     the 'regularized' SURE objective function with Savitzky-Golay filter for an instance centered in `data`
 
-    Parameters:
+    Parameters
     ----------
     order: int,
         order of the filter
@@ -255,12 +255,12 @@ def reg_sure_savgol_objective_func(order:int, radius:int, data:ArrayLike, verbos
     verbose: int, default 0,
         printing verbosity
 
-    Returns:
-    --------
+    Returns
+    -------
     cost: float,
 
-    Reference:
-    ----------
+    Reference
+    ---------
     [1] Krishnan S R, Seelamantula C S. On the selection of optimum Savitzky-Golay filters[J]. IEEE transactions on signal processing, 2012, 61(2): 380-391.
     """
     u = 1.2

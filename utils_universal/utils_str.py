@@ -28,18 +28,18 @@ def LCSubStr(X:str, Y:str) -> Tuple[int, List[str]]:
     find the longest common sub-strings of two strings,
     with complexity O(mn), m=len(X), n=len(Y)
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     X, Y: str,
         the two strings to extract the longest common sub-strings
 
-    Returns:
-    --------
+    Returns
+    -------
     lcs_len, lcs: int, list of str,
         the longest length, and the list of longest common sub-strings
 
-    Reference:
-    ----------
+    Reference
+    ---------
     https://www.geeksforgeeks.org/longest-common-substring-dp-29/
     """
     m, n = len(X), len(Y)
@@ -73,13 +73,13 @@ def dict_depth(d:dict) -> int:
 
     find the "depth" of a (possibly) nested dict
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     d: dict,
         a (possibly) nested dict
     
-    Returns:
-    --------
+    Returns
+    -------
     depth: int,
         the "depth" of `d`
     """
@@ -96,8 +96,8 @@ def dict_to_str(d:Union[dict, list, tuple], current_depth:int=1, indent_spaces:i
     convert a (possibly) nested dict into a `str` of json-like formatted form,
     this nested dict might also contain lists or tuples of dict (and of str, int, etc.)
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     d: dict, or list, or tuple,
         a (possibly) nested `dict`, or a list of `dict`
     current_depth: int, default 1,
@@ -105,8 +105,8 @@ def dict_to_str(d:Union[dict, list, tuple], current_depth:int=1, indent_spaces:i
     indent_spaces: int, default 4,
         the indent spaces of each depth
 
-    Returns:
-    --------
+    Returns
+    -------
     s: str,
         the formatted string
     """
@@ -172,18 +172,18 @@ def str2bool(v:Union[str, bool]) -> bool:
 
     converts a "boolean" value possibly in the format of str to bool
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     v: str or bool,
         the "boolean" value
 
-    Returns:
-    --------
+    Returns
+    -------
     b: bool,
         `v` in the format of bool
 
-    References:
-    -----------
+    References
+    ----------
     https://stackoverflow.com/questions/15008758/parsing-boolean-values-with-argparse
     """
     if isinstance(v, bool):
@@ -202,13 +202,13 @@ def printmd(md_str:str) -> NoReturn:
 
     printing bold, colored, etc., text
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     md_str: str,
         string in the markdown style
 
-    References:
-    -----------
+    References
+    ----------
     [1] https://stackoverflow.com/questions/23271575/printing-bold-colored-etc-text-in-ipython-qtconsole
     """
     try:
@@ -227,8 +227,8 @@ def local_fuzzy_match_1(query_string:str,
 
     fuzzy matches `query_string` in `large_string`, using `fuzzywuzzy` and `fuzzysearch`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     query_string: str,
         the query string to find fuzzy matches in `large_string`
     large_string: str,
@@ -240,8 +240,8 @@ def local_fuzzy_match_1(query_string:str,
     verbose: int, default 0,
         print verbosity
 
-    Returns:
-    --------
+    Returns
+    -------
     result: list,
         3-element list (if `best_only` is True):
             - matched text in `large_string`,
@@ -249,8 +249,8 @@ def local_fuzzy_match_1(query_string:str,
             - end index of the matched text in `large_string`
         or list of such 3-element list (`best_only` is False)
 
-    Reference:
-    ----------
+    Reference
+    ---------
     https://stackoverflow.com/questions/17740833/checking-fuzzy-approximate-substring-existing-in-a-longer-string-in-python
     """
     if verbose >= 2:
@@ -298,8 +298,8 @@ def local_fuzzy_match_2(query_string:str,
 
     fuzzy matches "query_string" in "large_string", using `difflib`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     query_string: str,
         the query string to find fuzzy matches in `large_string`
     large_string: str,
@@ -311,8 +311,8 @@ def local_fuzzy_match_2(query_string:str,
     verbose: int, default 0,
         print verbosity
 
-    Returns:
-    --------
+    Returns
+    -------
     result: list,
         3-element list (if `best_only` is True):
             - matched text in `large_string`,
@@ -320,8 +320,8 @@ def local_fuzzy_match_2(query_string:str,
             - end index of the matched text in `large_string`
         or list of such 3-element list (`best_only` is False)
 
-    Reference:
-    ----------
+    Reference
+    ---------
     https://stackoverflow.com/questions/17740833/checking-fuzzy-approximate-substring-existing-in-a-longer-string-in-python
     """
     _puncs_ = ["；", "。"]
@@ -385,8 +385,8 @@ def local_fuzzy_match(query_string:str, large_string:str, threshold:float=0.8, v
     fuzzy matches "query_string" in "large_string",
     merged from results obtained using `difflib` and from results using `fuzzywuzzy` and `fuzzysearch`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     query_string: str,
         the query string to find fuzzy matches in `large_string`
     large_string: str,
@@ -396,8 +396,8 @@ def local_fuzzy_match(query_string:str, large_string:str, threshold:float=0.8, v
     verbose: int, default 0,
         print verbosity
 
-    Returns:
-    --------
+    Returns
+    -------
     result: list,
         3-element list (if `best_only` is True):
             - matched text in `large_string`,
@@ -405,8 +405,8 @@ def local_fuzzy_match(query_string:str, large_string:str, threshold:float=0.8, v
             - end index of the matched text in `large_string`
         or list of such 3-element list (`best_only` is False)
 
-    Reference:
-    ----------
+    Reference
+    ---------
     https://stackoverflow.com/questions/17740833/checking-fuzzy-approximate-substring-existing-in-a-longer-string-in-python
     """
     if threshold < 0.7:
@@ -450,13 +450,13 @@ def extract_chinese(texts:str) -> str:
 
     extract all Chinese characters (and arabic numbers) in `texts`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     texts: str,
         a string which contains Chinese characters and other characters
 
-    Returns:
-    --------
+    Returns
+    -------
     pure_chinese_texts: str,
         the string which contains all Chinese characters (and arabic numbers) in `texts`,
         with ordering preserved

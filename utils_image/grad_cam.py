@@ -71,8 +71,8 @@ def grad_cam_naive_keras(input_model:Model,
 
     Grad-CAM, the naive (local) one
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     input_model: keras `Model`,
         the model to compute Grad-CAM
     img: ndarray,
@@ -103,8 +103,8 @@ def grad_cam_naive_keras(input_model:Model,
             key word arguments for plot,
             used only when "verbose" >= 3 or "plot" in "verbose"
 
-    Returns:
-    --------
+    Returns
+    -------
     cam, img_with_cam, heatmap, pred_class_index, pred_class_name: tuple,
         of type ndarray, ndarray, ndarray, int, str resp.,
         as the names imply
@@ -114,15 +114,15 @@ def grad_cam_naive_keras(input_model:Model,
 
     1 deprecated, will be used in tcm.services.application.sseg
 
-    References:
-    -----------
+    References
+    ----------
     [1] Selvaraju R R, Cogswell M, Das A, et al. Grad-cam: Visual explanations from deep networks via gradient-based localization, https://arxiv.org/abs/1610.02391
     [2] https://github.com/jacobgil/keras-grad-cam
     [3] https://github.com/adityac94/Grad_CAM_plus_plus
     [4] https://en.wikipedia.org/wiki/Taylor_series#Taylor_series_in_several_variables
 
-    Remarks:
-    --------
+    Remarks
+    -------
     Grad-CAM is mathematically essentially Taylor series in several variables,
     using only the linear part as approximation:
     .. math:: (to write)
@@ -286,8 +286,8 @@ def grad_cam_keras(input_model:Model,
 
     Grad-CAM
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     input_model: keras `Model`,
         the model to compute Grad-CAM
     img: ndarray,
@@ -318,8 +318,8 @@ def grad_cam_keras(input_model:Model,
             key word arguments for plot,
             used only when "verbose" >= 3 or "plot" in "verbose"
 
-    Returns:
-    --------
+    Returns
+    -------
     cam, img_with_cam, heatmap, pred_class_index, pred_class_name: tuple,
         of type ndarray, ndarray, ndarray, int, str resp.,
         as the names imply
@@ -329,14 +329,14 @@ def grad_cam_keras(input_model:Model,
 
     1 deprecated, will be used in tcm.services.application.sseg
 
-    References:
-    -----------
+    References
+    ----------
     [1] Selvaraju R R, Cogswell M, Das A, et al. Grad-cam: Visual explanations from deep networks via gradient-based localization, https://arxiv.org/abs/1610.02391
     [2] https://github.com/jacobgil/keras-grad-cam
     [3] https://github.com/adityac94/Grad_CAM_plus_plus
 
-    Remarks:
-    --------
+    Remarks
+    -------
     Grad-CAM is mathematically essentially Taylor series in several variables,
     using only the linear part as approximation:
     .. math:: (to write)
@@ -507,8 +507,8 @@ def grad_cam_plusplus_keras(input_model:Model,
 
     Grad-CAM++
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     input_model: keras `Model`,
         the model to compute Grad-CAM
     img: ndarray,
@@ -547,20 +547,20 @@ def grad_cam_plusplus_keras(input_model:Model,
 
     1 deprecated, will be used in tcm.services.application.sseg
 
-    Returns:
-    --------
+    Returns
+    -------
     cam, img_with_cam, heatmap, pred_class_index, pred_class_name: tuple,
         of type ndarray, ndarray, ndarray, int, str resp.,
         as the names imply
 
-    References:
-    -----------
+    References
+    ----------
     [1] Chattopadhay A, Sarkar A, Howlader P, et al. Grad-cam++: Generalized gradient-based visual explanations for deep convolutional networks, https://arxiv.org/abs/1710.11063
     [2] https://github.com/adityac94/Grad_CAM_plus_plus
     [3] to add
 
-    Remarks:
-    --------
+    Remarks
+    -------
     Grad-CAM++ tried to use something of "weighted" 1st order Taylor expansion,
     in attemp to achieve better approximation
     """
@@ -593,21 +593,21 @@ def _grad_cam_plusplus_keras_linear(input_model:Model,
     """
     Grad-CAM++, when the prediction layer has "linear" activation
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     ref. `grad_cam_plusplus_keras`
 
     TODO:
     ref. `grad_cam_plusplus_keras`
 
-    Returns:
-    --------
+    Returns
+    -------
     cam, img_with_cam, heatmap, pred_class_index, pred_class_name: tuple,
         of type ndarray, ndarray, ndarray, int, str resp.,
         as the names imply
 
-    References:
-    -----------
+    References
+    ----------
     [1] Chattopadhay A, Sarkar A, Howlader P, et al. Grad-cam++: Generalized gradient-based visual explanations for deep convolutional networks, https://arxiv.org/abs/1710.11063
     [2] https://github.com/adityac94/Grad_CAM_plus_plus
     """
@@ -778,21 +778,21 @@ def _grad_cam_plusplus_keras_softmax(input_model:Model,
 
     Grad-CAM++, when the prediction layer has "softmax" activation
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     ref. `grad_cam_plusplus_keras`
 
     TODO:
     ref. `grad_cam_plusplus_keras`
 
-    Returns:
-    --------
+    Returns
+    -------
     cam, img_with_cam, heatmap, pred_class_index, pred_class_name: tuple,
         of type ndarray, ndarray, ndarray, int, str resp.,
         as the names imply
 
-    References:
-    -----------
+    References
+    ----------
     [1] Chattopadhay A, Sarkar A, Howlader P, et al. Grad-cam++: Generalized gradient-based visual explanations for deep convolutional networks, https://arxiv.org/abs/1710.11063
     """
     img_preprocess_func = kwargs.get("preprocess_func", preprocess_img)

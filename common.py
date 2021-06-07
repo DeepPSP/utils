@@ -53,8 +53,8 @@ DEFAULT_FIG_SIZE_PER_SEC = 4.8
 def idx2ts(idx:int, start_ts:int, fs:int) -> int:
     """ finished, checked,
     
-    Parameters:
-    -----------
+    Parameters
+    ----------
     idx, int,
         the index to be converted into timestamp
     start_ts, int,
@@ -62,8 +62,8 @@ def idx2ts(idx:int, start_ts:int, fs:int) -> int:
     fs: int,
         sampling frequency
 
-    Returns:
-    --------
+    Returns
+    -------
     int, the timestamp of the point at index `idx`
     """
     return int(start_ts + idx * 1000 // fs)
@@ -74,15 +74,15 @@ def ms2samples(t:Real, fs:Real) -> int:
 
     convert time `t` with units in ms to number of samples
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     t: real number,
         time with units in ms
     fs: real number,
         sampling frequency of a signal
 
-    Returns:
-    --------
+    Returns
+    -------
     n_samples: int,
         number of samples corresponding to time `t`
     """
@@ -95,15 +95,15 @@ def samples2ms(n_samples:int, fs:Real) -> Real:
 
     inverse function of `ms2samples`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     n_samples: int,
         number of sample points
     fs: real number,
         sampling frequency of a signal
 
-    Returns:
-    --------
+    Returns
+    -------
     t: real number,
         time duration correponding to `n_samples`
     """
@@ -114,7 +114,7 @@ def samples2ms(n_samples:int, fs:Real) -> Real:
 def timestamp_to_local_datetime_string(ts:int, ts_in_second:bool=False, fmt:str="%Y-%m-%d %H:%M:%S") -> str:
     """ finished, checked,
 
-    Parameters:
+    Parameters
     -----------
     ts: int,
         timestamp, in second or millisecond
@@ -123,7 +123,7 @@ def timestamp_to_local_datetime_string(ts:int, ts_in_second:bool=False, fmt:str=
     fmt, str, default "%Y-%m-%d %H:%M:%S",
         the format of the output string
 
-    Returns:
+    Returns
     --------
     str, the string form of `ts` in the form of `fmt`
     """
@@ -148,8 +148,8 @@ def timestamp_to_local_datetime_string(ts:int, ts_in_second:bool=False, fmt:str=
 def time_string_to_timestamp(time_string:str, fmt:str="%Y-%m-%d %H:%M:%S", return_second:bool=False) -> int:
     """ finished, checked,
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     time_string: str,
         the time in the string format to be converted
     fmt: str, default "%Y-%m-%d %H:%M:%S",
@@ -157,8 +157,8 @@ def time_string_to_timestamp(time_string:str, fmt:str="%Y-%m-%d %H:%M:%S", retur
     return_second: bool, default False,
         if True, the output is in second, otherwise in millisecond
 
-    Returns:
-    --------
+    Returns
+    -------
     ts: int,
         timestamp, in second or millisecond, corr. to `time_string`
     """
@@ -172,13 +172,13 @@ def time_string_to_timestamp(time_string:str, fmt:str="%Y-%m-%d %H:%M:%S", retur
 def list_sum(l:Sequence[list]) -> list:
     """ finished, checked,
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     l: sequence of list,
         the sequence of lists to obtain the summation
 
-    Returns:
-    --------
+    Returns
+    -------
     l_sum: list,
         sum of `l`,
         i.e. if l = [list1, list2, ...], then l_sum = list1 + list2 + ...
@@ -193,14 +193,15 @@ def modulo(val:Real, dividend:Real, val_range_start:Real=0) -> Real:
     find the value
         val mod dividend, within interval [val_range_start, val_range_start+abs(dividend)]
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     val: real number,
         the number to be moduloed
     dividend: real number,
         the dividend
-    returns:
-    --------
+
+    Returns
+    -------
     mod_val: real number,
         equals val mod dividend, within interval [val_range_start, val_range_start+abs(dividend)]
     """
@@ -217,13 +218,13 @@ def gcd(l:Sequence[int]) -> int:
 
     greatest common divisor of a sequence of integers
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     l: sequence of int,
         a sequence of integers
     
-    Returns:
-    --------
+    Returns
+    -------
     int, the greatest common divisor of the integers in l;
     if l is empty, returns 0
     """
@@ -234,13 +235,13 @@ def gcd(l:Sequence[int]) -> int:
 def angle_d2r(angle:Union[Real,np.ndarray]) -> Union[Real,np.ndarray]:
     """ finished, checked,
     
-    Parameters:
-    -----------
+    Parameters
+    ----------
     angle: real number or ndarray,
         the angle(s) in degrees
 
-    Returns:
-    --------
+    Returns
+    -------
     to writereal number or ndarray, the angle(s) in radians
     """
     return np.pi*angle/180.0
@@ -251,16 +252,16 @@ def execute_cmd(cmd:str, logger:Optional[Logger]=None, raise_error:bool=True) ->
 
     execute shell command using `Popen`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     cmd: str,
         the shell command to be executed
     logger: Logger, optional,
     raise_error: bool, default True,
         if True, error will be raised when occured
 
-    Returns:
-    --------
+    Returns
+    -------
     exitcode, output_msg: int, list of str,
         exitcode: exit code returned by `Popen`
         output_msg: outputs from `stdout` of `Popen`
@@ -323,15 +324,15 @@ def get_record_list_recursive(db_dir:str, rec_ext:str) -> List[str]:
     then the output would be "patient1{sep}A0001", ..., "patient2{sep}B0001", ...,
     sep is determined by the system
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     db_dir: str,
         the parent (root) path of the whole database
     rec_ext: str,
         extension of the record files
 
-    Returns:
-    --------
+    Returns
+    -------
     res: list of str,
         list of records, in lexicographical order
     """
@@ -360,15 +361,15 @@ def get_record_list_recursive2(db_dir:str, rec_pattern:str) -> List[str]:
     then the output would be "patient1{sep}A0001", ..., "patient2{sep}B0001", ...,
     sep is determined by the system
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     db_dir: str,
         the parent (root) path of the whole database
     rec_pattern: str,
         pattern of the record filenames, e.g. "A*.mat"
 
-    Returns:
-    --------
+    Returns
+    -------
     res: list of str,
         list of records, in lexicographical order
     """
@@ -398,16 +399,16 @@ def get_record_list_recursive3(db_dir:str, rec_patterns:Union[str,Dict[str,str]]
     then the output would be "patient1{sep}A0001", ..., "patient2{sep}B0001", ...,
     sep is determined by the system
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     db_dir: str,
         the parent (root) path of the whole database
     rec_patterns: str or dict,
         pattern of the record filenames, e.g. "A(?:\d+).mat",
         or patterns of several subsets, e.g. `{"A": "A(?:\d+).mat"}`
 
-    Returns:
-    --------
+    Returns
+    -------
     res: list of str,
         list of records, in lexicographical order
     """
@@ -522,8 +523,8 @@ def clear_jupyter_notebook_outputs(fp:str, dst:Optional[str]=None) -> NoReturn:
     clear outputs of a jupyter notebook,
     in cases when one is not able to open it in the browser
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     fp: str,
         path of the jupyter notebook
     dst: str, optional,

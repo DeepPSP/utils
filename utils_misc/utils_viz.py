@@ -33,8 +33,8 @@ def plot_single_lead_ecg(s:ArrayLike, fs:Real, use_idx:bool=False, **kwargs:Any)
 
     single lead ECG plot,
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     s: array_like,
         the single lead ECG signal
     fs: real,
@@ -94,8 +94,8 @@ def plot_hypnogram(sleep_stage_curve:ArrayLike, style:str="original", **kwargs:A
 
     plot the hypnogram
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     sleep_stage_curve: array_like,
         the sleep stage curve, each element is of the form "t, val",
         allowed stages are (case insensitive)
@@ -147,8 +147,8 @@ def plot_confusion_matrix(y_true:ArrayLike,
     Normalization can be applied by setting `normalize=True`.
     In case `sklearn` has too low version to have this function
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     y_true: array_like,
         array of ground truths
     y_pred: array_like,
@@ -167,8 +167,8 @@ def plot_confusion_matrix(y_true:ArrayLike,
         colormap,
         if not specified, defaults to `plt.cm.Blues`
 
-    Returns:
-    --------
+    Returns
+    -------
     ax: `plt.axes.Axes`
     """
     from sklearn.metrics import confusion_matrix
@@ -241,8 +241,8 @@ class EcgAnimation(object):
 
     TODO: add more widgets and implement for multi-lead signals; acceleration!!!
 
-    References:
-    -----------
+    References
+    ----------
     [1] http://louistiao.me/posts/notebooks/embedding-matplotlib-animations-in-jupyter-as-interactive-javascript-widgets/
     [2] https://physionet.org/lightwave/
     [3] https://ipywidgets.readthedocs.io/en/latest/examples/Using%20Interact.html
@@ -255,8 +255,8 @@ class EcgAnimation(object):
     def __init__(self, signal:ArrayLike, fs:Real, fmt:Optional[str]=None, ticks_granularity:int=0) -> NoReturn:
         """ NOT finished,
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         signal: array_like,
             the input signal (1d for single lead signal, 2d for multi-lead signal)
         fs: real number,
@@ -376,8 +376,8 @@ class EcgAnimation(object):
 
         automatically infer the units of `data`,
 
-        Returns:
-        --------
+        Returns
+        -------
         units: str,
             units of `data`, "μV" or "mV"
         """

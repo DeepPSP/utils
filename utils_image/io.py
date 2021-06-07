@@ -83,7 +83,7 @@ from PIL.ExifTags import TAGS, GPSTAGS
 def get_labeled_exif(img: Union[Image, str]) -> dict:
     """
 
-    Reference:
+    References
     ----------
     [1] https://www.exiv2.org/tags.html
     [2] http://www.cipa.jp/std/documents/e/DC-008-2012_E.pdf
@@ -181,8 +181,8 @@ def normalize_image(img:np.ndarray,
     """
     Normalize an image by resizing it and rescaling its values
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         input image, in RGB
     value_range: array_like,
@@ -190,8 +190,8 @@ def normalize_image(img:np.ndarray,
     resize_shape: tuple, optional,
         output image shape, of the form (w,h)
     
-    Returns:
-    --------
+    Returns
+    -------
     normalized_img: ndarray
         resized and rescaled image
     """
@@ -233,8 +233,8 @@ def synthesis_img(raw_img:np.ndarray,
 
     generate synthetic image using `raw_img` with background `bkgd_img`, where the unchanged foreground is given by `raw_mask`
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     raw_img: ndarray,
         the source image
     bkgd_img: ndarray,
@@ -245,8 +245,8 @@ def synthesis_img(raw_img:np.ndarray,
         path to save the synthetic image
     verbose: int, default 0,
 
-    Returns:
-    --------
+    Returns
+    -------
     sys_img: ndarray,
         the generated image
     """
@@ -328,23 +328,23 @@ def _get_refined_mask(img:np.ndarray, raw_mask:np.ndarray) -> Tuple[np.ndarray]:
 
     refine the `raw_mask` via CLAHE, Gaussian blur, thresholding, etc.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the source image
     raw_mask: ndarray,
         the raw mask to be refined
 
-    Returns:
-    --------
+    Returns
+    -------
     img_grayscale_gblur, img_binary, img_close, refined_mask: ndarray,
         img_grayscale_gblur: the Guassian blured grayscale image
         img_binary: the binary image after global thresholding of `img_grayscale_gblur`
         img_close: the image after applying the closing morphological transformation
         refined_mask: the refined mask
 
-    References:
-    -----------
+    References
+    ----------
     [1] https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_histograms/py_histogram_equalization/py_histogram_equalization.html?highlight=clahe#clahe-contrast-limited-adaptive-histogram-equalization
     [2] https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_filtering/py_filtering.html?highlight=gaussianblur#gaussian-filtering
     [3] https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_morphological_ops/py_morphological_ops.html

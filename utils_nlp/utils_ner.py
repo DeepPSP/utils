@@ -11,8 +11,8 @@ def bio_to_bioes(input_fp:str, output_fp:str, sep:str) -> NoReturn:
 
     convert the bio format annotated file to bioes format
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     input_fp: str,
         the path of the input BIO format file
     output_fp: str,

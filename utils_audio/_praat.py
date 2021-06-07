@@ -28,8 +28,8 @@ class PMSound(pm.Sound):
                  sampling_frequency:Optional[Real]=None,
                  start_time:Optional[Real]=None, file_path:Optional[str]=None) -> NoReturn:
         """
-        Parameters:
-        -----------
+        Parameters
+        ----------
         values: ndarray, optional,
             values of the audio recording
         sampling_frequency: real number, optional,
@@ -60,8 +60,8 @@ class PMSound(pm.Sound):
                    tolerance:Real=1.0e-6) -> pm.Formant:
         """
         
-        Parameters:
-        -----------
+        Parameters
+        ----------
         method: str, default "burg", can also be "sl", "keep all", "robust",
         time_step: real number, optional, units in (s),
         max_number_of_formants: real number, default 5.0,
@@ -91,8 +91,8 @@ class PMSound(pm.Sound):
                           convert_to_dB_values:bool=True) -> pm.Matrix:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         window_length: real number, default 0.015, units in (s),
         time_step: real number, default 0.005, units in (s),
         position_of_first_filter: real number, default 100, units in (mel),
@@ -112,8 +112,8 @@ class PMSound(pm.Sound):
                              pre_emphasis_from:Real=50) -> pm.Matrix:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         pitch_floor: real number, default 60, units in (Hz),
         time_step: real number, default 0.002, units in (s)
         maximum_frequency: real number, default 5000, units in (Hz),
@@ -130,8 +130,8 @@ class PMSound(pm.Sound):
                                 maximum_frequency:Real=5000,
                                 pre_emphasis_from:Real=50) -> pm.Matrix:
         """
-        Parameters:
-        -----------
+        Parameters
+        ----------
         to write
 
         TODO: other operations including substract trend, smooth
@@ -144,8 +144,8 @@ class PMSound(pm.Sound):
     def to_point_process_periodic_cc(self, minimum_pitch:Real=75, maximum_pitch:Real=600) -> pm.Data:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         minimum_pitch: real number, default 75, units in (Hz),
         maximum_pitch: real number, default 600, units in (Hz),
         """
@@ -158,8 +158,8 @@ class PMSound(pm.Sound):
                                         include_minima:bool=False) -> pm.Data:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         minimum_pitch: real number, default 75, units in (Hz),
         maximum_pitch: real number, default 600, units in (Hz),
         include_maxima: bool, default True,
@@ -174,8 +174,8 @@ class PMSound(pm.Sound):
                                  interpolation:str="Sinc70") -> pm.Data:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         channel: real number or str,
         include_maxima: bool, default True,
         include_minima: bool, default False,
@@ -188,8 +188,8 @@ class PMSound(pm.Sound):
     def to_point_process_zeroes(self, channel:Union[Real, str], include_raisers:bool=True, include_fallers:bool=False) -> pm.Data:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         channel: real number or str,
         include_raisers: bool, default True,
         include_fallers: bool, default False,
@@ -205,8 +205,8 @@ class PMSound(pm.Sound):
                             maximum_frequency:Real=0) -> pm.Data:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         window_length: real number, default 0.015,
         time_step: real number, default 0.005,
         position_of_first_filter: real number, default 1,
@@ -218,8 +218,8 @@ class PMSound(pm.Sound):
     def to_cochleagram(self, time_step:Real=0.01, frequency_resolution:Real=0.1, window_length:Real=0.003, forward_masking_time:Real=0.03) -> pm.Data:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         time_step: real number, default 0.01,
         frequency_resolution: real number, default 0.1,
         window_length: real number, default 0.003,
@@ -236,8 +236,8 @@ class PMSound(pm.Sound):
                **kwargs:Any) -> pm.Data:
         """
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         method: str,
         prediction_order: int 16,
         window_length:real number, default 0.025,

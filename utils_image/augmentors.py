@@ -5,7 +5,8 @@ File: augmentors.py
 Author: wenhao
 remarks: utilities for image geometrical (pre-)processing, for the use of data augmentations, etc.
 
-NOTE:
+NOTE
+----
 if train models using keras,
 use ImageDataGenerator from keras.preprocessing.image instead via
 >>> from keras.preprocessing.image import ImageDataGenerator
@@ -55,7 +56,7 @@ def image_augmentation(img:np.ndarray,
 
     perform augmentations on `img`
 
-    Parameters:
+    Parameters
     ----------
     img: ndarray,
         the image to be augmented
@@ -66,13 +67,13 @@ def image_augmentation(img:np.ndarray,
         a sublist (the entire list if is None) of ["rotation", "shift", "shear", "zoom",]
     verbose: int, default 0,
 
-    Returns:
-    --------
+    Returns
+    -------
     img_augs: list of ndarray,
         the list consisting of augmented images of `img`
 
-    For face2gene:
-    --------------
+    For face2gene
+    -------------
     Each facial region is randomly augmented by rotation with a range of 5 degrees, small vertical and horizontal shifts (shift range of 0.05), shear transformation (shear range of 5π / 180) and random zoom (zoom range of 0.05) horizontal flip
     """
     img_augs = []
@@ -120,8 +121,8 @@ def _image_rotation(img:np.ndarray, angle:Real, num:int, verbose:int=0) -> np.nd
 
     rotate `img` `num` times with angles randomly chosen in the range of (-`abs(angle)`, `abs(angle)`)
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image to be rotated
     angle: real number,
@@ -130,8 +131,8 @@ def _image_rotation(img:np.ndarray, angle:Real, num:int, verbose:int=0) -> np.nd
         times of rotations applied to `img`
     verbose: int, default 0,
     
-    Returns:
-    --------
+    Returns
+    -------
     l_rotated, list of ndarray,
         the rotated images
     """
@@ -155,8 +156,8 @@ def _image_shift(img:np.ndarray, ratio:float, num:int, verbose:int=0) -> np.ndar
 
     shift `img` `num` times with ratios randomly chosen in the range (-`abs(ratio)`, `abs(ratio)`)
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image to be shifted
     ratio: float,
@@ -165,8 +166,8 @@ def _image_shift(img:np.ndarray, ratio:float, num:int, verbose:int=0) -> np.ndar
         times of shifts applied to `img`
     verbose: int, default 0,
     
-    Returns:
-    --------
+    Returns
+    -------
     l_shifted, list of ndarray,
         the shifted images
     """
@@ -195,8 +196,8 @@ def _shear_transformation(img:np.ndarray, angle:Real, num:int, verbose:int=0) ->
 
     apply horizontal shear transformation to `img` `num` times with angles randomly chosen in the range (-`abs(angle)`, `abs(angle)`)
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image to perform shear transformations
     angle: real number,
@@ -205,8 +206,8 @@ def _shear_transformation(img:np.ndarray, angle:Real, num:int, verbose:int=0) ->
         times of shear transformations applied to `img`
     verbose: int, default 0,
     
-    Returns:
-    --------
+    Returns
+    -------
     l_sheared, list of ndarray,
         the sheared images
     """
@@ -232,8 +233,8 @@ def _image_zoom(img:np.ndarray, ratio:float, num:int, verbose:int=0) -> np.ndarr
 
     zoom `img` `num` times with ratios randomly chosen in the range (-`abs(ratio)`, `abs(ratio)`)
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image to be zoomed
     ratio: float,
@@ -242,8 +243,8 @@ def _image_zoom(img:np.ndarray, ratio:float, num:int, verbose:int=0) -> np.ndarr
         times of zoomings applied to `img`
     verbose: int, default 0,
     
-    Returns:
-    --------
+    Returns
+    -------
     l_shifted, list of ndarray,
         the shifted images
     """
@@ -299,8 +300,8 @@ def _generate_coordinates(x_low:int, x_high:int, y_low:int, y_high:int):
 def add_border(img:np.ndarray, color:ArrayLike=[0,0,0], add_size:Union[int,ArrayLike_Int]=100) -> np.ndarray:
     """
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     img: ndarray,
         the image
     color: array_like,
@@ -341,8 +342,8 @@ def add_background(raw_img:np.ndarray,
 
     raw_img, bkgd_img in BGR format
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     raw_img: ndarray,
         the image to add background
     bkgd_img: ndarray,
@@ -357,8 +358,8 @@ def add_background(raw_img:np.ndarray,
         verbosity
     kwargs: dict,
 
-    Returns:
-    --------
+    Returns
+    -------
     sys_img: ndarray, or no return,
     """
     crop_ratio = kwargs.get("crop_ratio", 0.2)
