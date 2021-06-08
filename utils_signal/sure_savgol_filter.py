@@ -29,7 +29,7 @@ def fit_savgol_sure(data:ArrayLike,
                     verbose:int=0) -> np.ndarray:
     """ finished, to reduce time complexity,
 
-    best paramters for ecg denoising:
+    best parameters for ecg denoising:
         orders=[1,5]
         radii=20ms(e.g. 5 for frequency=250)
 
