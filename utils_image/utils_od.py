@@ -626,8 +626,8 @@ def nms(boxes:np.ndarray,
     """
     non-maximum suppression
 
-    Paramters
-    ---------
+    Parameters
+    ----------
     boxes: ndarray, of shape (n, 4),
         the bounding boxes
     confs: ndarray, of shape (n,),
