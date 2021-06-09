@@ -286,6 +286,7 @@ class ConvexCone2D(GeometricObject):
             vector of the left (compared to the axis vector) border line
         right_vec:
             vector of the right (compared to the axis vector) border line
+        kwargs: auxilliary key word arguments
 
         NOTE
         ----
@@ -523,8 +524,7 @@ class Fan2D(ConvexCone2D):
         angle: array_like, optional,
         left_vec: array_like, optional,
         right_vec: array_like, optional,
-        kwargs: dict,
-            extra key word arguments
+        kwargs: auxilliary key word arguments
         """
         super().__init__(apex, axis_vec, angle, left_vec, right_vec, **kwargs)
         self.radius = radius

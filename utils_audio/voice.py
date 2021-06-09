@@ -100,6 +100,7 @@ class Voice(object):
         l_file_path: list of str, optional,
             list of the paths of the audio files,
             voices in these files will be concatenated
+        kwargs: auxilliary key word arguments
         """
         self.values = values
         self.filtered_values = None
@@ -270,6 +271,7 @@ class Voice(object):
             format of the file to save
         fs: real, optional,
             sampling frequency of the file to save
+        kwargs: auxilliary key word arguments
         """
         fn, ext = os.path.splitext(filename)
         fmt = ext.replace(".", "") or fmt
@@ -1031,6 +1033,7 @@ class Voice(object):
         ----------
         items: str or list of str, optional,
             items to plot, including "spectrogram", "signal", "pitches", "formants", "intensity", "vuv"
+        kwargs: auxilliary key word arguments
 
         TODO: add time_range
         """
@@ -1135,6 +1138,10 @@ class Voice(object):
 
     def _plot_spectrogram(self, ax, cmap, dynamic_range=70, **kwargs:Any) -> NoReturn:
         """
+
+        Parameters
+        ----------
+        to write
         """
         font_prop = kwargs.get("font_prop", None)
         X, Y = self.spectrogram.x_grid(), self.spectrogram.y_grid()
@@ -1147,9 +1154,10 @@ class Voice(object):
     
     def _plot_praat(self, **kwargs:Any) -> NoReturn:
         """
+
         Parameters
         ----------
-
+        to write
         """
         if "plt" not in dir():
             import matplotlib.pyplot as plt
@@ -1229,7 +1237,7 @@ class Voice(object):
 
         Parameters
         ----------
-
+        to write
         """
         c = self.energy_proportion_curve(lowcut=lowcut, highcut=highcut, **kwargs)
         ts = c[:,0]

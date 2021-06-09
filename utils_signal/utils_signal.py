@@ -1534,6 +1534,7 @@ class MovingAverage(object):
         ----------
         data: array_like,
             the series data to compute its moving average
+        kwargs: auxilliary key word arguments
         """
         self.data = np.array(data)
         self.verbose = kwargs.get("verbose", 0)

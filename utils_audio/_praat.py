@@ -256,8 +256,14 @@ class PMSound(pm.Sound):
         return lpc
 
 
-    def draw(self, items:Optional[List[str]]=None, **kwargs):
+    def draw(self, items:Optional[List[str]]=None, **kwargs:Any) -> NoReturn:
         """
+
+        Parameters
+        ----------
+        items: list of str, optional,
+            items to draw (currently not used, all will be drawn)
+        kwargs: auxilliary key word arguments
         """
         import matplotlib.pyplot as plt
         fig, (ax_t, ax_f) = plt.subplots(2,1,figsize=(int(25*self.xmax),10),sharex=True)
@@ -276,8 +282,12 @@ class PMSound(pm.Sound):
         ax_f2.set_xlim([self.xmin, self.xmax])
         plt.show()
         
-    def _plot_spectrogram(self, ax, dynamic_range=70, **kwargs):
+    def _plot_spectrogram(self, ax, dynamic_range=70, **kwargs:Any) -> NoReturn:
         """
+
+        Parameters
+        ----------
+        to write
         """
         if "plt" not in dir():
             import matplotlib.pyplot as plt
@@ -293,6 +303,10 @@ class PMSound(pm.Sound):
 
     def _plot_intensity(self, ax):
         """
+
+        Parameters
+        ----------
+        to write
         """
         intensity = self.to_intensity()
         ax.plot(intensity.xs(), intensity.values.T, "o-", markersize=4, linewidth=0.6, color="yellow")
@@ -304,6 +318,10 @@ class PMSound(pm.Sound):
         """
         Extract selected pitch contour, and
         replace unvoiced samples by NaN to not plot
+
+        Parameters:
+        -----------
+        to write
         """
         pitches = self.to_pitch()
         pitch_values = pitches.selected_array["frequency"]
@@ -316,6 +334,10 @@ class PMSound(pm.Sound):
 
     def _plot_formant(self, ax, maximum_formant=5):
         """
+
+        Parameters
+        ----------
+        to write
         """
         formants = self.to_formant_burg()
         x = formants.xs()

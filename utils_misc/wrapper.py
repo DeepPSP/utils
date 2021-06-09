@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 
-def indicator_enter_leave_func(verbose:int=0):
+def indicator_enter_leave_func(verbose:int=0) -> callable:
     """
 
     Parameters
@@ -23,7 +23,7 @@ def indicator_enter_leave_func(verbose:int=0):
     nl = "\n"
     def dec_outer(fn:callable):
         @wraps(fn)
-        def dec_inner(*args, **kwargs):
+        def dec_inner(*args, **kwargs) -> callable:
             if verbose >= 1:
                 print(f"{nl}{'*'*6}  entering function {fn.__name__}  {'*'*6}")
                 start = time.time()
@@ -36,7 +36,12 @@ def indicator_enter_leave_func(verbose:int=0):
     return dec_outer
 
 
-def trivial_jit(signature_or_function=None, locals={}, target="cpu", cache=False, pipeline_class=None, **options):
+def trivial_jit(signature_or_function=None,
+                locals={},
+                target="cpu",
+                cache=False,
+                pipeline_class=None,
+                **options) -> callable:
     """
 
     Parameters

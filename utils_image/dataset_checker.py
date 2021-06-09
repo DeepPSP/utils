@@ -52,6 +52,7 @@ class ObjectDetectionCheck(object):
             names of the classes to check,
             images and bounding box annotations with classes belonging to check_cls will be checked,
             if None, all classes of bounding boxes will be checked
+        kwargs: auxilliary key word arguments
         """
         self.checker = checker
         self.check_col = check_col
