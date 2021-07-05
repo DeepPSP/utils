@@ -2,8 +2,8 @@
 """
 use various backends for audio reading, features extracting, etc.
 
-About the python backends:
---------------------------
+About the python backends
+-------------------------
 wave:
     the native python module,
     only has basic audio io operations
@@ -346,8 +346,8 @@ class Voice(object):
             time_step: Optional[Positive[float]]=None,
             subtract_mean: bool=True
 
-        References:
-        -----------
+        References
+        ----------
         [1] https://en.wikipedia.org/wiki/Sound_intensity
         """
         if time_range is None:
@@ -724,8 +724,8 @@ class Voice(object):
         time_range: array_like, optional,
             of the form [start_sec, end_sec], time range for computation
 
-        References:
-        -----------
+        References
+        ----------
         [1] https://headfonics.com/2017/12/what-is-jitter-in-audio/
         """
         if time_range is None:
