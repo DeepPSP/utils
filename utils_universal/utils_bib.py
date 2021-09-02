@@ -70,12 +70,14 @@ class BibLookup(object):
         # "22331878" or 
         # "http://www.ncbi.nlm.nih.gov/pubmed/22331878"
         self.__pmid_pattern_prefix = f"pmid{colon}|pmcid{colon}"  # and pmcid
-        self.__pmid_pattern = f"^(?:{self.__pmid_pattern_prefix})?(?:\d+|pmc\d+(?:\.\d+)?)$"
+        # self.__pmid_pattern = f"^(?:{self.__pmid_pattern_prefix})?(?:\d+|pmc\d+(?:\.\d+)?)$"
         self.__pmurl_pattern_prefix = "(?:https?:\/\/)?(?:pubmed\.ncbi\.nlm\.nih\.gov\/|www\.ncbi\.nlm\.nih\.gov\/pubmed\/)"
-        self.__pmurl_pattern = f"^(?:{self.__pmurl_pattern_prefix})?(?:\d+|pmc\d+(?:\.\d+)?)(?:\/)?$"
+        # self.__pmurl_pattern = f"^(?:{self.__pmurl_pattern_prefix})?(?:\d+|pmc\d+(?:\.\d+)?)(?:\/)?$"
+        self.__pm_pattern_prefix = f"{self.__pmurl_pattern_prefix}|{self.__pmid_pattern_prefix}"
+        self.__pm_pattern = f"^(?:{self.__pm_pattern_prefix})?(?:\d+|pmc\d+(?:\.\d+)?)(?:\/)?$"
         # arXiv examples:
         # "arXiv:1501.00001v1", "arXiv:cs/0012022"
-        self.__arxiv_pattern_prefix = f"arxiv{colon}"
+        self.__arxiv_pattern_prefix = f"((?:(?:(?:https?:\/\/)?arxiv.org\/)?abs\/)|arxiv{colon})"
         self.__arxiv_pattern = f"^(?:{self.__arxiv_pattern_prefix})?(?:[\w\-]+\/\d+|\d+\.\d+(v(\d+))?)$"
         # self.__arxiv_pattern_old = f"^(?:{self.__arxiv_pattern_prefix})?[\w\-]+\/\d+$"
         self.__default_err = "Not Found"
@@ -146,21 +148,10 @@ class BibLookup(object):
                 "headers": {"Accept": "application/x-bibtex; charset=utf-8"},
             }
             category = "doi"
-        elif re.search(self.__pmid_pattern, idtf):
+        elif re.search(self.__pm_pattern, idtf):
             url = "http://www.pubmedcentral.nih.gov/utils/idconv/v1.0/?format=json&ids=" + \
                 re.sub(
-                    self.__pmid_pattern_prefix,
-                    "",
-                    idtf,
-                ).strip("/")
-            fc = {
-                "url": url,
-            }
-            category = "pm"
-        elif re.search(self.__pmurl_pattern, idtf):
-            url = "http://www.pubmedcentral.nih.gov/utils/idconv/v1.0/?format=json&ids=" + \
-                re.sub(
-                    self.__pmurl_pattern_prefix,
+                    self.__pm_pattern_prefix,
                     "",
                     idtf,
                 ).strip("/")
@@ -182,6 +173,9 @@ class BibLookup(object):
         else:
             warnings.warn("unrecognized indentifier (none of doi, pmid, pmcid, pmurl, arxiv)")
             category, fc = "error", {}
+        if self.verbose > 1:
+            print(f"category = {category}")
+            print(f"feed content = {fc}")
         return category, fc
 
 
@@ -202,6 +196,8 @@ class BibLookup(object):
         """
         r = requests.post(**feed_content)
         res = r.content.decode("utf-8")
+        if self.verbose > 1:
+            print(res)
         return res
 
 
@@ -221,8 +217,12 @@ class BibLookup(object):
             decoded query result
         """
         r = requests.post(**feed_content)
+        if self.verbose > 1:
+            print(r.json())
         mid_res = r.json()["records"][0]
         doi = mid_res.get("doi", "")
+        if self.verbose > 1:
+            print(f"doi = {doi}")
         if doi:
             _, feed_content = self._obtain_feed_content(doi)
             res = self._handle_doi(feed_content)
@@ -248,6 +248,8 @@ class BibLookup(object):
         """
         r = requests.get(**feed_content)
         parsed = feedparser.parse(r.content.decode("utf-8")).entries[0]
+        if self.verbose > 1:
+            print(parsed)
         title = re.sub("[\s]+", " ", parsed["title"])  # sometimes this field has "\n"
         if title == "Error":
             res = self.__default_err
@@ -345,3 +347,25 @@ class BibLookup(object):
         if s_str.endswith(","):
             new_s += ","
         return new_s
+
+
+    @property
+    def doi_pattern(self) -> str:
+        return self.__doi_pattern
+
+    @property
+    def arxiv_pattern(self) -> str:
+        return self.__arxiv_pattern
+
+    @property
+    def pm_pattern(self) -> str:
+        return self.__pm_pattern
+
+    @property
+    def pubmed_pattern(self) -> str:
+        return self.__pm_pattern
+
+    def debug(self) -> NoReturn:
+        """
+        """
+        self.verbose = 2
